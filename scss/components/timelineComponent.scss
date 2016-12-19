@@ -1,0 +1,13 @@
+#timeline {
+  
+  span {
+    margin: 0 10px;
+    font-size: 12px;
+
+    &.selected {
+      font-weight: bold;
+      color: maroon;
+    }
+  }
+
+}

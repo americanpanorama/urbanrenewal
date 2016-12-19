@@ -39,3 +39,4 @@ node_modules
 # misc project-specifics
 dist
 build
+*.sublime-*

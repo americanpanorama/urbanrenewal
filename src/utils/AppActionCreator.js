@@ -2,12 +2,38 @@ import AppDispatcher from './AppDispatcher';
 
 export const AppActionTypes = {
 
+  storeChanged: 'storeChanged',
+  loadInitialData: 'loadInitialData',
   itemSelected: 'itemSelected',
+  citySelected: 'citySelected',
+  dateSelected: 'dateSelected',
   mapMoved: 'mapMoved'
 
 };
 
 export const AppActions = {
+
+  loadInitialData: (state, hashState) => {
+    AppDispatcher.dispatch({
+      type: AppActionTypes.loadInitialData,
+      state: state,
+      hashState: hashState
+    });
+  },
+
+  citySelected: (city_id) => {
+    AppDispatcher.dispatch({
+      type: AppActionTypes.citySelected,
+      value: city_id
+    });
+  },
+
+  dateSelected: (date) => {
+    AppDispatcher.dispatch({
+      type: AppActionTypes.dateSelected,
+      value: date
+    });
+  },
 
   /**
    * Dispatch action when an item is selected (usually by user action).

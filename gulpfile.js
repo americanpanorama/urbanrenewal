@@ -3,8 +3,8 @@ var gulp             = require('gulp'),
   buffer           = require('vinyl-buffer'),
   browserify       = require('browserify'),
   watchify         = require('watchify'),
-  babelify         = require('babelify'),
   parcelify        = require('parcelify'),
+  babelify         = require('babelify'),
   glob             = require('glob'),
   rimraf           = require("rimraf"),
   gulpLoadPlugins  = require('gulp-load-plugins'),
@@ -24,6 +24,7 @@ var dependencies = [
   'queue-async',
   'react',
   'react-dom',
+  'react-addons-transition-group',
   'react-leaflet'
 ];
 
@@ -68,7 +69,8 @@ function browserifyTask (options) {
         .pipe($.notify({
           'onLast': true,
           'message': function () { return 'APP bundle built in ' + (Date.now() - start) + 'ms'; }
-        }));
+        }))
+        .pipe($.connect.reload());
     } else {
       appBundler.bundle()
         .on('error', $.util.log)
@@ -174,7 +176,7 @@ function webserverTask(options) {
   return $.connect.server({
     root: './build/',
     port: port,
-    livereload: false
+    livereload: true
   });
 }
 
@@ -223,15 +225,15 @@ gulp.task('default', function () {
 
     browserifyTask({
       "development" : true,
-      "lintsrc"           : 'src/**/*.js*',
-      "src"       : './src/main.jsx',
+      "lintsrc"     : 'src/**/*.js*',
+      "src"         : './src/main.jsx',
       "dest"        : './build'
     });
 
     cssTask({
       "development" : true,
-      "src"       : './scss/*.scss',
-      "watchfiles"    : './scss/**/*.scss',
+      "src"         : './scss/*.scss',
+      "watchfiles"  : './scss/**/*.scss',
       "dest"        : './build'
     });
 
