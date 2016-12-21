@@ -1,16 +1,16 @@
 import * as React from 'react';
 import { PropTypes } from 'react';
 
+import GeographyStore from '../stores/GeographyStore';
+
 export default class USMap extends React.Component {
 
-  constructor (props) {
-    super(props);
-  }
+  constructor (props) { super(props); }
 
   render () {
     return (
       <g>
-        { this.props.data.map(polygon => {
+        { GeographyStore.getStatesGeojson().map(polygon => {
           return (
             <path
               key={ polygon.id }

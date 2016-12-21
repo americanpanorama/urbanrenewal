@@ -5,6 +5,7 @@ export const AppActionTypes = {
   storeChanged: 'storeChanged',
   loadInitialData: 'loadInitialData',
   itemSelected: 'itemSelected',
+  categorySelected: 'categorySelected',
   citySelected: 'citySelected',
   dateSelected: 'dateSelected',
   mapMoved: 'mapMoved'
@@ -18,6 +19,13 @@ export const AppActions = {
       type: AppActionTypes.loadInitialData,
       state: state,
       hashState: hashState
+    });
+  },
+
+  categorySelected: (category_id) => {
+    AppDispatcher.dispatch({
+      type: AppActionTypes.categorySelected,
+      value: category_id
     });
   },
 

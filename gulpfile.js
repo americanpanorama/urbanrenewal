@@ -1,26 +1,28 @@
-var gulp             = require('gulp'),
+var gulp           = require('gulp'),
   source           = require('vinyl-source-stream'),
   buffer           = require('vinyl-buffer'),
   browserify       = require('browserify'),
   watchify         = require('watchify'),
   parcelify        = require('parcelify'),
   babelify         = require('babelify'),
-  glob             = require('glob'),
   rimraf           = require("rimraf"),
-  gulpLoadPlugins  = require('gulp-load-plugins'),
-  exec             = require('child_process').exec;
+  gulpLoadPlugins  = require('gulp-load-plugins');
  
 // Automatically load any gulp plugins in your package.json
 var $ = gulpLoadPlugins();
 
+var dev = false;
+
+var htmlSources = './src/*.html',
+  devdir = './build',
+  proddur = './dist';
+
 // External dependencies you do not want to rebundle while developing,
 // but include in your application deployment
 var dependencies = [
-  '@panorama/toolkit',
   'd3',
   'flux',
   'leaflet',
-  'lodash',
   'queue-async',
   'react',
   'react-dom',
@@ -29,6 +31,15 @@ var dependencies = [
 ];
 
 var WEB_SERVER_PORT = 8888;
+
+gulp.task('html', function() {
+  gulp.src(htmlSources)
+    .pipe($.copy((dev) ? devdir : proddev, {
+      "prefix":  1
+    }));
+});
+
+
 
 function browserifyTask (options) {
 
@@ -58,7 +69,6 @@ function browserifyTask (options) {
   function createBundle() {
 
     var start = Date.now();
-    console.log('Building APP bundle');
     if (options.development) {
       lintTask(options);
       appBundler.bundle()
@@ -68,6 +78,7 @@ function browserifyTask (options) {
         .pipe($.livereload())
         .pipe($.notify({
           'onLast': true,
+          'title': 'app bundle',
           'message': function () { return 'APP bundle built in ' + (Date.now() - start) + 'ms'; }
         }))
         .pipe($.connect.reload());
@@ -107,14 +118,13 @@ function browserifyTask (options) {
 
     // Run the vendor bundle
     var start = new Date();
-    console.log('Building VENDORS bundle');
     vendorsBundler.bundle()
       .on('error', $.util.log)
       .pipe(source('vendors.js'))
       .pipe(gulp.dest(options.dest))
       .pipe($.notify({
         'onLast': true,
-        'title': 'VENDORS bundle',
+        'title': 'vendors bundle',
         'message': function () { return 'built in ' + (Date.now() - start) + 'ms'; },
         'notifier': function () {}
       }));
@@ -127,13 +137,12 @@ function cssTask(options) {
   if (options.development) {
     var run = function () {
       var start = new Date();
-      console.log('Building CSS bundle');
       gulp.src(options.src)
         .pipe($.sass())
         .pipe(gulp.dest(options.dest))
         .pipe($.notify({
           'onLast': true,
-          'title': 'CSS bundle',
+          'title': 'css bundle',
           'message': function () { return 'built in ' + (Date.now() - start) + 'ms'; },
           'notifier': function () {}
         }));
@@ -155,8 +164,9 @@ function copyTask(options) {
       }));
 }
 
+
+
 function lintTask(options) {
-  console.log('ESLinting...');
   return gulp.src(options.lintsrc)
     .pipe($.eslint())
     .pipe($.eslint.format())
@@ -180,18 +190,6 @@ function webserverTask(options) {
   });
 }
 
-function basemapsTask() {
-  console.log('Building basemaps...');
-  exec('npm run build:basemaps', function (err, stdout, stderr) {
-    if (err) {
-      console.log(stderr);
-    } else {
-      console.log(stdout.trim());
-    }
-    console.log('Basemaps build complete.');
-  });
-}
-
 function staticFolder() {
   return gulp.src("static/**")
   .pipe($.copy("build/"));
@@ -202,39 +200,38 @@ function staticDistFolder() {
   .pipe($.copy("./dist"));
 }
 
+gulp.task('setAsDev', function() {
+  dev = true;
+});
+
+gulp.task('dev', function() {
+  dev = true;
+  gulp.task('builddev', ['html']);
+});
+
 // Local development workflow:
 // build component and test on local server (localhost:8888)
 // with watcher to pick up changes and rebuild
 gulp.task('default', function () {
-
   rimraf("./build/**", function() {
-
+    // // copy html files to build
     copyTask({
       "src"               : "./src/*.html",
-      "dest"              : "./build"
+      "dest"              : devdir
     });
-
-    copyTask({
-      // "src"               : "../panorama/dist/*.css*",
-      "src"               : "./node_modules/@panorama/toolkit/dist/*.css*",
-      "dest"              : "./build",
-      "pathDepth"         : 4
-    });
-
-    basemapsTask();
 
     browserifyTask({
       "development" : true,
       "lintsrc"     : 'src/**/*.js*',
       "src"         : './src/main.jsx',
-      "dest"        : './build'
+      "dest"        : devdir
     });
 
     cssTask({
       "development" : true,
       "src"         : './scss/*.scss',
       "watchfiles"  : './scss/**/*.scss',
-      "dest"        : './build'
+      "dest"        : devdir
     });
 
     webserverTask();
@@ -253,14 +250,6 @@ gulp.task('dist', function () {
       "src" : "./src/*.html",
       "dest" : "./dist"
     });
-
-    copyTask({
-      "src"               : "./node_modules/@panorama/toolkit/dist/*.css*",
-      "dest"              : "./dist",
-      "pathDepth"         : 4
-    });
-
-    basemapsTask();
 
     browserifyTask({
       "development" : false,

@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { PropTypes } from 'react';
 
+import HighwaysStore from '../stores/HighwaysStore';
+
 export default class Highways extends React.Component {
 
   constructor (props) {
@@ -10,7 +12,7 @@ export default class Highways extends React.Component {
   render () {
     return (
       <g>
-        { this.props.data.map(polygon => {
+        { HighwaysStore.getHighwaysList().map(polygon => {
           return (
             <path
               key={ 'highwaysOpened' + polygon.properties.year_open }

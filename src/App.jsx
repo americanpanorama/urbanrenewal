@@ -12,6 +12,7 @@ import HighwaysStore from './stores/HighwaysStore';
 import TimelineComponent from './components/TimelineComponent.jsx';
 import USMap from './components/USMapComponent.jsx';
 import CityStats from './components/CityStats.jsx';
+import YearStats from './components/YearStats.jsx';
 
 // utils
 // TODO: refactor to use same structure as PanoramaDispatcher;
@@ -29,7 +30,7 @@ class App extends React.Component {
     this.state = this.getDefaultState();
 
     // bind handlers
-    const handlers = ['storeChanged','onCityClicked','onYearClicked'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onYearClicked'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
   }
 
@@ -79,9 +80,9 @@ class App extends React.Component {
   onWindowResize (event) {
   }
 
-  onCityClicked(event) {
-    AppActions.citySelected(event.target.id);
-  }
+  onCategoryClicked(event) { AppActions.categorySelected(event.target.id); }
+
+  onCityClicked(event) { AppActions.citySelected(event.target.id); }
 
   onYearClicked(event) {
     let year = parseInt(event.target.id);
@@ -94,31 +95,30 @@ class App extends React.Component {
   }
 
   render () {
-    console.log(CitiesStore.getCategories());
-
     return (
       <div className='container full-height'>
         <h1>Urban Renewal, 1949-1973</h1>
         <USMap 
           state={ this.state }
-          geojson={ GeographyStore.getStatesGeojson() }
-          highways={ HighwaysStore.getHighwaysList() }
-          cities={ CitiesStore.getCitiesDataForYearAndCategory(this.state.year, 'urban renewal grants dispursed') }
           onCityClicked={ this.onCityClicked }
         />
         <TimelineComponent 
           onClick={ this.onYearClicked }
           year={ this.state.year }
         />
-        { CitiesStore.getSelected() ? 
+        <YearStats
+          year={ this.state.year }
+          totals={ CitiesStore.getYearTotals(this.state.year) }
+          onCategoryClicked={ this.onCategoryClicked }
+        />
+        { CitiesStore.getSelectedCity() ? 
           <CityStats 
-            { ...CitiesStore.getCityData(CitiesStore.getSelected()) }
+            { ...CitiesStore.getCityData(CitiesStore.getSelectedCity()) }
             categories={ CitiesStore.getCategories() }
             year={ this.state.year }
           /> :
           null
         }
-
       </div>
     );
   }

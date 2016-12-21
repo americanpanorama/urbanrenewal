@@ -16,10 +16,10 @@ export default class Dorlings extends React.Component {
     d3.select(ReactDOM.findDOMNode(this))
       .transition()
       .duration(750)
-      .attr('r', Math.sqrt(this.props.value / 900000))
+      .attr('r', this.props.r)
       .each('end', () => {
         this.setState({
-          r: Math.sqrt(this.props.value / 900000)
+          r: this.props.r
         });
         callback();
       });
@@ -37,14 +37,15 @@ export default class Dorlings extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.value != nextProps.value) {
+    if (this.props.value != nextProps.value || this.props.color != nextProps.color) {
       d3.select(ReactDOM.findDOMNode(this))
         .transition()
         .duration(750)
-        .attr('r', Math.sqrt(nextProps.value / 900000))
+        .attr('r', this.props.r)
+        .style('fill', this.props.color)
         .each('end', () => {
           this.setState({
-            r: Math.sqrt(nextProps.value / 900000)
+            r: this.props.r
           });
         });
     }
@@ -53,13 +54,13 @@ export default class Dorlings extends React.Component {
   render () {
     return (
       <circle
-        cx={ this.props.projection(this.props.lngLat)[0] }
-        cy={ this.props.projection(this.props.lngLat)[1] }
+        cx={ this.props.cx }
+        cy={ this.props.cy }
         r={ this.state.r }
         style={ {
-          fill: 'grey',
+          fill: this.props.color,
           fillOpacity: 0.4,
-          stroke: 'purple',
+          stroke: this.props.color,
           strokeWidth: 0.5,
           strokeOpacity: 0.9
         } }

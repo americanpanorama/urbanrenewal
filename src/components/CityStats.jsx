@@ -1,21 +1,10 @@
 import * as React from 'react';
 import { PropTypes } from 'react';
+import CitiesStore from '../stores/CitiesStore.js';
+
 
 export default class CityStats extends React.Component {
-
-  constructor (props) {
-    super(props);
-  }
-
-  componentWillReceiveProps(nextProps) {
-
-  }
-
-  componentDidMount() {
-  }
-
-  componentDidUpdate() {
-  }
+  constructor (props) { super(props); }
 
   formatValue(value, category) {
     let formatted = '';
@@ -34,10 +23,10 @@ export default class CityStats extends React.Component {
       <div className='cityStats'>
         <h2>{ this.props.city + ', ' + this.props.state }</h2>
         <ul>
-        { this.props.categories.map(category => {
-          if (this.props.yearsData[this.props.year][category.category]) {
+        { Object.keys(this.props.categories).map(category_id => {
+          if (this.props.yearsData[this.props.year][category_id]) {
             return (
-              <li key={ 'cat' + category.category_id }>{ category.category + ": " + this.formatValue(this.props.yearsData[this.props.year][category.category], category.unit) }</li>
+              <li key={ 'cat' + category_id }>{ CitiesStore.getCategoryName(category_id) + ": " + this.formatValue(this.props.yearsData[this.props.year][category_id], CitiesStore.getCategoryUnit(category_id)) }</li>
             );
           }
         }) }

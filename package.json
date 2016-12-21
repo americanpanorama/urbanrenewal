@@ -6,7 +6,6 @@
   "scripts": {
     "start": "gulp",
     "dist": "gulp dist",
-    "test": "gulp test",
     "lint": "eslint ./src",
     "build:basemaps": "node_modules/.bin/cartodb-yaml ./basemaps/cartodb/basemaps.yml > ./basemaps/cartodb/basemaps.json"
   },
@@ -48,9 +47,8 @@
     "cartodb-yaml": "^0.1.0",
     "eslint": "^3.12.2",
     "eslint-plugin-react": "^6.8.0",
-    "glob": "^5.0.14",
+    "glob": "^7.1.1",
     "gulp": "^3.9.0",
-    "gulp-concat": "^2.6.0",
     "gulp-connect": "^2.2.0",
     "gulp-copy": "0.0.2",
     "gulp-cssmin": "^0.1.7",

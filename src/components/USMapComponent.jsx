@@ -7,11 +7,11 @@ import GeoStates from './GeoStates.jsx';
 import Highways from './HighwaysComponent.jsx';
 import Dorlings from './DorlingsComponent.jsx';
 
+import CitiesStore from '../stores/CitiesStore.js';
+
 export default class USMap extends React.Component {
 
-  constructor (props) {
-    super(props);
-  }
+  constructor (props) { super(props); }
 
   render () {
     let projection = d3.geo.albersUsa()
@@ -21,28 +21,30 @@ export default class USMap extends React.Component {
     let path = d3.geo.path()
       .projection(projection);
 
+    let r = d3.scale.sqrt()
+      .domain([0, CitiesStore.getCategoryMaxForCity('selected')])
+      .range([0,20]);
+
     return (
       <svg 
         width={900}  
         height={600}
         className='ussvg'
       >
-        <GeoStates 
-          data={ this.props.geojson }
-          path={ path }
-        />
+        <GeoStates path={ path } />
         <Highways 
-          data={ this.props.highways }
           path={ path }
           state={ this.props.state }
         />
         <ReactTransitionGroup component='g' className='transitionGroup'>
-          { this.props.cities.map((cityData, i) => (
+          { CitiesStore.getCitiesDataForYearAndCategory(this.props.state.year, CitiesStore.getSelectedCategory()).map((cityData, i) => (
             <Dorlings
-              { ...cityData }
-              projection={ projection }
-              key={'cityCircle' + cityData.city_id}
-              onCityClicked={ this.props.onCityClicked }
+              r={ r(cityData.value) }
+              cx={ projection(cityData.lngLat)[0] }
+              cy={ projection(cityData.lngLat)[1] }
+              key={'cityCircle' + cityData.city_id }
+              color={ CitiesStore.getCategoryColor('selected') }
+              city_id={ cityData.city_id }
             />
           ))}
         </ReactTransitionGroup>
