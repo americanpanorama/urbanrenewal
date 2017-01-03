@@ -99,10 +99,10 @@ const CitiesStore = {
         .domain(this.getCategoryIdsWithData());
 
       this.getCategoryIdsWithData().forEach(category_id => {
-        console.log(color(category_id));
         this.data.categories[category_id].color = color(category_id);
-        console.log(this.data.categories[category_id]);
       });
+
+      console.log(this.data.cities);
 
       this.data.loaded = true;
       this.emit(AppActionTypes.storeChanged);

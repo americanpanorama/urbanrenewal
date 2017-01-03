@@ -20,7 +20,7 @@ export default class Timeline extends React.Component {
   render() {
     let years = [...Array(25).keys()].map(num => num+1949);
     return (
-      <div id='timeline'>
+      <div id='timeline' style={ this.props.style }>
         { years.map(year => { 
           return (
             <span 

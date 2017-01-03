@@ -8,15 +8,29 @@ import Highways from './HighwaysComponent.jsx';
 import Dorlings from './DorlingsComponent.jsx';
 
 import CitiesStore from '../stores/CitiesStore.js';
+import GeographyStore from '../stores/GeographyStore';
 
 export default class USMap extends React.Component {
 
   constructor (props) { super(props); }
 
   render () {
+    let width = this.props.style.width,
+      height = this.props.style.height;
+
+    console.log(width, height);
+
     let projection = d3.geo.albersUsa()
-      .scale(1000)
-      .translate([900 / 2, 600 / 2]);
+      .scale(Math.min(1.36 * width, 2.08 * height))
+      .translate([width / 2, height / 2]);
+
+    // calculate scale
+    // let easternmost = projection([-66.95, 44.815])[0],
+    //   westernmost = projection([-124.732, 48.164])[0],
+    //   northernmost = projection([-95.153, 49.384])[1],
+    //   southernmost = projection([-81.086, 25.11])[1];
+
+    console.log(height);
 
     let path = d3.geo.path()
       .projection(projection);
@@ -27,8 +41,8 @@ export default class USMap extends React.Component {
 
     return (
       <svg 
-        width={900}  
-        height={600}
+        width={width}  
+        height={height}
         className='ussvg'
       >
         <GeoStates path={ path } />
@@ -45,6 +59,7 @@ export default class USMap extends React.Component {
               key={'cityCircle' + cityData.city_id }
               color={ CitiesStore.getCategoryColor('selected') }
               city_id={ cityData.city_id }
+              onCityClicked={ this.props.onCityClicked }
             />
           ))}
         </ReactTransitionGroup>

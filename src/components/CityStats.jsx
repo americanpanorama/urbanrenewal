@@ -32,7 +32,7 @@ export default class CityStats extends React.Component {
         }) }
         </ul>
         <h3>Projects</h3>
-        <ul>
+        <ul className='projects'>
         { Object.keys(this.props.projects).map(project_id => {
           if (this.props.projects[project_id].yearData[this.props.year]) {
             return (

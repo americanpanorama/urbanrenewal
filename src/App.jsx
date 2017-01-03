@@ -4,6 +4,7 @@ import * as React from 'react';
 
 // stores
 import CitiesStore from './stores/CitiesStore';
+import DimensionsStore from './stores/DimensionsStore';
 import GeographyStore from './stores/GeographyStore';
 import HighwaysStore from './stores/HighwaysStore';
 
@@ -96,29 +97,37 @@ class App extends React.Component {
 
   render () {
     return (
-      <div className='container full-height'>
-        <h1>Urban Renewal, 1949-1973</h1>
+      <div>
+        <header style={ DimensionsStore.getHeaderStyle() }>
+          <h1>Urban Renewal, 1949-1973</h1>
+        </header>
         <USMap 
           state={ this.state }
           onCityClicked={ this.onCityClicked }
+          style={ DimensionsStore.getNationalMapStyle() }
         />
         <TimelineComponent 
           onClick={ this.onYearClicked }
           year={ this.state.year }
+          style={ DimensionsStore.getTimelineStyle() }
         />
-        <YearStats
-          year={ this.state.year }
-          totals={ CitiesStore.getYearTotals(this.state.year) }
-          onCategoryClicked={ this.onCategoryClicked }
-        />
-        { CitiesStore.getSelectedCity() ? 
-          <CityStats 
-            { ...CitiesStore.getCityData(CitiesStore.getSelectedCity()) }
-            categories={ CitiesStore.getCategories() }
+        <aside
+          style={ DimensionsStore.getSidebarStyle() }
+        >
+          <YearStats
             year={ this.state.year }
-          /> :
-          null
-        }
+            totals={ CitiesStore.getYearTotals(this.state.year) }
+            onCategoryClicked={ this.onCategoryClicked }
+          />
+          { CitiesStore.getSelectedCity() ? 
+            <CityStats 
+              { ...CitiesStore.getCityData(CitiesStore.getSelectedCity()) }
+              categories={ CitiesStore.getCategories() }
+              year={ this.state.year }
+            /> :
+            null
+          }
+        </aside>
       </div>
     );
   }
