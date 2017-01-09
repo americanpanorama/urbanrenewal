@@ -22,6 +22,10 @@ export default class CityStats extends React.Component {
     return (
       <div className='cityStats'>
         <h2>{ this.props.city + ', ' + this.props.state }</h2>
+        <div 
+          onClick={ this.props.onCityClicked }
+          id={ null }
+        >close</div>
         <ul>
         { Object.keys(this.props.categories).map(category_id => {
           if (this.props.yearsData[this.props.year][category_id]) {

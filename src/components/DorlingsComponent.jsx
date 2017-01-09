@@ -19,7 +19,8 @@ export default class Dorlings extends React.Component {
       .attr('r', this.props.r)
       .each('end', () => {
         this.setState({
-          r: this.props.r
+          r: this.props.r,
+          color: this.props.color
         });
         callback();
       });
@@ -39,15 +40,17 @@ export default class Dorlings extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.value != nextProps.value || this.props.color != nextProps.color) {
+    if (this.props.value !== nextProps.value || this.props.color !== nextProps.color) {
       d3.select(ReactDOM.findDOMNode(this))
         .transition()
         .duration(750)
-        .attr('r', this.props.r)
-        .style('fill', this.props.color)
+        .attr('r', nextProps.r)
+        .style('fill', nextProps.color)
+        .style('stroke', nextProps.color)
         .each('end', () => {
           this.setState({
-            r: this.props.r
+            r: nextProps.r,
+            color: nextProps.color
           });
         });
       console.log('transition');
@@ -67,7 +70,7 @@ export default class Dorlings extends React.Component {
           strokeWidth: 0.5,
           strokeOpacity: 0.9
         } }
-        onMouseEnter={ this.props.onCityClicked }
+        onClick={ this.props.onCityClicked }
         id={ this.props.city_id }
         key={ 'city' + this.props.city_id }
       />

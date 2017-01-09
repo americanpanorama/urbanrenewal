@@ -7,6 +7,7 @@ import CitiesStore from './stores/CitiesStore';
 import DimensionsStore from './stores/DimensionsStore';
 import GeographyStore from './stores/GeographyStore';
 import HighwaysStore from './stores/HighwaysStore';
+import HashManager from './stores/HashManager';
 
 // components
 //import { HashManager } from '@panorama/toolkit';
@@ -40,7 +41,7 @@ class App extends React.Component {
   // ============================================================ //
 
   componentWillMount () {
-    AppActions.loadInitialData(this.state, this.state);
+    AppActions.loadInitialData(this.state, HashManager.getState());
   }
 
   componentDidMount () {
@@ -54,12 +55,11 @@ class App extends React.Component {
   componentWillUnmount () {
   }
 
-  componentDidUpdate () {
-  }
+  componentDidUpdate () { this.changeHash(); }
 
   getDefaultState () {
     return {
-      year: 1967
+      year: (HashManager.getState().year) ? HashManager.getState().year : 1967
     };
   }
 
@@ -96,6 +96,17 @@ class App extends React.Component {
     });
   }
 
+  /* manage hash */
+
+  changeHash () {
+    console.log(CitiesStore.getSlug());
+    HashManager.updateHash({ 
+      year: this.state.year,
+      city: CitiesStore.getSlug(),
+      category: CitiesStore.getSelectedCategory()
+    });
+  }
+
   render () {
     return (
       <div>
@@ -120,6 +131,7 @@ class App extends React.Component {
               { ...CitiesStore.getCityData(CitiesStore.getSelectedCity()) }
               categories={ CitiesStore.getCategories() }
               year={ this.state.year }
+              onCityClicked={ this.onCityClicked }
             /> :
             <YearStats
               year={ this.state.year }

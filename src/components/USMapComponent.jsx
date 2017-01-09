@@ -34,7 +34,7 @@ export default class USMap extends React.Component {
 
     let r = d3.scale.sqrt()
       .domain([0, CitiesStore.getCategoryMaxForCity('selected')])
-      .range([0,scale / 50]);
+      .range([0, scale/70]);
 
     return (
       <svg 

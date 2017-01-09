@@ -19,21 +19,21 @@ const CitiesStore = {
 
   dataLoader: CartoDBLoader,
 
-  loadInitialData: function(year) {
+  loadInitialData: function(year, citySlug, selectedCategory) {
     // initiate year keys on yearsTotal
     [...Array(25).keys()].map(num => num+1949).forEach(year => this.data.yearsTotals[year] = {});
 
     this.dataLoader.query([
       {
-        query: "select * from (SELECT sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, city, state, year, md.category_id from urdr_category_id_key c join urdr_master_data_new md on c.category_id = md.category_id and year = " + year + " join urdr_city_id_key cities on md.city_id = cities.city_id group by cities.the_geom, city, state, cities.city_id, year, md.category_id) year_vals where total is not null",
+        query: "select * from (SELECT sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, city, state, year, md.category_id from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id and year = " + year + " join urdr_city_id_key cities on md.city_id = cities.city_id group by cities.the_geom, city, state, cities.city_id, year, md.category_id) year_vals where total is not null",
         format: 'JSON'
       },
       {
-        query: "SELECT max(value) as max, md.category_id, assessed_category, unit_of_measurement from urdr_category_id_key c join urdr_master_data_new md on c.category_id = md.category_id group by md.category_id, assessed_category, unit_of_measurement",
+        query: "SELECT max(value) as max, md.category_id, assessed_category, unit_of_measurement from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id group by md.category_id, assessed_category, unit_of_measurement",
         format: 'JSON'
       },
       { 
-        query: "SELECT sum(value) as total, year, md.category_id from urdr_category_id_key c join urdr_master_data_new md on c.category_id = md.category_id group by year, md.category_id order by year, category_id",
+        query: "SELECT sum(value) as total, year, md.category_id from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id group by year, md.category_id order by year, category_id",
         format: 'JSON'
       }
     ]).then((responses) => {
@@ -66,6 +66,14 @@ const CitiesStore = {
         this.data.yearsTotals[response.year][response.category_id] = response.total;
       });
 
+      // load a city if one's specified
+      if (citySlug) {
+        this.loadCityData(this.getCityIdFromSlug(citySlug));
+      }
+      if (selectedCategory) {
+        this.setSelectedCategory(selectedCategory);
+      }
+
       this.data.loaded = true;
       this.data.yearsLoaded.push(year);
       this.emit(AppActionTypes.storeChanged);
@@ -75,7 +83,7 @@ const CitiesStore = {
   loadYearData: function(year) {
     this.dataLoader.query([
       {
-        query: "select * from (SELECT sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, city, state, year, md.category_id from urdr_category_id_key c join urdr_master_data_new md on c.category_id = md.category_id and year = " + year + " join urdr_city_id_key cities on md.city_id = cities.city_id group by cities.the_geom, city, state, cities.city_id, year, md.category_id) year_vals where total is not null",
+        query: "select * from (SELECT sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, city, state, year, md.category_id from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id and year = " + year + " join urdr_city_id_key cities on md.city_id = cities.city_id group by cities.the_geom, city, state, cities.city_id, year, md.category_id) year_vals where total is not null",
         format: 'JSON'
       },
     ]).then((responses) => {
@@ -95,7 +103,7 @@ const CitiesStore = {
   loadCityData: function(city_id) {
     this.dataLoader.query([
       {
-        query: "SELECT sum(value) as total, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.state, p.project_id, project, category_id, year from urdr_city_id_key cities join urdr_id_key p on cities.city_id = " + city_id + " and cities.city_id = p.city_id join urdr_master_data_new md on p.project_id = md.project_id group by cities.the_geom, cities.city, cities.state, p.project_id, project, category_id, year",
+        query: "SELECT sum(value) as total, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.state, p.project_id, project, category_id, year from urdr_city_id_key cities join urdr_id_key p on cities.city_id = " + city_id + " and cities.city_id = p.city_id join combined_dir_char md on p.project_id = md.project_id group by cities.the_geom, cities.city, cities.state, p.project_id, project, category_id, year",
         format: 'JSON'
       }
     ]).then(responses => {
@@ -127,6 +135,7 @@ const CitiesStore = {
         city: response.city,
         city_id: response.city_id,
         state: response.state,
+        slug: response.city + response.state.toUpperCase(),
         yearsData: {},
         projects: {}
       };
@@ -165,6 +174,8 @@ const CitiesStore = {
 
   getCityId: function(project_id) { return Object.keys(this.data.cities).filter(city_id => this.data.cities[city_id].projects.hasOwnProperty(project_id))[0]; },
 
+  getCityIdFromSlug: function(slug) { return (this.data.cities) ? Object.keys(this.data.cities).filter(cityId => (this.data.cities[cityId].slug == slug))[0] : null; },
+
   getCities: function() { return (this.data && this.data.loaded) ? this.data.cities : {}; },
 
   getCitiesList: function() { return (this.data && this.data.loaded) ? Object.keys(this.data.cities).map(city_id => this.data.cities[city_id]) : []; },
@@ -186,6 +197,10 @@ const CitiesStore = {
   getSelectedCategory: function() { return this.data.selectedCategory; },
 
   getSelectedCity: function() { return this.data.selectedCity; },
+
+  getSlug: function() { 
+    return (this.data.cities[this.getSelectedCity()] && this.data.cities[this.getSelectedCity()].slug) ? this.data.cities[this.getSelectedCity()].slug : null; 
+  },
 
   getCityData: function(city_id) { return (this.data && this.data.loaded && this.data.cities[city_id]) ? this.data.cities[city_id] : {}; },
 
@@ -222,7 +237,7 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
   switch (action.type) {
 
   case AppActionTypes.loadInitialData:
-    CitiesStore.loadInitialData(action.state.year);
+    CitiesStore.loadInitialData(action.state.year, action.hashState.city, action.hashState.category);
     break;
 
   case AppActionTypes.categorySelected:
@@ -230,7 +245,8 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
     break;
 
   case AppActionTypes.citySelected:
-    if (CitiesStore.cityLoaded(action.value)) {
+    console.log(action.value);
+    if (!action.value || CitiesStore.cityLoaded(action.value)) {
       CitiesStore.setSelectedCity(action.value);
     } else {
       CitiesStore.loadCityData(action.value);

@@ -27,6 +27,7 @@ export default class YearStats extends React.Component {
   }
 
   render() {
+    console.log(this.props);
     return (
       <div className='YearStats'>
         <h2>{ this.props.year}</h2>
@@ -36,6 +37,10 @@ export default class YearStats extends React.Component {
               key={ 'category' + category_id }
               id={ category_id }
               onClick={ this.props.onCategoryClicked }
+              style={ { 
+                borderBottom: '4px solid ' + CitiesStore.getCategoryColor(category_id),
+                fontWeight: (CitiesStore.getSelectedCategory() == category_id) ? "bold" : "normal"
+              } }
             >
               { CitiesStore.getCategoryName(category_id)+ ": " + this.formatValue(this.props.totals[category_id], CitiesStore.getCategoryUnit(category_id)) }
             </li>
