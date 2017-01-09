@@ -8,15 +8,11 @@ export default class YearStats extends React.Component {
     super(props);
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps) {}
 
-  }
+  componentDidMount() {}
 
-  componentDidMount() {
-  }
-
-  componentDidUpdate() {
-  }
+  componentDidUpdate() {}
 
   formatValue(value, category) {
     let formatted = '';

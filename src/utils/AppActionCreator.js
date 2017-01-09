@@ -8,7 +8,8 @@ export const AppActionTypes = {
   categorySelected: 'categorySelected',
   citySelected: 'citySelected',
   dateSelected: 'dateSelected',
-  mapMoved: 'mapMoved'
+  mapMoved: 'mapMoved',
+  windowResized: 'windowResized'
 
 };
 
@@ -62,6 +63,12 @@ export const AppActions = {
     AppDispatcher.dispatch({
       type: AppActionTypes.mapMoved,
       value: mapState
+    });
+  },
+
+  windowResized: () => {
+    AppDispatcher.dispatch({
+      type: AppActionTypes.windowResized
     });
   }
 

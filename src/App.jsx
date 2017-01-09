@@ -31,7 +31,7 @@ class App extends React.Component {
     this.state = this.getDefaultState();
 
     // bind handlers
-    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onYearClicked'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onYearClicked','onWindowResize'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
   }
 
@@ -44,7 +44,9 @@ class App extends React.Component {
   }
 
   componentDidMount () {
+    window.addEventListener('resize', this.onWindowResize);
     CitiesStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
+    DimensionsStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
     GeographyStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
     HighwaysStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
   }
@@ -78,8 +80,7 @@ class App extends React.Component {
   onMapMoved (event) {
   }
 
-  onWindowResize (event) {
-  }
+  onWindowResize (event) { AppActions.windowResized(); }
 
   onCategoryClicked(event) { AppActions.categorySelected(event.target.id); }
 
@@ -114,18 +115,17 @@ class App extends React.Component {
         <aside
           style={ DimensionsStore.getSidebarStyle() }
         >
-          <YearStats
-            year={ this.state.year }
-            totals={ CitiesStore.getYearTotals(this.state.year) }
-            onCategoryClicked={ this.onCategoryClicked }
-          />
           { CitiesStore.getSelectedCity() ? 
             <CityStats 
               { ...CitiesStore.getCityData(CitiesStore.getSelectedCity()) }
               categories={ CitiesStore.getCategories() }
               year={ this.state.year }
             /> :
-            null
+            <YearStats
+              year={ this.state.year }
+              totals={ CitiesStore.getYearTotals(this.state.year) }
+              onCategoryClicked={ this.onCategoryClicked }
+            />
           }
         </aside>
       </div>

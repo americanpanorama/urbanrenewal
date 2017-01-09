@@ -23,6 +23,7 @@ export default class Dorlings extends React.Component {
         });
         callback();
       });
+    console.log('entered');
   }
 
   componentWillLeave(callback) {
@@ -34,6 +35,7 @@ export default class Dorlings extends React.Component {
     //     callback();
     //   });
     callback();
+    console.log('left');
   }
 
   componentWillReceiveProps(nextProps) {
@@ -48,6 +50,7 @@ export default class Dorlings extends React.Component {
             r: this.props.r
           });
         });
+      console.log('transition');
     }
   }
 
@@ -64,8 +67,9 @@ export default class Dorlings extends React.Component {
           strokeWidth: 0.5,
           strokeOpacity: 0.9
         } }
-        onClick={ this.props.onCityClicked }
+        onMouseEnter={ this.props.onCityClicked }
         id={ this.props.city_id }
+        key={ 'city' + this.props.city_id }
       />
     );
   }

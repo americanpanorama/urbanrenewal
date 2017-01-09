@@ -16,12 +16,11 @@ export default class USMap extends React.Component {
 
   render () {
     let width = this.props.style.width,
-      height = this.props.style.height;
-
-    console.log(width, height);
+      height = this.props.style.height,
+      scale = Math.min(1.36 * width, 2.08 * height); // I calculated these with trial and error--sure there's a more precise way as this will be fragile if the width changes
 
     let projection = d3.geo.albersUsa()
-      .scale(Math.min(1.36 * width, 2.08 * height))
+      .scale(scale) 
       .translate([width / 2, height / 2]);
 
     // calculate scale
@@ -30,14 +29,12 @@ export default class USMap extends React.Component {
     //   northernmost = projection([-95.153, 49.384])[1],
     //   southernmost = projection([-81.086, 25.11])[1];
 
-    console.log(height);
-
     let path = d3.geo.path()
       .projection(projection);
 
     let r = d3.scale.sqrt()
       .domain([0, CitiesStore.getCategoryMaxForCity('selected')])
-      .range([0,20]);
+      .range([0,scale / 50]);
 
     return (
       <svg 
@@ -51,7 +48,7 @@ export default class USMap extends React.Component {
           state={ this.props.state }
         />
         <ReactTransitionGroup component='g' className='transitionGroup'>
-          { CitiesStore.getCitiesDataForYearAndCategory(this.props.state.year, CitiesStore.getSelectedCategory()).map((cityData, i) => (
+          { CitiesStore.getCitiesDataForYearAndCategory(this.props.state.year, CitiesStore.getSelectedCategory()).filter(cityData => projection(cityData.lngLat) !== null).map((cityData, i) => (
             <Dorlings
               r={ r(cityData.value) }
               cx={ projection(cityData.lngLat)[0] }
