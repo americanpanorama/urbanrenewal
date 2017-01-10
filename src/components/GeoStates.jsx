@@ -18,7 +18,8 @@ export default class USMap extends React.Component {
               style={ {
                 fill: 'silver',
                 stroke: 'white',
-                strokeWidth: 0.3
+                strokeWidth: 0.3,
+                pointerEvents: 'none'
               } }
             />
           );

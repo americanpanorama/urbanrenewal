@@ -34,6 +34,8 @@ const DimensionsStore = {
 
   getMainPaneWidth: function() { return this.data.mainPaneWidth; },
 
+  getNationalMapHeight: function() { return this.data.nationalMapHeight; },
+
   getHeaderStyle: function() {
     return {
       width: this.data.mainPaneWidth

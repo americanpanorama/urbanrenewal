@@ -27,7 +27,6 @@ export default class YearStats extends React.Component {
   }
 
   render() {
-    console.log(this.props);
     return (
       <div className='YearStats'>
         <h2>{ this.props.year}</h2>

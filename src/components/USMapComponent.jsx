@@ -3,6 +3,7 @@ import { PropTypes } from 'react';
 import * as d3 from 'd3';
 import ReactTransitionGroup from 'react-addons-transition-group';
 
+import PolygonD3 from './PolygonD3.jsx';
 import GeoStates from './GeoStates.jsx';
 import Highways from './HighwaysComponent.jsx';
 import Dorlings from './DorlingsComponent.jsx';
@@ -12,15 +13,44 @@ import GeographyStore from '../stores/GeographyStore';
 
 export default class USMap extends React.Component {
 
-  constructor (props) { super(props); }
+  constructor (props) { 
+    super(props); 
+    this.state = {
+      x: this.props.state.x,
+      y: this.props.state.y,
+      zoom: this.props.state.zoom
+    };
+  }
+
+  componentWillEnter(callback) { callback(); }
+
+  componentWillLeave(callback) { callback(); }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.state.zoom !== nextProps.state.zoom || this.props.state.x !== nextProps.state.x || this.props.state.y !== nextProps.state.y) {
+      //console.log(d3.select(this.refs['nationalMap']));
+      d3.select(this.refs['nationalMap'])
+        .transition()
+        .duration(500)
+        .attr("transform", "translate("+nextProps.state.x+","+nextProps.state.y+")scale(" + nextProps.state.zoom +")")
+        .each('end', () => {
+          this.setState({
+            x: nextProps.state.x,
+            y: nextProps.state.y,
+            zoom: nextProps.state.zoom
+          });
+        });
+    }
+  }
 
   render () {
     let width = this.props.style.width,
       height = this.props.style.height,
-      scale = Math.min(1.36 * width, 2.08 * height); // I calculated these with trial and error--sure there's a more precise way as this will be fragile if the width changes
+      scale = Math.min(1.36 * width, 2.08 * height), // I calculated these with trial and error--sure there's a more precise way as this will be fragile if the width changes
+      zoom = 1; //this.props.zoom;
 
     let projection = d3.geo.albersUsa()
-      .scale(scale) 
+      .scale(scale)
       .translate([width / 2, height / 2]);
 
     // calculate scale
@@ -34,7 +64,7 @@ export default class USMap extends React.Component {
 
     let r = d3.scale.sqrt()
       .domain([0, CitiesStore.getCategoryMaxForCity('selected')])
-      .range([0, scale/70]);
+      .range([0, scale*zoom/70]);
 
     return (
       <svg 
@@ -42,24 +72,59 @@ export default class USMap extends React.Component {
         height={height}
         className='ussvg'
       >
-        <GeoStates path={ path } />
-        <Highways 
-          path={ path }
-          state={ this.props.state }
+
+        <rect
+          width={width}
+          height={height}
+          fill={'transparent'}
+          ref='theRect'
+          onDoubleClick={ this.props.onMapClicked }
+          onMouseUp={this.props.handleMouseUp }
+          onMouseDown={this.props.handleMouseDown }
+          onMouseMove={this.props.handleMouseMove }
         />
-        <ReactTransitionGroup component='g' className='transitionGroup'>
-          { CitiesStore.getCitiesDataForYearAndCategory(this.props.state.year, CitiesStore.getSelectedCategory()).filter(cityData => projection(cityData.lngLat) !== null).map((cityData, i) => (
-            <Dorlings
-              r={ r(cityData.value) }
-              cx={ projection(cityData.lngLat)[0] }
-              cy={ projection(cityData.lngLat)[1] }
-              key={'cityCircle' + cityData.city_id }
-              color={ CitiesStore.getCategoryColor('selected') }
-              city_id={ cityData.city_id }
-              onCityClicked={ this.props.onCityClicked }
-            />
-          ))}
-        </ReactTransitionGroup>
+        <g 
+          ref='nationalMap'
+          transform={'translate('+this.state.x+','+this.state.y+')scale(' + this.state.zoom + ')'}
+        >
+          <GeoStates 
+            path={ path }
+          />
+          <Highways 
+            path={ path }
+            state={ this.props.state }
+          />
+          <ReactTransitionGroup component='g' className='transitionGroup'>
+            { CitiesStore.getCitiesDataForYearAndCategory(this.props.state.year, CitiesStore.getSelectedCategory()).filter(cityData => projection(cityData.lngLat) !== null).map((cityData, i) => (
+              <Dorlings
+                r={ r(cityData.value) / this.state.zoom }
+                cx={ projection(cityData.lngLat)[0] }
+                cy={ projection(cityData.lngLat)[1] }
+                key={'cityCircle' + cityData.city_id }
+                color={ CitiesStore.getCategoryColor('selected') }
+                city_id={ cityData.city_id }
+                onCityClicked={ this.props.onCityClicked }
+              />
+            ))}
+          </ReactTransitionGroup>
+        </g>
+        <text 
+          x={10} 
+          y={30} 
+          fontSize={30}
+        >
+          +
+        </text>
+        <text 
+          x={14} 
+          y={50} 
+          fontSize={30}
+          
+          onClick={ this.props.zoomOut }
+        >
+          -
+        </text>
+        
       </svg>
     );
   }

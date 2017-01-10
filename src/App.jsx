@@ -1,6 +1,7 @@
 // import node modules
 import d3 from 'd3';
 import * as React from 'react';
+import ReactTransitionGroup from 'react-addons-transition-group';
 
 // stores
 import CitiesStore from './stores/CitiesStore';
@@ -32,7 +33,7 @@ class App extends React.Component {
     this.state = this.getDefaultState();
 
     // bind handlers
-    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onYearClicked','onWindowResize'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
   }
 
@@ -50,6 +51,11 @@ class App extends React.Component {
     DimensionsStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
     GeographyStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
     HighwaysStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
+
+    // this.setState({
+    //   x: DimensionsStore.getMainPaneWidth() / 2,
+    //   y: DimensionsStore.getNationalMapHeight() / 2
+    // });
   }
 
   componentWillUnmount () {
@@ -59,7 +65,10 @@ class App extends React.Component {
 
   getDefaultState () {
     return {
-      year: (HashManager.getState().year) ? HashManager.getState().year : 1967
+      year: (HashManager.getState().year) ? HashManager.getState().year : 1967,
+      zoom: (HashManager.getState().zoom) ? parseInt(HashManager.getState().zoom) : 1,
+      x: 0,
+      y: 0
     };
   }
 
@@ -96,14 +105,65 @@ class App extends React.Component {
     });
   }
 
+  onZoomIn(event) {
+    this.setState({ 
+      zoom: this.state.zoom+1,
+      x: DimensionsStore.getNationalMapHeight()  / 2 - (event.nativeEvent.offsetX - this.state.x) / this.state.zoom * (this.state.zoom+1),
+      y: DimensionsStore.getNationalMapHeight()  / 2 - (event.nativeEvent.offsetY - this.state.y) / this.state.zoom * (this.state.zoom+1)
+    });
+  }
+
+  zoomOut() {
+    this.setState({
+      zoom: (this.state.zoom >= 2) ? this.state.zoom-1 : 1,
+      x: DimensionsStore.getNationalMapHeight()  / 2 - (DimensionsStore.getNationalMapHeight()  / 2 - this.state.x) / this.state.zoom * (this.state.zoom-1),
+      y: DimensionsStore.getNationalMapHeight()  / 2 - (DimensionsStore.getNationalMapHeight()  / 2 - this.state.y) / this.state.zoom * (this.state.zoom-1)
+    });
+  }
+
+  handleMouseUp() {
+    this.dragging = false;
+    this.coords = {};
+  }
+
+  handleMouseDown(e) {
+    this.dragging = true;
+    //Set coords
+    this.coords = {
+      x: e.pageX,
+      y: e.pageY
+    };
+  }
+
+  handleMouseMove(e) {
+    //If we are dragging
+    if (this.dragging) {
+      e.preventDefault();
+      //Get mouse change differential
+      var xDiff = this.coords.x - e.pageX,
+        yDiff = this.coords.y - e.pageY;
+      //Update to our new coordinates
+      this.coords.x = e.pageX;
+      this.coords.y = e.pageY;
+      //Adjust our x,y based upon the x/y diff from before
+      var x = this.state.x - xDiff,       
+        y = this.state.y - yDiff;
+      //Re-render
+      this.setState({
+        x: x,
+        y: y
+      });  
+    }
+  }
+
   /* manage hash */
 
   changeHash () {
-    console.log(CitiesStore.getSlug());
     HashManager.updateHash({ 
       year: this.state.year,
       city: CitiesStore.getSlug(),
-      category: CitiesStore.getSelectedCategory()
+      category: CitiesStore.getSelectedCategory(),
+      zoom: this.state.zoom
     });
   }
 
@@ -113,11 +173,19 @@ class App extends React.Component {
         <header style={ DimensionsStore.getHeaderStyle() }>
           <h1>Urban Renewal, 1949-1973</h1>
         </header>
-        <USMap 
-          state={ this.state }
-          onCityClicked={ this.onCityClicked }
-          style={ DimensionsStore.getNationalMapStyle() }
-        />
+
+        <ReactTransitionGroup>
+          <USMap 
+            state={ this.state }
+            onCityClicked={ this.onCityClicked }
+            style={ DimensionsStore.getNationalMapStyle() }
+            onMapClicked={ this.onZoomIn }
+            handleMouseUp={ this.handleMouseUp }
+            handleMouseDown={ this.handleMouseDown }
+            handleMouseMove={ this.handleMouseMove }
+            zoomOut={ this.zoomOut }
+          />
+        </ReactTransitionGroup>
         <TimelineComponent 
           onClick={ this.onYearClicked }
           year={ this.state.year }

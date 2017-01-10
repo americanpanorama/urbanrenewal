@@ -245,7 +245,6 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
     break;
 
   case AppActionTypes.citySelected:
-    console.log(action.value);
     if (!action.value || CitiesStore.cityLoaded(action.value)) {
       CitiesStore.setSelectedCity(action.value);
     } else {

@@ -8,7 +8,8 @@ export default class Dorlings extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
-      r: 1e-6
+      r: 1e-6,
+      color: this.props.color
     };
   }
 
@@ -24,7 +25,6 @@ export default class Dorlings extends React.Component {
         });
         callback();
       });
-    console.log('entered');
   }
 
   componentWillLeave(callback) {
@@ -36,13 +36,13 @@ export default class Dorlings extends React.Component {
     //     callback();
     //   });
     callback();
-    console.log('left');
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.value !== nextProps.value || this.props.color !== nextProps.color) {
+    if (this.props.r !== nextProps.r || this.props.color !== nextProps.color) {
       d3.select(ReactDOM.findDOMNode(this))
         .transition()
+        //.delay((nextProps.r > this.props.r) ? 750 : 0)
         .duration(750)
         .attr('r', nextProps.r)
         .style('fill', nextProps.color)
@@ -53,7 +53,6 @@ export default class Dorlings extends React.Component {
             color: nextProps.color
           });
         });
-      console.log('transition');
     }
   }
 
@@ -64,9 +63,9 @@ export default class Dorlings extends React.Component {
         cy={ this.props.cy }
         r={ this.state.r }
         style={ {
-          fill: this.props.color,
+          fill: this.state.color,
           fillOpacity: 0.4,
-          stroke: this.props.color,
+          stroke: this.state.color,
           strokeWidth: 0.5,
           strokeOpacity: 0.9
         } }
