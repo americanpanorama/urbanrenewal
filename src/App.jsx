@@ -106,18 +106,20 @@ class App extends React.Component {
   }
 
   onZoomIn(event) {
+    let nextZoom = this.state.zoom*2;
     this.setState({ 
-      zoom: this.state.zoom+1,
-      x: DimensionsStore.getNationalMapHeight()  / 2 - (event.nativeEvent.offsetX - this.state.x) / this.state.zoom * (this.state.zoom+1),
-      y: DimensionsStore.getNationalMapHeight()  / 2 - (event.nativeEvent.offsetY - this.state.y) / this.state.zoom * (this.state.zoom+1)
+      zoom: nextZoom,
+      x: DimensionsStore.getNationalMapHeight()  / 2 - (event.nativeEvent.offsetX - this.state.x) / this.state.zoom * (nextZoom),
+      y: DimensionsStore.getNationalMapHeight()  / 2 - (event.nativeEvent.offsetY - this.state.y) / this.state.zoom * (nextZoom)
     });
   }
 
   zoomOut() {
+    let nextZoom = this.state.zoom / 2;
     this.setState({
-      zoom: (this.state.zoom >= 2) ? this.state.zoom-1 : 1,
-      x: DimensionsStore.getNationalMapHeight()  / 2 - (DimensionsStore.getNationalMapHeight()  / 2 - this.state.x) / this.state.zoom * (this.state.zoom-1),
-      y: DimensionsStore.getNationalMapHeight()  / 2 - (DimensionsStore.getNationalMapHeight()  / 2 - this.state.y) / this.state.zoom * (this.state.zoom-1)
+      zoom: (this.state.zoom >= 2) ? nextZoom : 1,
+      x: DimensionsStore.getNationalMapHeight()  / 2 - (DimensionsStore.getNationalMapHeight()  / 2 - this.state.x) / this.state.zoom * (nextZoom),
+      y: DimensionsStore.getNationalMapHeight()  / 2 - (DimensionsStore.getNationalMapHeight()  / 2 - this.state.y) / this.state.zoom * (nextZoom)
     });
   }
 
