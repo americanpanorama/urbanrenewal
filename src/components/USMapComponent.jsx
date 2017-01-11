@@ -18,7 +18,8 @@ export default class USMap extends React.Component {
     this.state = {
       x: this.props.state.x,
       y: this.props.state.y,
-      zoom: this.props.state.zoom
+      zoom: this.props.state.zoom,
+      dorlingZoom: this.props.state.zoom
     };
   }
 
@@ -28,10 +29,12 @@ export default class USMap extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.props.state.zoom !== nextProps.state.zoom || this.props.state.x !== nextProps.state.x || this.props.state.y !== nextProps.state.y) {
-      //console.log(d3.select(this.refs['nationalMap']));
+      this.setState({
+        dorlingZoom: nextProps.state.zoom
+      });
       d3.select(this.refs['nationalMap'])
         .transition()
-        .duration(500)
+        .duration(750)
         .attr("transform", "translate("+nextProps.state.x+","+nextProps.state.y+")scale(" + nextProps.state.zoom +")")
         .each('end', () => {
           this.setState({
@@ -46,8 +49,7 @@ export default class USMap extends React.Component {
   render () {
     let width = this.props.style.width,
       height = this.props.style.height,
-      scale = Math.min(1.36 * width, 2.08 * height), // I calculated these with trial and error--sure there's a more precise way as this will be fragile if the width changes
-      zoom = 1; //this.props.zoom;
+      scale = Math.min(1.36 * width, 2.08 * height); // I calculated these with trial and error--sure there's a more precise way as this will be fragile if the width changes
 
     let projection = d3.geo.albersUsa()
       .scale(scale)
@@ -64,25 +66,18 @@ export default class USMap extends React.Component {
 
     let r = d3.scale.sqrt()
       .domain([0, CitiesStore.getCategoryMaxForCity('selected')])
-      .range([0, scale*zoom/70]);
+      .range([0, scale/70/this.state.dorlingZoom]);
 
     return (
       <svg 
         width={width}  
         height={height}
         className='ussvg'
+        onDoubleClick={ this.props.onMapClicked }
+        onMouseUp={this.props.handleMouseUp }
+        onMouseDown={this.props.handleMouseDown }
+        onMouseMove={this.props.handleMouseMove }
       >
-
-        <rect
-          width={width}
-          height={height}
-          fill={'transparent'}
-          ref='theRect'
-          onDoubleClick={ this.props.onMapClicked }
-          onMouseUp={this.props.handleMouseUp }
-          onMouseDown={this.props.handleMouseDown }
-          onMouseMove={this.props.handleMouseMove }
-        />
         <g 
           ref='nationalMap'
           transform={'translate('+this.state.x+','+this.state.y+')scale(' + this.state.zoom + ')'}
@@ -97,7 +92,7 @@ export default class USMap extends React.Component {
           <ReactTransitionGroup component='g' className='transitionGroup'>
             { CitiesStore.getCitiesDataForYearAndCategory(this.props.state.year, CitiesStore.getSelectedCategory()).filter(cityData => projection(cityData.lngLat) !== null).map((cityData, i) => (
               <Dorlings
-                r={ r(cityData.value) / this.state.zoom }
+                r={ r(cityData.value) }
                 cx={ projection(cityData.lngLat)[0] }
                 cy={ projection(cityData.lngLat)[1] }
                 key={'cityCircle' + cityData.city_id }
