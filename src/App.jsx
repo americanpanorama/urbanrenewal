@@ -66,9 +66,9 @@ class App extends React.Component {
   getDefaultState () {
     return {
       year: (HashManager.getState().year) ? HashManager.getState().year : 1967,
-      zoom: (HashManager.getState().zoom) ? parseInt(HashManager.getState().zoom) : 1,
-      x: 0,
-      y: 0
+      x: (HashManager.getState().view) ? parseInt(HashManager.getState().view.split('/')[0]) :0,
+      y: (HashManager.getState().view) ? parseInt(HashManager.getState().view.split('/')[1]) :0,
+      zoom: (HashManager.getState().view) ? parseInt(HashManager.getState().view.split('/')[2]) : 1
     };
   }
 
@@ -161,9 +161,9 @@ class App extends React.Component {
   changeHash () {
     HashManager.updateHash({ 
       year: this.state.year,
+      view: [this.state.x, this.state.y, this.state.zoom].join('/'),
       city: CitiesStore.getSlug(),
-      category: CitiesStore.getSelectedCategory(),
-      zoom: this.state.zoom
+      category: CitiesStore.getSelectedCategory()
     });
   }
 
