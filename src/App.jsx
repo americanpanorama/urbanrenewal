@@ -204,6 +204,7 @@ class App extends React.Component {
               categories={ CitiesStore.getCategories() }
               year={ this.state.year }
               onCityClicked={ this.onCityClicked }
+              onCategoryClicked={ this.onCategoryClicked }
             /> :
             <YearStats
               year={ this.state.year }
