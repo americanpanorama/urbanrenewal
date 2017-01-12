@@ -99,6 +99,7 @@ export default class USMap extends React.Component {
                 color={ CitiesStore.getCategoryColor('selected') }
                 city_id={ cityData.city_id }
                 onCityClicked={ this.props.onCityClicked }
+                selected={ (CitiesStore.getSelectedCity() == cityData.city_id) }
               />
             ))}
           </ReactTransitionGroup>

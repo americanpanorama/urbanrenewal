@@ -46,7 +46,7 @@ const CitiesStore = {
       });
 
       // assign colors
-      let color = d3.scale.category10()
+      let color = d3.scale.category20()
         .domain(this.getCategoryIdsWithData());
 
       // category data

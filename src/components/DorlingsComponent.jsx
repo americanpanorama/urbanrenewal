@@ -64,8 +64,8 @@ export default class Dorlings extends React.Component {
         r={ this.state.r }
         style={ {
           fill: this.state.color,
-          fillOpacity: 0.4,
-          stroke: this.state.color,
+          fillOpacity: (this.props.selected) ? 0.9 : 0.4,
+          stroke: (this.props.selected) ? '#333' : this.state.color,
           strokeWidth: 0.5,
           strokeOpacity: 0.9
         } }

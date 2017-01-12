@@ -107,9 +107,11 @@ class App extends React.Component {
 
   onZoomIn(event) {
     let nextZoom = this.state.zoom*2;
+    console.log(DimensionsStore.getNationalMapHeight()  / 2, event.nativeEvent.offsetX, this.state.x, this.state.zoom, nextZoom);
+
     this.setState({ 
       zoom: nextZoom,
-      x: DimensionsStore.getNationalMapHeight()  / 2 - (event.nativeEvent.offsetX - this.state.x) / this.state.zoom * (nextZoom),
+      x: DimensionsStore.getMainPaneWidth()  / 2 - (event.nativeEvent.offsetX - this.state.x) / this.state.zoom * (nextZoom),
       y: DimensionsStore.getNationalMapHeight()  / 2 - (event.nativeEvent.offsetY - this.state.y) / this.state.zoom * (nextZoom)
     });
   }
@@ -118,7 +120,7 @@ class App extends React.Component {
     let nextZoom = this.state.zoom / 2;
     this.setState({
       zoom: (this.state.zoom >= 2) ? nextZoom : 1,
-      x: DimensionsStore.getNationalMapHeight()  / 2 - (DimensionsStore.getNationalMapHeight()  / 2 - this.state.x) / this.state.zoom * (nextZoom),
+      x: DimensionsStore.getMainPaneWidth()  / 2 - (DimensionsStore.getNationalMapHeight()  / 2 - this.state.x) / this.state.zoom * (nextZoom),
       y: DimensionsStore.getNationalMapHeight()  / 2 - (DimensionsStore.getNationalMapHeight()  / 2 - this.state.y) / this.state.zoom * (nextZoom)
     });
   }
