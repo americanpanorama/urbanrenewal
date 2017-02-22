@@ -46,6 +46,17 @@ export default class USMap extends React.Component {
     }
   }
 
+  _pickHex(color1, color2, weight) {
+    var p = weight;
+    var w = p * 2 - 1;
+    var w1 = (w/1+1) / 2;
+    var w2 = 1 - w1;
+    var rgb = [Math.round(color1[0] * w1 + color2[0] * w2),
+        Math.round(color1[1] * w1 + color2[1] * w2),
+        Math.round(color1[2] * w1 + color2[2] * w2)];
+    return 'rgb(' + rgb + ')';
+  }
+
   render () {
     let width = this.props.style.width,
       height = this.props.style.height,
@@ -54,6 +65,9 @@ export default class USMap extends React.Component {
     let projection = d3.geo.albersUsa()
       .scale(scale)
       .translate([width / 2, height / 2]);
+
+
+            
 
     // calculate scale
     // let easternmost = projection([-66.95, 44.815])[0],
@@ -90,13 +104,13 @@ export default class USMap extends React.Component {
             state={ this.props.state }
           />
           <ReactTransitionGroup component='g' className='transitionGroup'>
-            { CitiesStore.getCitiesDataForYearAndCategory(this.props.state.year, CitiesStore.getSelectedCategory()).filter(cityData => projection(cityData.lngLat) !== null).map((cityData, i) => (
+            { CitiesStore.getDorlings(this.props.state.year).filter(cityData => projection(cityData.lngLat) !== null).map((cityData, i) => (
               <Dorlings
                 r={ r(cityData.value) }
                 cx={ projection(cityData.lngLat)[0] }
                 cy={ projection(cityData.lngLat)[1] }
                 key={'cityCircle' + cityData.city_id }
-                color={ CitiesStore.getCategoryColor('selected') }
+                color={ cityData.color }
                 city_id={ cityData.city_id }
                 onCityClicked={ this.props.onCityClicked }
                 selected={ (CitiesStore.getSelectedCity() == cityData.city_id) }
@@ -104,7 +118,7 @@ export default class USMap extends React.Component {
             ))}
           </ReactTransitionGroup>
         </g>
-        <text 
+        <text
           x={10} 
           y={30} 
           fontSize={30}

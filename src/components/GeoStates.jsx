@@ -16,9 +16,9 @@ export default class USMap extends React.Component {
               key={ polygon.id }
               d={ this.props.path(polygon.geometry) }
               style={ {
-                fill: 'silver',
-                stroke: 'white',
-                strokeWidth: 0.3,
+                fill: '#777',
+                stroke: '#111',
+                strokeWidth: 0.2,
                 pointerEvents: 'none'
               } }
             />

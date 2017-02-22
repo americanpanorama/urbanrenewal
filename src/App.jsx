@@ -12,6 +12,7 @@ import HashManager from './stores/HashManager';
 
 // components
 //import { HashManager } from '@panorama/toolkit';
+import CityMap from './components/CityMap.jsx';
 import TimelineComponent from './components/TimelineComponent.jsx';
 import USMap from './components/USMapComponent.jsx';
 import CityStats from './components/CityStats.jsx';
@@ -24,6 +25,13 @@ import { AppActions, AppActionTypes } from './utils/AppActionCreator';
 import AppDispatcher from './utils/AppDispatcher';
 
 // config
+
+let cases = {
+  '1956': [994], // Cincinnati
+  '1958': [590], // Atlanta
+  '1959': [65], // Cambridge,
+  '1960': [168] // New York
+};
 
 // main app container
 class App extends React.Component {
@@ -52,6 +60,8 @@ class App extends React.Component {
     GeographyStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
     HighwaysStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
 
+    CitiesStore.loadCityData(994);
+
     // this.setState({
     //   x: DimensionsStore.getMainPaneWidth() / 2,
     //   y: DimensionsStore.getNationalMapHeight() / 2
@@ -65,7 +75,7 @@ class App extends React.Component {
 
   getDefaultState () {
     return {
-      year: (HashManager.getState().year) ? HashManager.getState().year : 1967,
+      year: (HashManager.getState().year) ? HashManager.getState().year : 1958,
       x: (HashManager.getState().view) ? parseInt(HashManager.getState().view.split('/')[0]) :0,
       y: (HashManager.getState().view) ? parseInt(HashManager.getState().view.split('/')[1]) :0,
       zoom: (HashManager.getState().view) ? parseInt(HashManager.getState().view.split('/')[2]) : 1
@@ -166,8 +176,8 @@ class App extends React.Component {
     HashManager.updateHash({ 
       year: this.state.year,
       view: [this.state.x, this.state.y, this.state.zoom].join('/'),
-      city: CitiesStore.getSlug(),
-      category: CitiesStore.getSelectedCategory()
+      //city: CitiesStore.getSlug(),
+      //category: CitiesStore.getSelectedCategory()
     });
   }
 
@@ -175,7 +185,7 @@ class App extends React.Component {
     return (
       <div>
         <header style={ DimensionsStore.getHeaderStyle() }>
-          <h1>Urban Renewal, 1949-1973</h1>
+          <h1>Renewing Inequality, 1949-1973</h1>
         </header>
 
         <ReactTransitionGroup>
@@ -193,6 +203,7 @@ class App extends React.Component {
         <TimelineComponent 
           onClick={ this.onYearClicked }
           year={ this.state.year }
+          yearsData={ CitiesStore.getYearsTotals() }
           style={ DimensionsStore.getTimelineStyle() }
         />
         <aside
@@ -212,6 +223,24 @@ class App extends React.Component {
               onCategoryClicked={ this.onCategoryClicked }
             />
           }
+
+          { (cases[this.state.year]) ? 
+            cases[this.state.year].map((cityId, i)=> {
+              return (
+                <CityMap 
+                  year={ this.state.year }
+                  cityData={ CitiesStore.getCityData(cityId) }
+                  key={'case' + this.state.year + i }
+                />
+              );
+            }) :
+            ''
+          }
+
+
+
+
+          
         </aside>
       </div>
     );

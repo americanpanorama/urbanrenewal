@@ -4,14 +4,24 @@ import { AppActionTypes } from '../utils/AppActionCreator';
 import CartoDBLoader from '../utils/CartoDBLoader';
 import d3 from 'd3';
 
+let cases = {
+  '1956': [994], // Cincinnati
+  '1958': [590], // Atlanta
+  '1959': [65], // Cambridge,
+  '1960': [168] // New York
+};
+
 const CitiesStore = {
 
   data: {
     cities: {},
-    categories: {},
+    categories: {
+      'totalFamiles': {category: 'total Families'},
+      'percentFamiliesOfColor': {category: 'Percent families of color'}
+    },
     yearsTotals: {},
     selectedCity: null,
-    selectedCategory: 67,
+    selectedCategory: 72,
     yearsLoaded: [],
     citiesLoaded: [],
     loaded: false
@@ -39,11 +49,11 @@ const CitiesStore = {
     ]).then((responses) => {
       responses[0].forEach(response => {
         this.parseCityData(response);
-        if (!this.data.cities[response.city_id].yearsData[response.year]) {
-          this.data.cities[response.city_id].yearsData[response.year] = {};
-        }
-        this.data.cities[response.city_id].yearsData[response.year][response.category_id] = response.total;
+        this.parseYearData(response);
+        
       });
+
+      this.parseFamilyData(year);
 
       // assign colors
       let color = d3.scale.category20()
@@ -66,6 +76,14 @@ const CitiesStore = {
         this.data.yearsTotals[response.year][response.category_id] = response.total;
       });
 
+      // calculate family data for year
+      Object.keys(this.data.yearsTotals).forEach(year => {
+        if (this.data.yearsTotals[year][71] || this.data.yearsTotals[year][72]) {
+          this.data.yearsTotals[year]['totalFamilies'] = this.data.yearsTotals[year][71] + this.data.yearsTotals[year][72];
+          this.data.yearsTotals[year]['percentFamiliesOfColor'] = this.data.yearsTotals[year][72] / this.data.yearsTotals[year]['totalFamilies'];
+        }
+      });
+
       // load a city if one's specified
       if (citySlug) {
         this.loadCityData(this.getCityIdFromSlug(citySlug));
@@ -73,6 +91,8 @@ const CitiesStore = {
       if (selectedCategory) {
         this.setSelectedCategory(selectedCategory);
       }
+
+      console.log(this.data);
 
       this.data.loaded = true;
       this.data.yearsLoaded.push(year);
@@ -89,11 +109,10 @@ const CitiesStore = {
     ]).then((responses) => {
       responses[0].forEach(response => {
         this.parseCityData(response);
-        if (!this.data.cities[response.city_id].yearsData[response.year]) {
-          this.data.cities[response.city_id].yearsData[response.year] = {};
-        }
-        this.data.cities[response.city_id].yearsData[response.year][response.category_id] = response.total;
+        this.parseYearData(response);
       });
+
+      this.parseFamilyData(year);
 
       this.data.yearsLoaded.push(year);
       this.emit(AppActionTypes.storeChanged);
@@ -103,7 +122,11 @@ const CitiesStore = {
   loadCityData: function(city_id) {
     this.dataLoader.query([
       {
-        query: "SELECT sum(value) as total, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.state, p.project_id, project, category_id, year from urdr_city_id_key cities join urdr_id_key p on cities.city_id = " + city_id + " and cities.city_id = p.city_id join combined_dir_char md on p.project_id = md.project_id group by cities.the_geom, cities.city, cities.state, p.project_id, project, category_id, year",
+        query: "SELECT sum(value) as total, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.state, p.project_id, project, category_id, year, st_asgeojson(p.the_geom) as project_geojson from urdr_city_id_key cities join urdr_id_key p on cities.city_id = " + city_id + " and cities.city_id = p.city_id join combined_dir_char md on p.project_id = md.project_id group by cities.the_geom, cities.city, cities.state, p.project_id, project, category_id, year, p.the_geom",
+        format: 'JSON'
+      },
+      {
+        query: ("SELECT ct.cartodb_id, ST_AsGeoJSON(ct.the_geom, 4) as the_geojson, ct.gisjoin, 100 * negro / (negro + white) as percent, case when i_under_999 > (i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 999 when (i_under_999 + i__1000___1998) > (i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 1999 when (i_under_999 + i__1000___1998 + i__2000___2998) > (i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 2999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998) > (i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 3999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998) > (i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 4999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998) > (i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 5999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998) > (i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 6999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998) > (i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 7999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998) > (i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 8999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998) > (i__10000___14998 + i__15000___24998 + i__25000_plus) then 9999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998) > (i__15000___24998 + i__25000_plus) then 14999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998) > i__25000_plus then 24999 else 25000 end as median FROM us_tracts_1960 ct join urdr_city_id_key cities on cities.nhgiscty = ct.nhgiscty and cities.city_id = " + city_id + " join census_data_1960 d on ct.gisjoin = d.gisjoin and (negro + white) > 0  order by percent desc, median").replace(/\+/g, '%2B'),
         format: 'JSON'
       }
     ]).then(responses => {
@@ -112,6 +135,8 @@ const CitiesStore = {
         if (!this.data.cities[city_id].projects[response.project_id]) {
           this.data.cities[city_id].projects[response.project_id] = {
             project: response.project,
+            id: response.project_id,
+            theGeojson: JSON.parse(response.project_geojson),
             yearData: {}
           };
         }
@@ -119,6 +144,14 @@ const CitiesStore = {
           this.data.cities[city_id].projects[response.project_id].yearData[response.year] = {};
         }
         this.data.cities[city_id].projects[response.project_id].yearData[response.year][response.category_id] = response.total;
+      });
+
+      responses[1].forEach(response => {
+        this.data.cities[city_id].tracts[response.gisjoin] = {
+          theGeojson: JSON.parse(response.the_geojson),
+          percentPeopleOfColor: response.percent,
+          medianIncome: response.median
+        };
       });
 
       this.data.citiesLoaded.push(city_id);
@@ -137,9 +170,42 @@ const CitiesStore = {
         state: response.state,
         slug: response.city + response.state.toUpperCase(),
         yearsData: {},
-        projects: {}
+        projects: {},
+        tracts: {}
       };
     }
+  },
+
+  parseFamilyData: function(year) {
+    // calculate family data--white families is cat 71, non-white 72
+    Object.keys(this.data.cities).forEach(city_id => {
+      if (this.data.cities[city_id].yearsData[year]) {
+        let white = (this.data.cities[city_id].yearsData[year][71]) ? this.data.cities[city_id].yearsData[year][71] : 0,
+          nonwhite =  (this.data.cities[city_id].yearsData[year][72]) ? this.data.cities[city_id].yearsData[year][72] : 0;
+        if (white + nonwhite > 0) {
+          this.data.cities[city_id].yearsData[year]['totalFamilies'] = white + nonwhite;
+          this.data.cities[city_id].yearsData[year]['percentFamiliesOfColor'] = nonwhite / this.data.cities[city_id].yearsData[year]['totalFamilies'];
+        }
+      }
+    });
+  },
+
+  parseYearData: function(response) {
+    if (!this.data.cities[response.city_id].yearsData[response.year]) {
+      this.data.cities[response.city_id].yearsData[response.year] = {};
+    }
+    this.data.cities[response.city_id].yearsData[response.year][response.category_id] = response.total;
+  },
+
+  _pickHex: function(color1, color2, weight) {
+    var p = weight;
+    var w = p * 2 - 1;
+    var w1 = (w/1+1) / 2;
+    var w2 = 1 - w1;
+    var rgb = [Math.round(color1[0] * w1 + color2[0] * w2),
+        Math.round(color1[1] * w1 + color2[1] * w2),
+        Math.round(color1[2] * w1 + color2[2] * w2)];
+    return 'rgb(' + rgb + ')';
   },
 
   cityLoaded: function(city_id) { return (this.data.citiesLoaded.indexOf(city_id) !== -1); },
@@ -183,7 +249,7 @@ const CitiesStore = {
   getCitiesDataForYearAndCategory: function(year, category) { 
     return (this.data && this.data.loaded) ?
       this.getCitiesList()
-        .filter(cityData => cityData.yearsData[year] && !isNaN(cityData.yearsData[year][category]) && cityData.yearsData[year][category] > 0 )
+        .filter(cityData => cityData.yearsData[year] && cityData.yearsData[year][category] > 0 )
         .map(cityData => {
           return {
             lngLat: [cityData.lng, cityData.lat],
@@ -191,6 +257,23 @@ const CitiesStore = {
             value: cityData.yearsData[year][category]
           };
         }) :
+      [];
+  },
+
+  getDorlings: function(year) {
+    // need to add something to select category
+    return (this.data && this.data.loaded) ?
+      this.getCitiesList()
+        .filter(cityData => cityData.yearsData[year] && cityData.yearsData[year]['totalFamilies'] > 0 )
+        .map(cityData => {
+          return {
+            lngLat: [cityData.lng, cityData.lat],
+            city_id: cityData.city_id,
+            value: cityData.yearsData[year]['totalFamilies'],
+            color: this._pickHex([125,200,125], [100,150,200], cityData.yearsData[year]['percentFamiliesOfColor'])
+          };
+        })
+        .sort((a,b) => b.value - a.value) :
       [];
   },
 
@@ -223,6 +306,14 @@ const CitiesStore = {
   getCategoryName: function(category_id) { return this.data.categories[category_id].category; },
 
   getCategoryUnit: function(category_id) { return this.data.categories[category_id].unit; },
+
+  getProjectGeojson: function(project_id) {
+    let city_id = this.getCityId(project_id);
+    if (this.data.cities[city_id] && this.data.cities[city_id].projects[project_id]) {
+      return this.data.cities[city_id].projects[project_id];
+    }
+
+  },
 
   getYearsTotals: function() { return this.data.yearsTotals; },
 
@@ -257,6 +348,15 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
     } else {
       CitiesStore.loadYearData(action.value);
     }
+
+    if (cases[action.value]) {
+      cases[action.value].forEach(cityId => {
+        if (!CitiesStore.cityLoaded(cityId)) {
+          CitiesStore.loadCityData(cityId);
+        } 
+      });  
+    }
+
     break;
 
   }

@@ -15,6 +15,10 @@ export default class YearStats extends React.Component {
   componentDidUpdate() {}
 
   formatValue(value, category) {
+    if (!value) {
+      return '';
+    }
+    
     let formatted = '';
     switch(category) {
     case 'dollars':

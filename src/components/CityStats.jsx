@@ -28,7 +28,7 @@ export default class CityStats extends React.Component {
         >close</div>
         <ul>
         { Object.keys(this.props.categories).map(category_id => {
-          if (this.props.yearsData[this.props.year][category_id]) {
+          if (this.props.yearsData[this.props.year] && this.props.yearsData[this.props.year][category_id]) {
             return (
               <li 
                 key={ 'cat' + category_id }

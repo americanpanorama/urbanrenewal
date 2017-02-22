@@ -46,7 +46,6 @@ export default class Dorlings extends React.Component {
         .duration(750)
         .attr('r', nextProps.r)
         .style('fill', nextProps.color)
-        .style('stroke', nextProps.color)
         .each('end', () => {
           this.setState({
             r: nextProps.r,
@@ -64,10 +63,10 @@ export default class Dorlings extends React.Component {
         r={ this.state.r }
         style={ {
           fill: this.state.color,
-          fillOpacity: (this.props.selected) ? 0.9 : 0.4,
-          stroke: (this.props.selected) ? '#333' : this.state.color,
-          strokeWidth: 0.5,
-          strokeOpacity: 0.9
+          fillOpacity: 1,
+          stroke: '#333',
+          strokeWidth: 1,
+          strokeOpacity: 1
         } }
         onClick={ this.props.onCityClicked }
         id={ this.props.city_id }
