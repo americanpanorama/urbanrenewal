@@ -3,6 +3,7 @@ import AppDispatcher from './AppDispatcher';
 export const AppActionTypes = {
 
   storeChanged: 'storeChanged',
+  POCSelected: 'POCSelected',
   loadInitialData: 'loadInitialData',
   itemSelected: 'itemSelected',
   categorySelected: 'categorySelected',
@@ -52,6 +53,15 @@ export const AppActions = {
     AppDispatcher.dispatch({
       type: AppActionTypes.itemSelected,
       value: item
+    });
+  },
+
+  POCSelected: (value, topOrBottom) => {
+    console.log(value, topOrBottom);
+    AppDispatcher.dispatch({
+      type: AppActionTypes.POCSelected,
+      value: value,
+      topOrBottom: topOrBottom
     });
   },
 

@@ -22,6 +22,7 @@ const CitiesStore = {
     yearsTotals: {},
     selectedCity: null,
     selectedCategory: 72,
+    poc: [.25, 0.9],
     yearsLoaded: [],
     citiesLoaded: [],
     loaded: false
@@ -238,6 +239,16 @@ const CitiesStore = {
     this.emit(AppActionTypes.storeChanged);
   },
 
+  setPOCBottom: function(value) {
+    this.data.poc[0] = value;
+    this.emit(AppActionTypes.storeChanged);
+  },
+
+  setPOCTop: function(value) {
+    this.data.poc[1] = value;
+    this.emit(AppActionTypes.storeChanged);
+  },
+
   getCityId: function(project_id) { return Object.keys(this.data.cities).filter(city_id => this.data.cities[city_id].projects.hasOwnProperty(project_id))[0]; },
 
   getCityIdFromSlug: function(slug) { return (this.data.cities) ? Object.keys(this.data.cities).filter(cityId => (this.data.cities[cityId].slug == slug))[0] : null; },
@@ -270,7 +281,7 @@ const CitiesStore = {
             lngLat: [cityData.lng, cityData.lat],
             city_id: cityData.city_id,
             value: cityData.yearsData[year]['totalFamilies'],
-            color: this._pickHex([125,200,125], [100,150,200], cityData.yearsData[year]['percentFamiliesOfColor'])
+            color: (cityData.yearsData[year]['percentFamiliesOfColor'] >= this.getPOCBottom() && cityData.yearsData[year]['percentFamiliesOfColor'] <= this.getPOCTop()) ? this._pickHex([125,200,125], [100,150,200], cityData.yearsData[year]['percentFamiliesOfColor']) : 'transparent'
           };
         })
         .sort((a,b) => b.value - a.value) :
@@ -303,9 +314,9 @@ const CitiesStore = {
     return (this.data.categories[category_id]) ? this.data.categories[category_id].maxForCity : 1;
   },
 
-  getCategoryName: function(category_id) { return this.data.categories[category_id].category; },
+  getCategoryName: function(category_id) { return (this.data.categories[category_id]) ? this.data.categories[category_id].category : ''; },
 
-  getCategoryUnit: function(category_id) { return this.data.categories[category_id].unit; },
+  getCategoryUnit: function(category_id) { return (this.data.categories[category_id]) ? this.data.categories[category_id].unit : ''; },
 
   getProjectGeojson: function(project_id) {
     let city_id = this.getCityId(project_id);
@@ -314,6 +325,12 @@ const CitiesStore = {
     }
 
   },
+
+  getPOC: function() { return this.data.poc; },
+
+  getPOCBottom: function() { return this.data.poc[0]; },
+
+  getPOCTop: function() { return this.data.poc[1]; },
 
   getYearsTotals: function() { return this.data.yearsTotals; },
 
@@ -357,6 +374,14 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
       });  
     }
 
+    break;
+
+  case AppActionTypes.POCSelected:
+    if (action.topOrBottom == 'bottom') {
+      CitiesStore.setPOCBottom(action.value);
+    } else if (action.topOrBottom == 'top') {
+      CitiesStore.setPOCTop(action.value);
+    }
     break;
 
   }

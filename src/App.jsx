@@ -41,7 +41,7 @@ class App extends React.Component {
     this.state = this.getDefaultState();
 
     // bind handlers
-    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
   }
 
@@ -95,6 +95,8 @@ class App extends React.Component {
     this.setState({
     });
   }
+
+  onDragUpdate(value, topOrBottom) { console.log(value, topOrBottom); AppActions.POCSelected(value, topOrBottom); }
 
   onMapMoved (event) {
   }
@@ -202,6 +204,8 @@ class App extends React.Component {
         </ReactTransitionGroup>
         <TimelineComponent 
           onClick={ this.onYearClicked }
+          onDragUpdate={ this.onDragUpdate }
+          poc={ CitiesStore.getPOC() }
           year={ this.state.year }
           yearsData={ CitiesStore.getYearsTotals() }
           style={ DimensionsStore.getTimelineStyle() }

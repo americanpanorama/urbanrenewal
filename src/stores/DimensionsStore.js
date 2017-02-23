@@ -51,7 +51,8 @@ const DimensionsStore = {
 
   getTimelineStyle: function() {
     return {
-      width: this.data.mainPaneWidth
+      width: this.data.mainPaneWidth,
+      height: 100
     };
   },
 
