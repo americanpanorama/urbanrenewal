@@ -22,7 +22,7 @@ const CitiesStore = {
     yearsTotals: {},
     selectedCity: null,
     selectedCategory: 72,
-    poc: [.25, 0.9],
+    poc: [0, 1],
     yearsLoaded: [],
     citiesLoaded: [],
     loaded: false

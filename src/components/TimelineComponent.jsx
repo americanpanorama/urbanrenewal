@@ -198,8 +198,8 @@ export default class Timeline extends React.Component {
                 y="40" 
                 width={ (this.props.poc[0] * gradientLegend.width) - 1 } 
                 height="20" 
-                fill="black"
-                fillOpacity={ 0.7 }
+                fill="#111"
+                fillOpacity={ 0.9 }
               /> :
               ''
             }
@@ -210,8 +210,8 @@ export default class Timeline extends React.Component {
                 y="40" 
                 width={ (1 - this.props.poc[1]) * gradientLegend.width - 3} 
                 height="20" 
-                fill="black"
-                fillOpacity={ 0.7 }
+                fill="#111"
+                fillOpacity={ 0.9 }
               /> :
               ''
             }
