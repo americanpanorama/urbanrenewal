@@ -3,11 +3,11 @@ var React = require('react');
 var Handle = React.createClass({
 
   getInitialState: function() {
+    let xForPercent = this.props.width - (this.props.percent * this.props.width);
     return {
-      x: this.props.width - (this.props.percent * this.props.width) - 2, // the visible handle position
-      deX: this.props.width - (this.props.percent * this.props.width) - 4, // the draggable element x
+      x: (this.props.max) ? xForPercent : xForPercent - 4, // the visible handle position
+      deX: (this.props.max) ? xForPercent - 2 : xForPercent - 6, // the draggable element x
       deWidth: 8,
-      pocBottom: this.props.percent, // the value
       isDragging: false,
       max: (this.props.max) ? this.props.max : 1,
       min: (this.props.min) ? this.props.min : 0,

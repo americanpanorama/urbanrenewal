@@ -7,7 +7,7 @@ const DimensionsStore = {
   data: {
     containerPadding: 20,
     headerHeight: 100,
-    timelineHeight: 150, // set in scss
+    timelineHeight: 200, // set in scss
     tilesHeight: window.innerHeight - 140, // two paddings + headerHeight
     sidebarTitleBottomMargin: 10,
     adNavHeight: 20,
@@ -22,8 +22,8 @@ const DimensionsStore = {
     this.data.windowHeight = window.innerHeight;
     this.data.windowWidth = window.innerWidth;
     this.data.tilesHeight = this.data.windowHeight - this.data.headerHeight - 2*this.data.containerPadding;
-    this.data.sidebarWidth =(document.getElementsByClassName('dataViewer').length > 0) ? document.getElementsByClassName('dataViewer')[0].offsetWidth : this.data.windowWidth * 0.322 - 2*this.data.containerPadding;
-    this.data.mainPaneWidth = (document.getElementsByClassName('main-pane').length > 0) ? document.getElementsByClassName('main-pane')[0].offsetWidth : this.data.windowWidth * 0.644 - 2*this.data.containerPadding;
+    this.data.sidebarWidth =(document.getElementsByClassName('dataViewer').length > 0) ? document.getElementsByClassName('dataViewer')[0].offsetWidth : this.data.windowWidth * 0.33 - this.data.containerPadding;
+    this.data.mainPaneWidth = (document.getElementsByClassName('main-pane').length > 0) ? document.getElementsByClassName('main-pane')[0].offsetWidth : this.data.windowWidth * 0.66;
     this.data.sidebarTitleHeight = (document.getElementsByClassName('sidebarTitle').length > 0) ? document.getElementsByClassName('sidebarTitle')[0].offsetHeight: 30;
     this.data.nationalMapHeight = this.data.windowHeight - this.data.headerHeight - this.data.timelineHeight;
 
@@ -51,8 +51,15 @@ const DimensionsStore = {
 
   getTimelineStyle: function() {
     return {
-      width: this.data.mainPaneWidth,
-      height: 100
+      width: this.data.mainPaneWidth - 300,
+      height: this.data.timelineHeight
+    };
+  },
+
+  getLegendGradientStyle: function() {
+    return {
+      width: 300,
+      height: this.data.timelineHeight
     };
   },
 
@@ -62,7 +69,9 @@ const DimensionsStore = {
 
   getSidebarStyle: function() {
     return {
-      width: this.data.sidebarWidth
+      marginTop: this.data.headerHeight,
+      width: this.data.sidebarWidth,
+      paddingRight: this.data.containerPadding
     };
   },
 

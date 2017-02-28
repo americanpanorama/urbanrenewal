@@ -4,22 +4,19 @@ html {
   height: 100%;
   width: 100%;
   background-color: $background-color;
+  font-family: 'Oswald', serif;
 }
 
 body {
   color: $text-color;
 }
 
-h1 { font-size: 2em; }
-h2 { font-size: 1.4em; }
+h1 { font-size: 3em; }
+h2 { font-size: 2em; }
 h3 { font-size: 1em; }
 h4 { font-size: 0.67em; }
 h5 { font-size: 0.5em; }
 h6 { font-size: 0.35em; }
-
-.ussvg {
-  background-color: #111;
-}
 
 aside {
   position: fixed;
@@ -28,3 +25,13 @@ aside {
   bottom: 10px;
 }
 
+header {
+  text-align: center;
+  * {
+    display: inline-block;
+  }
+  h1 {
+    padding-right: 10px;
+  }
+
+}

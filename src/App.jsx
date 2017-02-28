@@ -13,6 +13,7 @@ import HashManager from './stores/HashManager';
 // components
 //import { HashManager } from '@panorama/toolkit';
 import CityMap from './components/CityMap.jsx';
+import LegendGradient from './components/LegendGradientComponent.jsx';
 import TimelineComponent from './components/TimelineComponent.jsx';
 import USMap from './components/USMapComponent.jsx';
 import CityStats from './components/CityStats.jsx';
@@ -187,7 +188,8 @@ class App extends React.Component {
     return (
       <div>
         <header style={ DimensionsStore.getHeaderStyle() }>
-          <h1>Renewing Inequality, 1949-1973</h1>
+          <h1>Renewing Inequality</h1>
+          <h2>1954-1972</h2>
         </header>
 
         <ReactTransitionGroup>
@@ -204,11 +206,16 @@ class App extends React.Component {
         </ReactTransitionGroup>
         <TimelineComponent 
           onClick={ this.onYearClicked }
-          onDragUpdate={ this.onDragUpdate }
+          state={ this.state }
           poc={ CitiesStore.getPOC() }
           year={ this.state.year }
           yearsData={ CitiesStore.getYearsTotals() }
           style={ DimensionsStore.getTimelineStyle() }
+        />
+        <LegendGradient
+          poc={ CitiesStore.getPOC() }
+          style={ DimensionsStore.getLegendGradientStyle() }
+          onDragUpdate={ this.onDragUpdate }
         />
         <aside
           style={ DimensionsStore.getSidebarStyle() }

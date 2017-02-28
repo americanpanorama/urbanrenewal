@@ -1,6 +1,5 @@
 #timeline {
 
-  height: 150px;
   
   span {
     margin: 0 10px;
@@ -12,8 +11,17 @@
     }
   }
 
-            #rect1 { fill: url(#Gradient1); }
-            .stop1 { stop-color: rgb(125,200,125); }
-            .stop2 { stop-color: rgb(100,150,200); }
+
+
+  text {
+      -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+  	user-select: none;
+  }
 
 }
+
+            #rect1 { fill: url(#grad1); }
+            .stop1 { stop-color: rgb(125,200,125); }
+            .stop2 { stop-color: rgb(100,150,200); }
