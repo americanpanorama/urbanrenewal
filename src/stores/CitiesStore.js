@@ -93,8 +93,6 @@ const CitiesStore = {
         this.setSelectedCategory(selectedCategory);
       }
 
-      console.log(this.data);
-
       this.data.loaded = true;
       this.data.yearsLoaded.push(year);
       this.emit(AppActionTypes.storeChanged);
@@ -123,7 +121,7 @@ const CitiesStore = {
   loadCityData: function(city_id) {
     this.dataLoader.query([
       {
-        query: "SELECT sum(value) as total, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.state, p.project_id, project, category_id, year, st_asgeojson(p.the_geom) as project_geojson from urdr_city_id_key cities join urdr_id_key p on cities.city_id = " + city_id + " and cities.city_id = p.city_id join combined_dir_char md on p.project_id = md.project_id group by cities.the_geom, cities.city, cities.state, p.project_id, project, category_id, year, p.the_geom",
+        query: "SELECT sum(value) as total, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.state, p.project_id, project, category_id, year, st_asgeojson(p.the_geom) as project_geojson from urdr_city_id_key cities join urdr_id_key p on cities.city_id = " + city_id + " and cities.city_id = p.city_id join combined_dir_char md on p.project_id = md.project_id and case when md.category_id = any(array[71,72]) and quarter != 'December' then false else true end group by cities.the_geom, cities.city, cities.state, p.project_id, project, category_id, year, p.the_geom",
         format: 'JSON'
       },
       {
@@ -138,13 +136,13 @@ const CitiesStore = {
             project: response.project,
             id: response.project_id,
             theGeojson: JSON.parse(response.project_geojson),
-            yearData: {}
+            yearsData: {}
           };
         }
-        if (!this.data.cities[city_id].projects[response.project_id].yearData[response.year]) {
-          this.data.cities[city_id].projects[response.project_id].yearData[response.year] = {};
+        if (!this.data.cities[city_id].projects[response.project_id].yearsData[response.year]) {
+          this.data.cities[city_id].projects[response.project_id].yearsData[response.year] = {};
         }
-        this.data.cities[city_id].projects[response.project_id].yearData[response.year][response.category_id] = response.total;
+        this.data.cities[city_id].projects[response.project_id].yearsData[response.year][response.category_id] = response.total;
       });
 
       responses[1].forEach(response => {
@@ -154,6 +152,19 @@ const CitiesStore = {
           medianIncome: response.median
         };
       });
+
+      // use the project totals to calculate city totals
+      this.data.cities[city_id].yearsData = {};
+      Object.keys(this.data.cities[city_id].projects).forEach(project_id => {
+        Object.keys(this.data.cities[city_id].projects[project_id].yearsData).forEach(year => {
+          this.data.cities[city_id].yearsData[year] = (this.data.cities[city_id].yearsData[year]) ? this.data.cities[city_id].yearsData[year] : {};
+          Object.keys(this.data.cities[city_id].projects[project_id].yearsData[year]).forEach(category_id => {
+            this.data.cities[city_id].yearsData[year][category_id] = (this.data.cities[city_id].yearsData[year][category_id]) ? this.data.cities[city_id].yearsData[year][category_id] + this.data.cities[city_id].projects[project_id].yearsData[year][category_id] : this.data.cities[city_id].projects[project_id].yearsData[year][category_id];
+          });
+        });
+      });
+      // add family data
+      Object.keys(this.data.cities[city_id].yearsData).forEach(year => this.parseFamilyData(year, city_id) );
 
       this.data.citiesLoaded.push(city_id);
       this.setSelectedCity(city_id);
@@ -177,9 +188,10 @@ const CitiesStore = {
     }
   },
 
-  parseFamilyData: function(year) {
+  parseFamilyData: function(year, singleCityId) {
     // calculate family data--white families is cat 71, non-white 72
-    Object.keys(this.data.cities).forEach(city_id => {
+    let CityIdsToParse = (singleCityId) ? [singleCityId] : Object.keys(this.data.cities);
+    CityIdsToParse.forEach(city_id => {
       if (this.data.cities[city_id].yearsData[year]) {
         let white = (this.data.cities[city_id].yearsData[year][71]) ? this.data.cities[city_id].yearsData[year][71] : 0,
           nonwhite =  (this.data.cities[city_id].yearsData[year][72]) ? this.data.cities[city_id].yearsData[year][72] : 0;

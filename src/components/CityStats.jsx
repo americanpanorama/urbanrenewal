@@ -44,12 +44,12 @@ export default class CityStats extends React.Component {
                 { (CitiesStore.getSelectedCategory() == category_id) ?
                   <ul className='projects'>
                   { Object.keys(this.props.projects).map(project_id => {
-                    if (this.props.projects[project_id].yearData[this.props.year] && this.props.projects[project_id].yearData[this.props.year][category_id] > 0) {
+                    if (this.props.projects[project_id].yearsData[this.props.year] && this.props.projects[project_id].yearsData[this.props.year][category_id] > 0) {
                       return (
                         <li 
                           key={ 'project' + project_id }
                         >
-                          { this.props.projects[project_id].project + ": " + this.formatValue(this.props.projects[project_id].yearData[this.props.year][category_id], CitiesStore.getCategoryUnit(category_id))}
+                          { this.props.projects[project_id].project + ": " + this.formatValue(this.props.projects[project_id].yearsData[this.props.year][category_id], CitiesStore.getCategoryUnit(category_id))}
                         </li>
                       );
                     }

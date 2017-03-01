@@ -25,7 +25,7 @@ const DimensionsStore = {
     this.data.sidebarWidth =(document.getElementsByClassName('dataViewer').length > 0) ? document.getElementsByClassName('dataViewer')[0].offsetWidth : this.data.windowWidth * 0.33 - this.data.containerPadding;
     this.data.mainPaneWidth = (document.getElementsByClassName('main-pane').length > 0) ? document.getElementsByClassName('main-pane')[0].offsetWidth : this.data.windowWidth * 0.66;
     this.data.sidebarTitleHeight = (document.getElementsByClassName('sidebarTitle').length > 0) ? document.getElementsByClassName('sidebarTitle')[0].offsetHeight: 30;
-    this.data.nationalMapHeight = this.data.windowHeight - this.data.headerHeight - this.data.timelineHeight;
+    this.data.nationalMapHeight = this.data.windowHeight - this.data.headerHeight - this.data.timelineHeight - this.data.containerPadding * 2;
 
     this.emit(AppActionTypes.storeChanged);
   },

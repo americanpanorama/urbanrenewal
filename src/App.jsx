@@ -97,7 +97,7 @@ class App extends React.Component {
     });
   }
 
-  onDragUpdate(value, topOrBottom) { console.log(value, topOrBottom); AppActions.POCSelected(value, topOrBottom); }
+  onDragUpdate(value, topOrBottom) { AppActions.POCSelected(value, topOrBottom); }
 
   onMapMoved (event) {
   }
@@ -120,8 +120,7 @@ class App extends React.Component {
 
   onZoomIn(event) {
     let nextZoom = this.state.zoom*2;
-    console.log(DimensionsStore.getNationalMapHeight()  / 2, event.nativeEvent.offsetX, this.state.x, this.state.zoom, nextZoom);
-
+    
     this.setState({ 
       zoom: nextZoom,
       x: DimensionsStore.getMainPaneWidth()  / 2 - (event.nativeEvent.offsetX - this.state.x) / this.state.zoom * (nextZoom),
@@ -207,9 +206,9 @@ class App extends React.Component {
         <TimelineComponent 
           onClick={ this.onYearClicked }
           state={ this.state }
-          poc={ CitiesStore.getPOC() }
           year={ this.state.year }
-          yearsData={ CitiesStore.getYearsTotals() }
+          yearsData={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData : CitiesStore.getYearsTotals() }
+          name={ (CitiesStore.getSelectedCity()) ? (CitiesStore.getCityData(CitiesStore.getSelectedCity()).city + ', ' + CitiesStore.getCityData(CitiesStore.getSelectedCity()).state).toUpperCase() : 'United States' }
           style={ DimensionsStore.getTimelineStyle() }
         />
         <LegendGradient
@@ -235,7 +234,7 @@ class App extends React.Component {
             />
           }
 
-          { (cases[this.state.year]) ? 
+          {/* (cases[this.state.year]) ? 
             cases[this.state.year].map((cityId, i)=> {
               return (
                 <CityMap 
@@ -246,7 +245,7 @@ class App extends React.Component {
               );
             }) :
             ''
-          }
+          */}
 
 
 
