@@ -36,7 +36,7 @@ const CitiesStore = {
 
     this.dataLoader.query([
       {
-        query: "select * from (SELECT sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, city, state, year, md.category_id from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id and year = " + year + " and quarter = 'December' join urdr_city_id_key cities on md.city_id = cities.city_id group by cities.the_geom, city, state, cities.city_id, year, md.category_id) year_vals where total is not null",
+        query: "select * from (SELECT sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, city, state, year, md.category_id from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id and year = " + year + " join urdr_city_id_key cities on md.city_id = cities.city_id group by cities.the_geom, city, state, cities.city_id, year, md.category_id) year_vals where total is not null", //"select * from (SELECT sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, city, state, year, md.category_id from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id and year = " + year + " and quarter = 'December' join urdr_city_id_key cities on md.city_id = cities.city_id group by cities.the_geom, city, state, cities.city_id, year, md.category_id) year_vals where total is not null",
         format: 'JSON'
       },
       {
@@ -44,7 +44,7 @@ const CitiesStore = {
         format: 'JSON'
       },
       { 
-        query: "SELECT sum(value) as total, year, md.category_id from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id and case when c.category_id = any(array[71,72]) and quarter != 'December' then false else true end group by year, md.category_id order by year, category_id",
+        query: "SELECT sum(value) as total, year, md.category_id from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id group by year, md.category_id order by year, category_id", //"SELECT sum(value) as total, year, md.category_id from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id and case when c.category_id = any(array[71,72]) and quarter != 'December' then false else true end group by year, md.category_id order by year, category_id",
         format: 'JSON'
       }
     ]).then((responses) => {
@@ -121,7 +121,7 @@ const CitiesStore = {
   loadCityData: function(city_id) {
     this.dataLoader.query([
       {
-        query: "SELECT sum(value) as total, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.state, p.project_id, project, category_id, year, st_asgeojson(p.the_geom) as project_geojson from urdr_city_id_key cities join urdr_id_key p on cities.city_id = " + city_id + " and cities.city_id = p.city_id join combined_dir_char md on p.project_id = md.project_id and case when md.category_id = any(array[71,72]) and quarter != 'December' then false else true end group by cities.the_geom, cities.city, cities.state, p.project_id, project, category_id, year, p.the_geom",
+        query: "SELECT sum(value) as total, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.state, p.project_id, project, category_id, year, st_asgeojson(p.the_geom) as project_geojson from urdr_city_id_key cities join urdr_id_key p on cities.city_id = " + city_id + " and cities.city_id = p.city_id join combined_dir_char md on p.project_id = md.project_id group by cities.the_geom, cities.city, cities.state, p.project_id, project, category_id, year, p.the_geom", //"SELECT sum(value) as total, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.state, p.project_id, project, category_id, year, st_asgeojson(p.the_geom) as project_geojson from urdr_city_id_key cities join urdr_id_key p on cities.city_id = " + city_id + " and cities.city_id = p.city_id join combined_dir_char md on p.project_id = md.project_id and case when md.category_id = any(array[71,72]) and quarter != 'December' then false else true end group by cities.the_geom, cities.city, cities.state, p.project_id, project, category_id, year, p.the_geom",
         format: 'JSON'
       },
       {
@@ -376,15 +376,15 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
     if (CitiesStore.yearLoaded(action.value)) {
     } else {
       CitiesStore.loadYearData(action.value);
-    }
+    } 
 
-    if (cases[action.value]) {
+    /* if (cases[action.value]) {
       cases[action.value].forEach(cityId => {
         if (!CitiesStore.cityLoaded(cityId)) {
           CitiesStore.loadCityData(cityId);
         } 
       });  
-    }
+    } */
 
     break;
 

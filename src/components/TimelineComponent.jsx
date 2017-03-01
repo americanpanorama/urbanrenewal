@@ -48,15 +48,15 @@ export default class Timeline extends React.Component {
     let firstYear = 1954,
       years = [...Array(19).keys()].map(num => num+firstYear),
       width = this.props.style.width,
-      rightMargin = 50,
+      rightMargin = 200,
       contentWidth = width - rightMargin,
       yearWidth = contentWidth / years.length,
       yearMiddleOffset = yearWidth / 2,
       barWidth = Math.round(yearWidth * 0.6666),
       barOffset = (yearWidth - barWidth) / 2,
       height = this.props.style.height,
-      headerHeight = 35,
-      footerHeight = 35,
+      headerHeight = 0,
+      footerHeight = 0,
       contentHeight = height - headerHeight - footerHeight,
       yearLabelSize = 14,
       yearLabelHeight = 20,
@@ -85,46 +85,51 @@ export default class Timeline extends React.Component {
           </filter>
         </defs>
 
-        {/* header */}
-        <text
-          dx={ width }
-          dy={ 0 }
-          fill='white'
-          fontSize={ 20 }
-          textAnchor='end'
-          alignmentBaseline='hanging'
-        >
-          { this.props.name }
-        </text>
+
 
         {/* category labels */}
         <g>
-          <text
-            dx={ rightMargin + 20 }
-            dy={ 0 }
-            fill='white'
-            fontSize={ 15 }
-            textAnchor='start'
-            alignmentBaseline='hanging'
-          >
-            families displaced
-          </text>
-          <text
-            dx={ rightMargin + 20 }
-            dy={ height - 4 }
-            fill='white'
-            fontSize={ 15 }
-            textAnchor='start'
-            alignmentBaseline='baseline'
-          >
-            funding
-          </text>
+
         </g>
 
     
         <g 
           transform={'translate(0,' + headerHeight + ')'}
         >  
+
+          {/* header */}
+          <text
+            dx={ rightMargin / 2 }
+            dy={ yearLabelY + 2 }
+            fill='white'
+            fontSize={ 20 }
+            textAnchor='middle'
+            alignmentBaseline='middle'
+          >
+            { this.props.name }
+          </text>
+
+          <text
+            dx={ rightMargin - 30 }
+            dy={ maxBarHeight * 0.5 }
+            fill='white'
+            fontSize={ 15 }
+            textAnchor='end'
+            alignmentBaseline='middle'
+          >
+            families displaced
+          </text>
+          <text
+            dx={ rightMargin - 30 }
+            dy={ bottomY + maxBarHeight * 0.5 }
+            fill='white'
+            fontSize={ 15 }
+            textAnchor='end'
+            alignmentBaseline='middle'
+          >
+            funding
+          </text>
+
           {/* axes */}
           { [...Array(Math.floor(maxFamilies /familiesTickInterval)).keys()].map(iterator => {
             return (

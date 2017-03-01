@@ -89,9 +89,9 @@ var Handle = React.createClass({
           className='visibleHandle'
           id={ this.props.id }
           x={ this.state.x }
-          y={ 35 }
+          y={ this.props.y }
           width={ 4 }
-          height={ 30 }
+          height={ this.props.height }
           fill={ this.state.handleColor }
         />
         <rect className="handle"

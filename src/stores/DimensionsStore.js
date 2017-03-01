@@ -7,7 +7,7 @@ const DimensionsStore = {
   data: {
     containerPadding: 20,
     headerHeight: 100,
-    timelineHeight: 200, // set in scss
+    timelineHeight: 150, // set in scss
     tilesHeight: window.innerHeight - 140, // two paddings + headerHeight
     sidebarTitleBottomMargin: 10,
     adNavHeight: 20,
@@ -35,6 +35,12 @@ const DimensionsStore = {
   getMainPaneWidth: function() { return this.data.mainPaneWidth; },
 
   getNationalMapHeight: function() { return this.data.nationalMapHeight; },
+
+  getMainStyle: function() {
+    return {
+      width: this.data.mainPaneWidth
+    };
+  },
 
   getHeaderStyle: function() {
     return {

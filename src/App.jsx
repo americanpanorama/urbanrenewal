@@ -61,8 +61,6 @@ class App extends React.Component {
     GeographyStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
     HighwaysStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
 
-    CitiesStore.loadCityData(994);
-
     // this.setState({
     //   x: DimensionsStore.getMainPaneWidth() / 2,
     //   y: DimensionsStore.getNationalMapHeight() / 2
@@ -77,6 +75,7 @@ class App extends React.Component {
   getDefaultState () {
     return {
       year: (HashManager.getState().year) ? HashManager.getState().year : 1958,
+      cat: (HashManager.getState().cat) ? HashManager.getState().cat : 'families',
       x: (HashManager.getState().view) ? parseInt(HashManager.getState().view.split('/')[0]) :0,
       y: (HashManager.getState().view) ? parseInt(HashManager.getState().view.split('/')[1]) :0,
       zoom: (HashManager.getState().view) ? parseInt(HashManager.getState().view.split('/')[2]) : 1
@@ -178,8 +177,8 @@ class App extends React.Component {
     HashManager.updateHash({ 
       year: this.state.year,
       view: [this.state.x, this.state.y, this.state.zoom].join('/'),
-      //city: CitiesStore.getSlug(),
-      //category: CitiesStore.getSelectedCategory()
+      city: CitiesStore.getSlug(),
+      cat: this.state.cat
     });
   }
 
@@ -191,31 +190,36 @@ class App extends React.Component {
           <h2>1954-1972</h2>
         </header>
 
-        <ReactTransitionGroup>
-          <USMap 
-            state={ this.state }
-            onCityClicked={ this.onCityClicked }
-            style={ DimensionsStore.getNationalMapStyle() }
-            onMapClicked={ this.onZoomIn }
-            handleMouseUp={ this.handleMouseUp }
-            handleMouseDown={ this.handleMouseDown }
-            handleMouseMove={ this.handleMouseMove }
-            zoomOut={ this.zoomOut }
+        <article style={ DimensionsStore.getMainStyle() }>
+          <ReactTransitionGroup>
+            <USMap 
+              state={ this.state }
+              onCityClicked={ this.onCityClicked }
+              style={ DimensionsStore.getNationalMapStyle() }
+              onMapClicked={ this.onZoomIn }
+              handleMouseUp={ this.handleMouseUp }
+              handleMouseDown={ this.handleMouseDown }
+              handleMouseMove={ this.handleMouseMove }
+              zoomOut={ this.zoomOut }
+            />
+          </ReactTransitionGroup>
+          <LegendGradient
+            poc={ CitiesStore.getPOC() }
+            style={ DimensionsStore.getLegendGradientStyle() }
+            onDragUpdate={ this.onDragUpdate }
+            percent={ (CitiesStore.getSelectedCity() && CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year] && CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year].percentFamiliesOfColor) ? Math.round(CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year].percentFamiliesOfColor * 100) : false }
+            
           />
-        </ReactTransitionGroup>
-        <TimelineComponent 
-          onClick={ this.onYearClicked }
-          state={ this.state }
-          year={ this.state.year }
-          yearsData={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData : CitiesStore.getYearsTotals() }
-          name={ (CitiesStore.getSelectedCity()) ? (CitiesStore.getCityData(CitiesStore.getSelectedCity()).city + ', ' + CitiesStore.getCityData(CitiesStore.getSelectedCity()).state).toUpperCase() : 'United States' }
-          style={ DimensionsStore.getTimelineStyle() }
-        />
-        <LegendGradient
-          poc={ CitiesStore.getPOC() }
-          style={ DimensionsStore.getLegendGradientStyle() }
-          onDragUpdate={ this.onDragUpdate }
-        />
+          <TimelineComponent 
+            onClick={ this.onYearClicked }
+            state={ this.state }
+            year={ this.state.year }
+            yearsData={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData : CitiesStore.getYearsTotals() }
+            name={ (CitiesStore.getSelectedCity()) ? (CitiesStore.getCityData(CitiesStore.getSelectedCity()).city + ', ' + CitiesStore.getCityData(CitiesStore.getSelectedCity()).state).toUpperCase() : 'United States' }
+            style={ DimensionsStore.getTimelineStyle() }
+          />
+        </article>
+        
         <aside
           style={ DimensionsStore.getSidebarStyle() }
         >

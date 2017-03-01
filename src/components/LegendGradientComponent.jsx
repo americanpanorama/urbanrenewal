@@ -34,12 +34,12 @@ export default class LegendGradient extends React.Component {
   render() {
     let width = this.props.style.width,
       height = this.props.style.height,
-      gradientLegend = {
-        width: this.props.style.width - 100,
-        gutter: 50
-      },
-      xForBottom = gradientLegend.gutter + ((100 - Math.round(this.props.poc[0] * 100)) * gradientLegend.width / 100),
-      xForTop = gradientLegend.gutter + ((100 - Math.round(this.props.poc[1] * 100)) * gradientLegend.width / 100);
+      gutter = 30,
+      barWidth = width - gutter * 2,
+      barHeight = 20,
+      xForBottom = gutter + ((100 - Math.round(this.props.poc[0] * 100)) * barWidth / 100),
+      xForTop = gutter + ((100 - Math.round(this.props.poc[1] * 100)) * barWidth / 100),
+      mask = (this.props.percent) ? [this.props.percent/100 - 0.01, this.props.percent/100 + 0.01] : (this.props.poc) ? this.props.poc : [0,1];
 
     return (
       <svg 
@@ -61,89 +61,122 @@ export default class LegendGradient extends React.Component {
 
           {/* category labels */}
           <text
-            x={ gradientLegend.gutter }
-            y={ 16 }
-            fontSize={ 11 }
+            x={ gutter }
+            y={ height * 0.25 - 5 }
+            fontSize={ 15 }
             fill='white'
-            textAnchor='middle'
+            textAnchor='start'
+            alignmentBaseline='middle'
           >
             people of color
           </text>
           <text
-            x={ gradientLegend.gutter + gradientLegend.width }
-            y={ 91 }
-            fontSize={ 11 }
+            x={ gutter + barWidth }
+            y={ height * 0.75 + 5 }
+            fontSize={ 15 }
             fill='white'
-            textAnchor='middle'
+            textAnchor='end'
+            alignmentBaseline='middle'
           >
             whites
           </text>
 
           {/* percent labels */}
+          { (this.props.percent) ? 
+            <g transform={ 'translate(' + gutter + ')' } >
+              <text
+                dx={ barWidth - (this.props.percent/100 * barWidth) }
+                y={ height / 2 - barHeight / 2 - 9 }
+                fill='white'
+                textAnchor='middle'
+                fontSize={ 11 }
+                alignmentBaseline='middle'
+              >
+                { this.props.percent + '%' }
+              </text> 
+              <text
+                dx={ barWidth - (this.props.percent/100 * barWidth) }
+                y={ height / 2 + barHeight / 2 + 9 }
+                fill='white'
+                textAnchor='middle'
+                fontSize={ 11 }
+                alignmentBaseline='middle'
+              >
+                { (100 - this.props.percent) + '%' }
+              </text>
+            </g> :
+            <g>
+               <text
+                  x={ xForBottom }
+                  y={ height / 2 - barHeight / 2 - 9 }
+                  fontSize={ 11 }
+                  fill='white'
+                  textAnchor='start'
+                  alignmentBaseline='baseline'
+                >
+                  { Math.round(this.props.poc[0] * 100) + '%' }
+                </text>
+                <text
+                  x={ xForBottom }
+                  y={ height / 2 + barHeight / 2 + 9 }
+                  fontSize={ 11 }
+                  fill="white"
+                  textAnchor='start'
+                  alignmentBaseline='hanging'
+                >
+                  { (100 - Math.round(this.props.poc[0] * 100)) + '%' }
+                </text>
+                <text
+                  x={ xForTop }
+                  y={ height / 2 - barHeight / 2 - 9 }
+                  fontSize={ 11 }
+                  fill='white'
+                  textAnchor='end'
+                  alignmentBaseline='baseline'
+                >
+                  { Math.round(this.props.poc[1] * 100) + '%' }
+                </text>
+                <text
+                  x={ xForTop }
+                  y={ height / 2 + barHeight / 2 + 9 }
+                  fontSize={ 11 }
+                  fill="white"
+                  textAnchor='end'
+                  alignmentBaseline='hanging'
+                >
+                  { (100 - Math.round(this.props.poc[1] * 100)) + '%' }
+                </text>
+            </g>
+          }
 
-          <text
-            x={ xForBottom }
-            y={ 32 }
-            fontSize={ 11 }
-            fill='white'
-            textAnchor='start'
-          >
-            { Math.round(this.props.poc[0] * 100) + '%' }
-          </text>
-          <text
-            x={ xForBottom }
-            y={ 75 }
-            fontSize={ 11 }
-            fill="white"
-            textAnchor='start'
-          >
-            { (100 - Math.round(this.props.poc[0] * 100)) + '%' }
-          </text>
-          <text
-            x={ xForTop }
-            y={ 32 }
-            fontSize={ 11 }
-            fill='white'
-            textAnchor='end'
-          >
-            { Math.round(this.props.poc[1] * 100) + '%' }
-          </text>
-          <text
-            x={ xForTop }
-            y={ 75 }
-            fontSize={ 11 }
-            fill="white"
-            textAnchor='end'
-          >
-            { (100 - Math.round(this.props.poc[1] * 100)) + '%' }
-          </text>
+ 
 
           {/* gradient rect with masks for disabled ranges */}
-          <g transform={ 'translate(' + gradientLegend.gutter + ')' } >
+          <g transform={ 'translate(' + gutter + ')' } >
             <rect 
               id="rect1" 
               x="0" 
-              y="40" 
-              width={ gradientLegend.width } 
-              height="20" 
+              y={ height / 2 - barHeight / 2 }
+              width={ barWidth } 
+              height={ barHeight } 
               fill="url(#grad1)"
             />
-            { (this.props.poc[0] > 0) ?
+            { (mask[0] > 0) ?
               <rect
-                x={gradientLegend.width - (this.props.poc[0] * gradientLegend.width) + 2 }
-                y="40" 
-                width={ (this.props.poc[0] * gradientLegend.width) - 1 } 
+                x={barWidth - (mask[0] * barWidth) + 2 }
+                y={ height / 2 - barHeight / 2 }
+                width={ (mask[0] * barWidth) - 1 } 
                 height="20" 
                 fill="#111"
                 fillOpacity={ 0.9 }
               /> :
               ''
             }
-            { (this.props.poc[1] < 1) ?
+            { (mask[1] < 1) ?
               <rect
                 x={ 0 }
-                y="40" 
-                width={ (1 - this.props.poc[1]) * gradientLegend.width} 
+                y={ height / 2 - barHeight / 2 }
+                width={ (1 - mask[1]) * barWidth} 
                 height="20" 
                 fill="#111"
                 fillOpacity={ 0.9 }
@@ -152,20 +185,74 @@ export default class LegendGradient extends React.Component {
             }
 
             {/* top and bottom handles */}
-            <Handle
-              percent={ this.props.poc[0] }
-              max={ this.props.poc[1] }
-              width={ gradientLegend.width } 
-              onUpdate={ this.props.onDragUpdate }
-            />
+            { (!this.props.percent) ? 
+              <g>
+                <Handle
+                  y={ height / 2 - barHeight / 2 - 5 }
+                  height={ barHeight + 10 }
+                  percent={ this.props.poc[0] }
+                  max={ this.props.poc[1] }
+                  width={ barWidth } 
+                  onUpdate={ this.props.onDragUpdate }
+                />
 
-            <Handle
-              percent={ this.props.poc[1] }
-              min={ this.props.poc[0] }
-              width={ gradientLegend.width } 
-              onUpdate={ this.props.onDragUpdate }
-            />
+                <Handle
+                  y={ height / 2 - barHeight / 2 - 5 }
+                  height={ barHeight + 10 }
+                  percent={ this.props.poc[1] }
+                  min={ this.props.poc[0] }
+                  width={ barWidth } 
+                  onUpdate={ this.props.onDragUpdate }
+                />
+              </g> :
+              ''  
+            }
+            
 
+            {/* (this.props.percent) ? 
+              <g>
+                <rect
+                  x={ barWidth - (this.props.percent/100 * barWidth) }
+                  y={ height / 2 + barHeight / 2 + 5 }
+                  width={ 1 }
+                  height={ height-15 - (height / 2 + barHeight / 2 + 5) }
+                  fill='silver'
+                />
+                <rect
+                  x={ barWidth - (this.props.percent/100 * barWidth) }
+                  y={ height / 2 + barHeight / 2 + 5 }
+                  width={ 1 }
+                  height={ 7 }
+                  fill='silver'
+                  transform={"rotate(-30 " + (barWidth - (this.props.percent/100 * barWidth)) + " " + (height / 2 + barHeight / 2 + 5) + ")" }
+                />
+                <rect
+                  x={ barWidth - (this.props.percent/100 * barWidth) }
+                  y={ height / 2 + barHeight / 2 + 5 }
+                  width={ 1 }
+                  height={ 7 }
+                  fill='silver'
+                  transform={"rotate(30 " + (barWidth - (this.props.percent/100 * barWidth)) + " " + (height / 2 + barHeight / 2 + 5) + ")" }
+                />
+                <rect
+                  x={ barWidth - (this.props.percent/100 * barWidth) }
+                  y={ height - 15 }
+                  width={ width }
+                  height={ 1 }
+                  fill='silver'
+                />
+                <text
+                  dx={ barWidth - (this.props.percent/100 * barWidth) }
+                  dy={ height-15 }
+                  fill='white'
+                  textAnchor='middle'
+                  alignmentBaseline='middle'
+                >
+                  { (this.props.percent >= 50) ? this.props.percent + '% people of color' :  (100 - this.props.percent) + '% whites' }
+                </text> 
+              </g>:
+              '' 
+            */}
 
           </g>
         </g>
