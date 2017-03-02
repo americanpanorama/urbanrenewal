@@ -80,7 +80,7 @@ export default class USMap extends React.Component {
 
     let r = d3.scale.sqrt()
       .domain([0, CitiesStore.getCategoryMaxForCity('selected')])
-      .range([0, scale/70/this.state.dorlingZoom]);
+      .range([0, scale/30/this.state.dorlingZoom]);
 
     return (
       <svg 

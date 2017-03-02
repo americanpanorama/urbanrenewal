@@ -2,6 +2,7 @@ import * as React from 'react';
 import { PropTypes } from 'react';
 import * as d3 from 'd3';
 import ReactTransitionGroup from 'react-addons-transition-group';
+import Timespan from './TimespanComponent.jsx';
 
 export default class Timeline extends React.Component {
 
@@ -55,7 +56,7 @@ export default class Timeline extends React.Component {
       barWidth = Math.round(yearWidth * 0.6666),
       barOffset = (yearWidth - barWidth) / 2,
       height = this.props.style.height,
-      headerHeight = 0,
+      headerHeight = 200,
       footerHeight = 0,
       contentHeight = height - headerHeight - footerHeight,
       yearLabelSize = 14,
@@ -69,7 +70,75 @@ export default class Timeline extends React.Component {
       familiesTickHeight = topY / (maxFamilies / familiesTickInterval),
       maxFunding = Object.keys(this.props.yearsData).reduce((candidate, year) => (!this.props.yearsData[year][68] || candidate > this.props.yearsData[year][68]) ? candidate : this.props.yearsData[year][68], 0),
       fundingTickInterval = this._calculateTickInterval(maxFunding),
-      fundingTickHeight = topY / (maxFunding / fundingTickInterval);
+      fundingTickHeight = topY / (maxFunding / fundingTickInterval),
+      projectsRows = 0,
+      projectRowHeight = 12;
+
+      
+    let yearsSpanWidth = (year1, year2) => yearWidth * (year2-year1) - 1,
+      xOffsetForYear = (year) => (year - firstYear) * yearWidth,
+      xOffsetForYearMiddle = (year) => xOffsetForYear(year) + yearMiddleOffset,
+      xOffsetForYearBar = (year) => xOffsetForYear(year) + barOffset;
+
+    let _processProjects = () => {
+      let projects=[];
+      
+      Object.keys(this.props.projects).map((projectId) => {
+        projects.push(this.props.projects[projectId]);
+      });
+      // sort to put the longest first
+      projects = projects.sort((a,b) => (b.endYear - b.startYear) - (a.endYear - a.startYear));
+
+      // calculate "grid" placement for each project
+      let rows = [new Array(years.length)];
+      projects.forEach((project, i) => {
+        let availableRow = false;
+        rows.forEach((row, rowNum) => {
+          let canFit = true;
+            
+          // test whether the project can fit in the space
+          for (let col = years.indexOf(project.startYear); col <= years.indexOf(project.endYear); col ++) {
+            if (rows[rowNum][col]) {
+              canFit = false;
+            }
+            // for one year spans pad it
+            if (project.startYear == project.endYear) {
+              if ((col > 0 && rows[rowNum][col-1]) || (col <= years.indexOf(project.endYear) && rows[rowNum][col+1])) {
+                canFit = false;
+              }
+            }
+          }
+          if (canFit && !availableRow) {
+            availableRow = rowNum;
+          }
+        });
+
+        projects[i].row = (availableRow !== false) ? availableRow : rows.length;
+        if (!availableRow) {
+          rows.push(new Array(years.length));
+        }
+        for (let col = years.indexOf(project.startYear); col <= years.indexOf(project.endYear); col ++) {
+          rows[projects[i].row][col] = 'x';
+          // for one year spans pad it
+          if (project.startYear == project.endYear) {
+            if (col > 0) {
+              rows[projects[i].row][col-1] = 'x';
+            } 
+            if (col <= years.indexOf(project.endYear)) {
+              rows[projects[i].row][col+1] = 'x';
+            } 
+          }
+        }
+      });
+
+      projectsRows = rows.length;
+
+      return projects;
+    };
+
+    let _projectTimespanHeight = () => projectsRows * projectRowHeight; 
+
+    let processedProjects = _processProjects();
 
     return (
       <svg 
@@ -78,21 +147,27 @@ export default class Timeline extends React.Component {
         id='timeline'
       >
 
-        <defs>
-          <filter x="0" y="0" width="1" height="1" id="textBackground">
-            <feFlood floodColor="#232d37"/>
-            <feComposite in="SourceGraphic"/>
-          </filter>
-        </defs>
-
-
-
         {/* category labels */}
         <g>
 
         </g>
 
-    
+        {/* vertical ticks */}
+        <g transform={'translate(' + rightMargin + ')'}>
+          { years.map(year => {
+            return (
+              <rect
+                x={ xOffsetForYear(year) }
+                y={ headerHeight - _projectTimespanHeight() }
+                width={ 0.5 }
+                height={ _projectTimespanHeight() }
+                fill='#323B44'
+                key={ 'verticalTick' + year }
+              />
+            );
+          })} 
+        </g>
+
         <g 
           transform={'translate(0,' + headerHeight + ')'}
         >  
@@ -180,9 +255,9 @@ export default class Timeline extends React.Component {
           { years.map(year => {
             return (
               <text
-                dx={ (year - firstYear) * yearWidth + yearMiddleOffset }
+                dx={ xOffsetForYearMiddle(year) }
                 dy={ yearLabelY + 2 }
-                fill={ (year == this.props.state.year) ? 'yellow' : 'white' }
+                fill={ (year < this.props.yearSpan[0] || year > this.props.yearSpan[1]) ? '#454545' : (year == this.props.state.year) ? 'yellow' : 'white' }
                 fontSize={ (year % 5 == 0) ? yearLabelSize : yearLabelSize - 2 }
                 textAnchor='middle'
                 alignmentBaseline='middle'
@@ -211,7 +286,7 @@ export default class Timeline extends React.Component {
                 return (
                   <g>
                     <rect
-                      x={ (year - firstYear) * yearWidth  + barOffset}
+                      x={ xOffsetForYearBar(year) }
                       y={ topY - (maxBarHeight * (this.props.yearsData[year].totalFamilies / maxFamilies)) }
                       width={ barWidth }
                       height={ maxBarHeight * (this.props.yearsData[year].totalFamilies / maxFamilies) }
@@ -257,7 +332,7 @@ export default class Timeline extends React.Component {
                 return (
                   <g>
                     <rect
-                      x={ (year - firstYear) * yearWidth + barOffset}
+                      x={ xOffsetForYearBar(year) }
                       y={ bottomY }
                       width={ barWidth }
                       height={ maxBarHeight * this.props.yearsData[year][68] / maxFunding }
@@ -270,7 +345,7 @@ export default class Timeline extends React.Component {
                     { [...Array(Math.floor(this.props.yearsData[year][68] /fundingTickInterval)).keys()].map(iterator => {
                       return (
                         <rect
-                          x={ (year - firstYear) * yearWidth  + barOffset }
+                          x={ xOffsetForYearBar(year) }
                           y={ bottomY + (iterator + 1) * fundingTickHeight}
                           width={ barWidth }
                           height={ 1 }
@@ -285,41 +360,54 @@ export default class Timeline extends React.Component {
             })}
           </g>
 
-          {/* no data available */}
-          <rect
-            x={ (1966 - firstYear) * yearWidth }
-            y={ topY - maxBarHeight / 2 - 4 }
-            width={ 1 }
+          <Timespan
+            width={ yearsSpanWidth(1967, 1973) }
             height={ 8 }
-            fill='silver'
-          />
-          <rect
-            x={ (1973 - firstYear) * yearWidth - 1 }
+            x={ xOffsetForYear(1967) }
             y={ topY - maxBarHeight / 2 - 4 }
-            width={ 1 }
-            height={ 8 }
-            fill='silver'
+            text='no displacement data available'
           />
-          <rect
-            x={ (1966 - firstYear) * yearWidth }
-            y={ topY - maxBarHeight / 2 }
-            width={ yearWidth * 7 }
-            height={ 1 }
-            fill='silver'
-          />
-          <text
-            dx={ (1969 - firstYear) * yearWidth + yearMiddleOffset }
-            dy={ topY - maxBarHeight / 2 }
-            fill='silver'
-            fontSize={ 12 }
-            textAnchor='middle'
-            alignmentBaseline='middle'
-            filter="url(#textBackground)"
-          >
-            no displacement data available
-          </text>
 
+
+
+
+          
         </g>
+
+        { (this.props.projects) ? 
+          <g>
+
+            <text
+              dx={ rightMargin - 30 }
+              dy={ headerHeight }
+              fill='white'
+              fontSize={ 15 }
+              textAnchor='end'
+              alignmentBaseline='middle'
+            >
+              projects
+            </text>
+
+            {processedProjects.map((project, i) => {
+              //if (this.props.year >= this.props.projects[projectId].startYear && this.props.year <= this.props.projects[projectId].endYear) {
+              if (true) {
+                return(
+                  <Timespan
+                    inSelectedYear={ (this.props.year >= project.startYear && this.props.year <= project.endYear) }
+                    width={ yearsSpanWidth(project.startYear, project.endYear + 1) - barOffset * 2 }
+                    height={ projectRowHeight }
+                    x={ rightMargin + xOffsetForYear(project.startYear) + barOffset }
+                    y={ headerHeight - ((project.row + 1) * 14 )  }
+                    offset={ barOffset }
+                    text={ project.project.replace(/\b\w/g, l => l.toUpperCase()) }
+                    key={ 'projectSpan' + i }
+                  />
+                );
+              }
+            }) }
+          </g>:
+          '' 
+        }
 
 
 

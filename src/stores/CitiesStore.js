@@ -121,7 +121,7 @@ const CitiesStore = {
   loadCityData: function(city_id) {
     this.dataLoader.query([
       {
-        query: "SELECT sum(value) as total, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.state, p.project_id, project, category_id, year, st_asgeojson(p.the_geom) as project_geojson from urdr_city_id_key cities join urdr_id_key p on cities.city_id = " + city_id + " and cities.city_id = p.city_id join combined_dir_char md on p.project_id = md.project_id group by cities.the_geom, cities.city, cities.state, p.project_id, project, category_id, year, p.the_geom", //"SELECT sum(value) as total, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.state, p.project_id, project, category_id, year, st_asgeojson(p.the_geom) as project_geojson from urdr_city_id_key cities join urdr_id_key p on cities.city_id = " + city_id + " and cities.city_id = p.city_id join combined_dir_char md on p.project_id = md.project_id and case when md.category_id = any(array[71,72]) and quarter != 'December' then false else true end group by cities.the_geom, cities.city, cities.state, p.project_id, project, category_id, year, p.the_geom",
+        query: "SELECT value as total, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.state, p.project_id, project, category_id, year, st_asgeojson(p.the_geom) as project_geojson from urdr_city_id_key cities join urdr_id_key p on cities.city_id = " + city_id + " and cities.city_id = p.city_id join combined_dir_char md on p.project_id = md.project_id and value > 0", //"SELECT sum(value) as total, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.state, p.project_id, project, category_id, year, st_asgeojson(p.the_geom) as project_geojson from urdr_city_id_key cities join urdr_id_key p on cities.city_id = " + city_id + " and cities.city_id = p.city_id join combined_dir_char md on p.project_id = md.project_id and case when md.category_id = any(array[71,72]) and quarter != 'December' then false else true end group by cities.the_geom, cities.city, cities.state, p.project_id, project, category_id, year, p.the_geom",
         format: 'JSON'
       },
       {
@@ -136,11 +136,16 @@ const CitiesStore = {
             project: response.project,
             id: response.project_id,
             theGeojson: JSON.parse(response.project_geojson),
+            startYear: null,
+            endYear: null,
             yearsData: {}
           };
         }
+        // get start and end years
         if (!this.data.cities[city_id].projects[response.project_id].yearsData[response.year]) {
           this.data.cities[city_id].projects[response.project_id].yearsData[response.year] = {};
+          this.data.cities[city_id].projects[response.project_id].startYear = (!this.data.cities[city_id].projects[response.project_id].startYear || response.year < this.data.cities[city_id].projects[response.project_id].startYear) ? response.year :  this.data.cities[city_id].projects[response.project_id].startYear;
+          this.data.cities[city_id].projects[response.project_id].endYear = (!this.data.cities[city_id].projects[response.project_id].endYear || response.year > this.data.cities[city_id].projects[response.project_id].endYear) ? response.year :  this.data.cities[city_id].projects[response.project_id].endYear;
         }
         this.data.cities[city_id].projects[response.project_id].yearsData[response.year][response.category_id] = response.total;
       });
@@ -157,6 +162,8 @@ const CitiesStore = {
       this.data.cities[city_id].yearsData = {};
       Object.keys(this.data.cities[city_id].projects).forEach(project_id => {
         Object.keys(this.data.cities[city_id].projects[project_id].yearsData).forEach(year => {
+          this.data.cities[city_id].startYear = (!this.data.cities[city_id].startYear || year < this.data.cities[city_id].startYear) ? year : this.data.cities[city_id].startYear;
+          this.data.cities[city_id].endYear = (!this.data.cities[city_id].endYear || year > this.data.cities[city_id].endYear) ? year : this.data.cities[city_id].endYear;
           this.data.cities[city_id].yearsData[year] = (this.data.cities[city_id].yearsData[year]) ? this.data.cities[city_id].yearsData[year] : {};
           Object.keys(this.data.cities[city_id].projects[project_id].yearsData[year]).forEach(category_id => {
             this.data.cities[city_id].yearsData[year][category_id] = (this.data.cities[city_id].yearsData[year][category_id]) ? this.data.cities[city_id].yearsData[year][category_id] + this.data.cities[city_id].projects[project_id].yearsData[year][category_id] : this.data.cities[city_id].projects[project_id].yearsData[year][category_id];
@@ -181,6 +188,8 @@ const CitiesStore = {
         city_id: response.city_id,
         state: response.state,
         slug: response.city + response.state.toUpperCase(),
+        startYear: null,
+        endYear: null,
         yearsData: {},
         projects: {},
         tracts: {}

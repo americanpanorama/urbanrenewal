@@ -7,7 +7,8 @@ const DimensionsStore = {
   data: {
     containerPadding: 20,
     headerHeight: 100,
-    timelineHeight: 150, // set in scss
+    timelineHeight: 350, // set in scss
+    gradientHeight: 150,
     tilesHeight: window.innerHeight - 140, // two paddings + headerHeight
     sidebarTitleBottomMargin: 10,
     adNavHeight: 20,
@@ -65,7 +66,7 @@ const DimensionsStore = {
   getLegendGradientStyle: function() {
     return {
       width: 300,
-      height: this.data.timelineHeight
+      height: this.data.gradientHeight
     };
   },
 
