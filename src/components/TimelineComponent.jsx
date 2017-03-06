@@ -68,7 +68,7 @@ export default class Timeline extends React.Component {
       maxFamilies = Object.keys(this.props.yearsData).reduce((candidate, year) => (!this.props.yearsData[year].totalFamilies || candidate > this.props.yearsData[year].totalFamilies) ? candidate : this.props.yearsData[year].totalFamilies, 0),
       familiesTickInterval = this._calculateTickInterval(maxFamilies),
       familiesTickHeight = topY / (maxFamilies / familiesTickInterval),
-      maxFunding = Object.keys(this.props.yearsData).reduce((candidate, year) => (!this.props.yearsData[year][68] || candidate > this.props.yearsData[year][68]) ? candidate : this.props.yearsData[year][68], 0),
+      maxFunding = Object.keys(this.props.yearsData).reduce((candidate, year) => (!this.props.yearsData[year]['urban renewal grants dispursed'] || candidate > this.props.yearsData[year]['urban renewal grants dispursed']) ? candidate : this.props.yearsData[year]['urban renewal grants dispursed'], 0),
       fundingTickInterval = this._calculateTickInterval(maxFunding),
       fundingTickHeight = topY / (maxFunding / fundingTickInterval),
       projectsRows = 0,
@@ -160,7 +160,7 @@ export default class Timeline extends React.Component {
                 x={ xOffsetForYear(year) }
                 y={ headerHeight - _projectTimespanHeight() }
                 width={ 0.5 }
-                height={ _projectTimespanHeight() }
+                height={ height }
                 fill='#323B44'
                 key={ 'verticalTick' + year }
               />
@@ -274,9 +274,9 @@ export default class Timeline extends React.Component {
           {/* families data */}
           {/* baseline */}
           <rect
-            x={ 0 }
+            x={ xOffsetForYear(this.props.yearSpan[0]) }
             y={ topY }
-            width={ contentWidth }
+            width={ (this.props.yearSpan[1] - this.props.yearSpan[0] + 1) * yearWidth }
             height={ 1 }
             fill={ this._pickHex([125,200,125], [100,150,200], 0.5) }
           />
@@ -291,10 +291,8 @@ export default class Timeline extends React.Component {
                       width={ barWidth }
                       height={ maxBarHeight * (this.props.yearsData[year].totalFamilies / maxFamilies) }
                       fill={ this._pickHex([125,200,125], [100,150,200], this.props.yearsData[year].percentFamiliesOfColor) }
-                      onClick={ this.props.onClick }
-                      id={ year }
                       key={ 'yearData' + year }
-                      stroke={ (year == this.props.state.year) ? 'yellow' : 'none' }
+                      stroke={ (year == this.props.state.year && this.props.state.cat == 'families') ? 'yellow' : 'none' }
                       strokeWidth={ 2 }
                     />
 
@@ -310,6 +308,18 @@ export default class Timeline extends React.Component {
                         />
                       );
                     }) }
+
+                    {/* invisible rect that makes the full year space clickable--useful generally but particularly for short areas */}
+                    <rect
+                      x={ xOffsetForYear(year) }
+                      y={ topY - maxBarHeight }
+                      width={ yearWidth }
+                      height={ maxBarHeight }
+                      fill={ 'transparent' }
+                      onClick={ this.props.onClick }
+                      id={ year + '|families' }
+                      key={ 'clickableyearData' + year }
+                    />
                   </g>
                 );
               }
@@ -320,29 +330,29 @@ export default class Timeline extends React.Component {
           {/* funding */}
           {/* baseline */}
           <rect
-            x={ 0 }
+            x={ xOffsetForYear(this.props.yearSpan[0]) }
             y={ bottomY }
-            width={ contentWidth }
+            width={ (this.props.yearSpan[1] - this.props.yearSpan[0] + 1) * yearWidth }
             height={ 1 }
             fill={ '#9E7B9B' }
           />
           <g>
             { years.map(year => {
-              if (this.props.yearsData[year] && this.props.yearsData[year][68]) {
+              if (this.props.yearsData[year] && this.props.yearsData[year]['urban renewal grants dispursed']) {
                 return (
                   <g>
                     <rect
                       x={ xOffsetForYearBar(year) }
                       y={ bottomY }
                       width={ barWidth }
-                      height={ maxBarHeight * this.props.yearsData[year][68] / maxFunding }
+                      height={ maxBarHeight * this.props.yearsData[year]['urban renewal grants dispursed'] / maxFunding }
                       fill={ '#9E7B9B' }
-                      onClick={ this.props.onClick }
-                      id={ year }
                       key={ 'yearDataMoney' + year }
+                      stroke={ (year == this.props.state.year && this.props.state.cat == 'funding') ? 'yellow' : 'none' }
+                      strokeWidth={ 2 }
                     />
 
-                    { [...Array(Math.floor(this.props.yearsData[year][68] /fundingTickInterval)).keys()].map(iterator => {
+                    { [...Array(Math.floor(this.props.yearsData[year]['urban renewal grants dispursed'] /fundingTickInterval)).keys()].map(iterator => {
                       return (
                         <rect
                           x={ xOffsetForYearBar(year) }
@@ -354,6 +364,18 @@ export default class Timeline extends React.Component {
                         />
                       );
                     }) }
+
+                    {/* invisible rect that makes the full year space clickable--useful generally but particularly for short areas */}
+                    <rect
+                      x={ xOffsetForYear(year) }
+                      y={ bottomY }
+                      width={ yearWidth }
+                      height={ maxBarHeight }
+                      fill={ 'transparent' }
+                      onClick={ this.props.onClick }
+                      id={ year + '|funding' }
+                      key={ 'clickableyearDataFunding' + year }
+                    />
                   </g>
                 );
               }

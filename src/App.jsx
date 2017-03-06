@@ -110,11 +110,16 @@ class App extends React.Component {
   onYearClicked(event) {
     let year = parseInt(event.target.id);
 
-    AppActions.dateSelected(year);
+    let cat = (event.target.id.indexOf('families') !== -1) ? 'families' : (event.target.id.indexOf('funding') !== -1) ? 'funding' : this.state.cat;
+
+    
 
     this.setState({
-      year: year
+      year: year,
+      cat: cat
     });
+
+    AppActions.dateSelected(year);
   }
 
   onZoomIn(event) {
@@ -204,6 +209,7 @@ class App extends React.Component {
             />
           </ReactTransitionGroup>
           <LegendGradient
+            state={ this.state }
             poc={ CitiesStore.getPOC() }
             style={ DimensionsStore.getLegendGradientStyle() }
             onDragUpdate={ this.onDragUpdate }

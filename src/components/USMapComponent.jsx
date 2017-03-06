@@ -46,6 +46,10 @@ export default class USMap extends React.Component {
     }
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return true;
+  }
+
   _pickHex(color1, color2, weight) {
     var p = weight;
     var w = p * 2 - 1;
@@ -67,7 +71,6 @@ export default class USMap extends React.Component {
       .translate([width / 2, height / 2]);
 
 
-            
 
     // calculate scale
     // let easternmost = projection([-66.95, 44.815])[0],
@@ -79,8 +82,8 @@ export default class USMap extends React.Component {
       .projection(projection);
 
     let r = d3.scale.sqrt()
-      .domain([0, CitiesStore.getCategoryMaxForCity('selected')])
-      .range([0, scale/30/this.state.dorlingZoom]);
+      .domain([0, (this.props.state.cat == 'funding') ? CitiesStore.getCategoryMaxForCity('urban renewal grants dispursed') : CitiesStore.getCategoryMaxForCity('totalFamilies') ])
+      .range([0, 50/this.state.dorlingZoom]);
 
     return (
       <svg 
@@ -104,7 +107,7 @@ export default class USMap extends React.Component {
             state={ this.props.state }
           />
           <ReactTransitionGroup component='g' className='transitionGroup'>
-            { CitiesStore.getDorlings(this.props.state.year).filter(cityData => projection(cityData.lngLat) !== null).map((cityData, i) => (
+            { CitiesStore.getDorlings(this.props.state.year, this.props.state.cat).filter(cityData => projection(cityData.lngLat) !== null).map((cityData, i) => (
               <Dorlings
                 r={ r(cityData.value) }
                 cx={ projection(cityData.lngLat)[0] }

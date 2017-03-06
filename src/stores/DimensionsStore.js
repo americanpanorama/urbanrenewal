@@ -58,14 +58,14 @@ const DimensionsStore = {
 
   getTimelineStyle: function() {
     return {
-      width: this.data.mainPaneWidth - 300,
+      width: this.data.mainPaneWidth - 500,
       height: this.data.timelineHeight
     };
   },
 
   getLegendGradientStyle: function() {
     return {
-      width: 300,
+      width: 500,
       height: this.data.gradientHeight
     };
   },

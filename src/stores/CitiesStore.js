@@ -36,32 +36,25 @@ const CitiesStore = {
 
     this.dataLoader.query([
       {
-        query: "select * from (SELECT sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, city, state, year, md.category_id from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id and year = " + year + " join urdr_city_id_key cities on md.city_id = cities.city_id group by cities.the_geom, city, state, cities.city_id, year, md.category_id) year_vals where total is not null", //"select * from (SELECT sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, city, state, year, md.category_id from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id and year = " + year + " and quarter = 'December' join urdr_city_id_key cities on md.city_id = cities.city_id group by cities.the_geom, city, state, cities.city_id, year, md.category_id) year_vals where total is not null",
-        format: 'JSON'
-      },
-      {
-        query: "SELECT max(value) as max, md.category_id, assessed_category, unit_of_measurement from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id group by md.category_id, assessed_category, unit_of_measurement",
+        query: "SELECT max(value) as max, md.category_id, assessed_category, unit_of_measurement from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id group by md.category_id, assessed_category, unit_of_measurement union (select total as max, 1000 as category_id, 'totalFamilies' as assessed_category, 'familiies' as unit_of_measurement from (SELECT sum(value) as total, city_id, year from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id and (c.category_id = 71 or c.category_id = 72) and value is not null group by city_id, year order by sum(value) desc limit 1) tf) ",
         format: 'JSON'
       },
       { 
         query: "SELECT sum(value) as total, year, md.category_id from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id group by year, md.category_id order by year, category_id", //"SELECT sum(value) as total, year, md.category_id from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id and case when c.category_id = any(array[71,72]) and quarter != 'December' then false else true end group by year, md.category_id order by year, category_id",
         format: 'JSON'
+      },
+      {
+        query: "select * from (SELECT sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, city, state, year, md.category_id from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id and year = " + year + " join urdr_city_id_key cities on md.city_id = cities.city_id group by cities.the_geom, city, state, cities.city_id, year, md.category_id) year_vals where total is not null", //"select * from (SELECT sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, city, state, year, md.category_id from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id and year = " + year + " and quarter = 'December' join urdr_city_id_key cities on md.city_id = cities.city_id group by cities.the_geom, city, state, cities.city_id, year, md.category_id) year_vals where total is not null",
+        format: 'JSON'
       }
+
     ]).then((responses) => {
-      responses[0].forEach(response => {
-        this.parseCityData(response);
-        this.parseYearData(response);
-        
-      });
-
-      this.parseFamilyData(year);
-
       // assign colors
       let color = d3.scale.category20()
         .domain(this.getCategoryIdsWithData());
 
       // category data
-      responses[1].forEach(response => { 
+      responses[0].forEach(response => { 
         this.data.categories[response.category_id] = {
           category: response.assessed_category,
           unit: response.unit_of_measurement,
@@ -70,18 +63,26 @@ const CitiesStore = {
         };
       });
 
-      responses[2].forEach(response => {
+      responses[1].forEach(response => {
         if (!this.data.yearsTotals[response.year]) {
           this.data.yearsTotals[response.year] = {};
         }
-        this.data.yearsTotals[response.year][response.category_id] = response.total;
+        this.data.yearsTotals[response.year][this.getCategoryName(response.category_id)] = response.total;
       });
+
+      responses[2].forEach(response => {
+        this.parseCityData(response);
+        this.parseYearData(response);
+        
+      });
+
+      this.parseFamilyData(year);
 
       // calculate family data for year
       Object.keys(this.data.yearsTotals).forEach(year => {
-        if (this.data.yearsTotals[year][71] || this.data.yearsTotals[year][72]) {
-          this.data.yearsTotals[year]['totalFamilies'] = this.data.yearsTotals[year][71] + this.data.yearsTotals[year][72];
-          this.data.yearsTotals[year]['percentFamiliesOfColor'] = this.data.yearsTotals[year][72] / this.data.yearsTotals[year]['totalFamilies'];
+        if (this.data.yearsTotals[year]['white families'] || this.data.yearsTotals[year]['non-white families']) {
+          this.data.yearsTotals[year]['totalFamilies'] = this.data.yearsTotals[year]['white families'] + this.data.yearsTotals[year]['non-white families'];
+          this.data.yearsTotals[year]['percentFamiliesOfColor'] = this.data.yearsTotals[year]['non-white families'] / this.data.yearsTotals[year]['totalFamilies'];
         }
       });
 
@@ -147,7 +148,7 @@ const CitiesStore = {
           this.data.cities[city_id].projects[response.project_id].startYear = (!this.data.cities[city_id].projects[response.project_id].startYear || response.year < this.data.cities[city_id].projects[response.project_id].startYear) ? response.year :  this.data.cities[city_id].projects[response.project_id].startYear;
           this.data.cities[city_id].projects[response.project_id].endYear = (!this.data.cities[city_id].projects[response.project_id].endYear || response.year > this.data.cities[city_id].projects[response.project_id].endYear) ? response.year :  this.data.cities[city_id].projects[response.project_id].endYear;
         }
-        this.data.cities[city_id].projects[response.project_id].yearsData[response.year][response.category_id] = response.total;
+        this.data.cities[city_id].projects[response.project_id].yearsData[response.year][this.getCategoryName(response.category_id)] = response.total;
       });
 
       responses[1].forEach(response => {
@@ -165,8 +166,8 @@ const CitiesStore = {
           this.data.cities[city_id].startYear = (!this.data.cities[city_id].startYear || year < this.data.cities[city_id].startYear) ? year : this.data.cities[city_id].startYear;
           this.data.cities[city_id].endYear = (!this.data.cities[city_id].endYear || year > this.data.cities[city_id].endYear) ? year : this.data.cities[city_id].endYear;
           this.data.cities[city_id].yearsData[year] = (this.data.cities[city_id].yearsData[year]) ? this.data.cities[city_id].yearsData[year] : {};
-          Object.keys(this.data.cities[city_id].projects[project_id].yearsData[year]).forEach(category_id => {
-            this.data.cities[city_id].yearsData[year][category_id] = (this.data.cities[city_id].yearsData[year][category_id]) ? this.data.cities[city_id].yearsData[year][category_id] + this.data.cities[city_id].projects[project_id].yearsData[year][category_id] : this.data.cities[city_id].projects[project_id].yearsData[year][category_id];
+          Object.keys(this.data.cities[city_id].projects[project_id].yearsData[year]).forEach(category => {
+            this.data.cities[city_id].yearsData[year][category] = (this.data.cities[city_id].yearsData[year][category]) ? this.data.cities[city_id].yearsData[year][category] + this.data.cities[city_id].projects[project_id].yearsData[year][category] : this.data.cities[city_id].projects[project_id].yearsData[year][category];
           });
         });
       });
@@ -202,8 +203,8 @@ const CitiesStore = {
     let CityIdsToParse = (singleCityId) ? [singleCityId] : Object.keys(this.data.cities);
     CityIdsToParse.forEach(city_id => {
       if (this.data.cities[city_id].yearsData[year]) {
-        let white = (this.data.cities[city_id].yearsData[year][71]) ? this.data.cities[city_id].yearsData[year][71] : 0,
-          nonwhite =  (this.data.cities[city_id].yearsData[year][72]) ? this.data.cities[city_id].yearsData[year][72] : 0;
+        let white = (this.data.cities[city_id].yearsData[year]['white families']) ? this.data.cities[city_id].yearsData[year]['white families'] : 0,
+          nonwhite =  (this.data.cities[city_id].yearsData[year]['non-white families']) ? this.data.cities[city_id].yearsData[year]['non-white families'] : 0;
         if (white + nonwhite > 0) {
           this.data.cities[city_id].yearsData[year]['totalFamilies'] = white + nonwhite;
           this.data.cities[city_id].yearsData[year]['percentFamiliesOfColor'] = nonwhite / this.data.cities[city_id].yearsData[year]['totalFamilies'];
@@ -216,7 +217,7 @@ const CitiesStore = {
     if (!this.data.cities[response.city_id].yearsData[response.year]) {
       this.data.cities[response.city_id].yearsData[response.year] = {};
     }
-    this.data.cities[response.city_id].yearsData[response.year][response.category_id] = response.total;
+    this.data.cities[response.city_id].yearsData[response.year][this.getCategoryName(response.category_id)] = response.total;
   },
 
   _pickHex: function(color1, color2, weight) {
@@ -292,21 +293,39 @@ const CitiesStore = {
       [];
   },
 
-  getDorlings: function(year) {
+  getDorlings: function(year, cat) {
     // need to add something to select category
-    return (this.data && this.data.loaded) ?
-      this.getCitiesList()
-        .filter(cityData => cityData.yearsData[year] && cityData.yearsData[year]['totalFamilies'] > 0 )
-        .map(cityData => {
-          return {
-            lngLat: [cityData.lng, cityData.lat],
-            city_id: cityData.city_id,
-            value: cityData.yearsData[year]['totalFamilies'],
-            color: (cityData.yearsData[year]['percentFamiliesOfColor'] >= this.getPOCBottom() && cityData.yearsData[year]['percentFamiliesOfColor'] <= this.getPOCTop()) ? this._pickHex([125,200,125], [100,150,200], cityData.yearsData[year]['percentFamiliesOfColor']) : 'transparent'
-          };
-        })
-        .sort((a,b) => b.value - a.value) :
-      [];
+    if (cat == 'families') {
+      return (this.data && this.data.loaded) ?
+        this.getCitiesList()
+          .filter(cityData => cityData.yearsData[year] && cityData.yearsData[year]['totalFamilies'] > 0 )
+          .map(cityData => {
+            return {
+              lngLat: [cityData.lng, cityData.lat],
+              city_id: cityData.city_id,
+              value: cityData.yearsData[year]['totalFamilies'],
+              color: (cityData.yearsData[year]['percentFamiliesOfColor'] >= this.getPOCBottom() && cityData.yearsData[year]['percentFamiliesOfColor'] <= this.getPOCTop()) ? this._pickHex([125,200,125], [100,150,200], cityData.yearsData[year]['percentFamiliesOfColor']) : 'transparent'
+            };
+          })
+          .sort((a,b) => b.value - a.value) :
+        [];
+    } else if (cat == 'funding') {
+      return (this.data && this.data.loaded) ?
+        this.getCitiesList()
+          .filter(cityData => cityData.yearsData[year] && cityData.yearsData[year]['urban renewal grants dispursed'] > 0 )
+          .map(cityData => {
+            return {
+              lngLat: [cityData.lng, cityData.lat],
+              city_id: cityData.city_id,
+              value: cityData.yearsData[year]['urban renewal grants dispursed'],
+              color: '#9E7B9B'
+            };
+          })
+          .sort((a,b) => b.value - a.value) :
+        [];
+    } else {
+      return [];
+    }
   },
 
   getSelectedCategory: function() { return this.data.selectedCategory; },
@@ -321,18 +340,24 @@ const CitiesStore = {
 
   getCategories: function() { return this.data.categories; },
 
-  getCategoryIdsWithData: function() { return Object.keys(this.data.categories).filter(category_id => this.data.categories[category_id].hasData); },
+  getCategory: function(id) { return this.data.categories[id]; },
 
-  getCategory: function(category_id) { return this.data.categories[category_id]; },
+  getCategoryName: function(id) { return this.data.categories[id].category; },
+
+  getCategoryIdsWithData: function() { return Object.keys(this.data.categories).filter(category_id => this.data.categories[category_id].hasData); },
 
   getCategoryColor: function(category_id) { 
     category_id = (category_id == 'selected') ? this.getSelectedCategory() : category_id;
     return (this.data.categories[category_id]) ? this.data.categories[category_id].color : 1;
   },
 
-  getCategoryMaxForCity: function(category_id) { 
-    category_id = (category_id == 'selected') ? this.getSelectedCategory() : category_id;
+  getCategoryMaxForCity: function(category) { 
+    let category_id = this.getCategoryIdFromName(category);
     return (this.data.categories[category_id]) ? this.data.categories[category_id].maxForCity : 1;
+  },
+
+  getCategoryIdFromName: function(name) {
+    return Object.keys(this.data.categories).filter(id => (this.data.categories[id].category == name))[0];
   },
 
   getCategoryName: function(category_id) { return (this.data.categories[category_id]) ? this.data.categories[category_id].category : ''; },
