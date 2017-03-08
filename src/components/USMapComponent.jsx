@@ -101,6 +101,7 @@ export default class USMap extends React.Component {
         >
           <GeoStates 
             path={ path }
+            state={ this.props.state }
           />
           <Highways 
             path={ path }
@@ -109,10 +110,11 @@ export default class USMap extends React.Component {
           <ReactTransitionGroup component='g' className='transitionGroup'>
             { CitiesStore.getDorlings(this.props.state.year, this.props.state.cat).filter(cityData => projection(cityData.lngLat) !== null).map((cityData, i) => (
               <Dorlings
-                r={ r(cityData.value) }
+                r={ r(cityData.value) >= 2/this.props.state.zoom ? r(cityData.value) : 2/this.props.state.zoom }
                 cx={ projection(cityData.lngLat)[0] }
                 cy={ projection(cityData.lngLat)[1] }
                 key={'cityCircle' + cityData.city_id }
+                zoom={ this.props.state.zoom }
                 color={ cityData.color }
                 city_id={ cityData.city_id }
                 onCityClicked={ this.props.onCityClicked }
@@ -120,22 +122,61 @@ export default class USMap extends React.Component {
               />
             ))}
           </ReactTransitionGroup>
+
+          { (this.props.state.zoom >= 4) ?
+            CitiesStore.getDorlings(this.props.state.year, this.props.state.cat).filter(cityData => projection(cityData.lngLat) !== null).map((cityData, i) => (
+                <text
+                  x={ projection(cityData.lngLat)[0] }
+                  y={ projection(cityData.lngLat)[1] - r(cityData.value) - 1 }
+                  fill='white'
+                  fontSize={ 16 / this.props.state.zoom }
+                  key={ 'cityLabel' + cityData.city_id }
+                  textAnchor='middle'
+                  onClick={ this.props.onCityClicked }
+                  id={ cityData.city_id }
+                > 
+                  { cityData.name.replace(/\b\w/g, l => l.toUpperCase()) }
+                </text>
+            )) :
+            ''
+          }
+            
         </g>
+
+        
+
         <text
-          x={10} 
-          y={30} 
-          fontSize={30}
+          x={30} 
+          y={50} 
+          fontSize={60}
+          fill='yellow'
+          textAnchor='middle'
+
         >
           +
         </text>
         <text 
-          x={14} 
-          y={50} 
-          fontSize={30}
+          x={30} 
+          y={80} 
+          fontSize={60}
+          textAnchor='middle'
+          fill='yellow'
           
           onClick={ this.props.zoomOut }
         >
           -
+        </text>
+
+        <text 
+          x={30} 
+          y={100} 
+          fontSize={20}
+          textAnchor='middle'
+          fill='yellow'
+          
+          onClick={ this.props.resetView }
+        >
+          reset
         </text>
         
       </svg>

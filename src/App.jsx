@@ -42,7 +42,7 @@ class App extends React.Component {
     this.state = this.getDefaultState();
 
     // bind handlers
-    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
   }
 
@@ -76,8 +76,8 @@ class App extends React.Component {
     return {
       year: (HashManager.getState().year) ? HashManager.getState().year : 1958,
       cat: (HashManager.getState().cat) ? HashManager.getState().cat : 'families',
-      x: (HashManager.getState().view) ? parseInt(HashManager.getState().view.split('/')[0]) :0,
-      y: (HashManager.getState().view) ? parseInt(HashManager.getState().view.split('/')[1]) :0,
+      x: (HashManager.getState().view) ? parseInt(HashManager.getState().view.split('/')[0]) : 0,
+      y: (HashManager.getState().view) ? parseInt(HashManager.getState().view.split('/')[1]) : 0,
       zoom: (HashManager.getState().view) ? parseInt(HashManager.getState().view.split('/')[2]) : 1
     };
   }
@@ -138,6 +138,14 @@ class App extends React.Component {
       zoom: (this.state.zoom >= 2) ? nextZoom : 1,
       x: DimensionsStore.getMainPaneWidth()  / 2 - (DimensionsStore.getNationalMapHeight()  / 2 - this.state.x) / this.state.zoom * (nextZoom),
       y: DimensionsStore.getNationalMapHeight()  / 2 - (DimensionsStore.getNationalMapHeight()  / 2 - this.state.y) / this.state.zoom * (nextZoom)
+    });
+  }
+
+  resetView() {
+    this.setState({
+      x: 0,
+      y: 0,
+      zoom: 1
     });
   }
 
@@ -206,6 +214,7 @@ class App extends React.Component {
               handleMouseDown={ this.handleMouseDown }
               handleMouseMove={ this.handleMouseMove }
               zoomOut={ this.zoomOut }
+              resetView={ this.resetView }
             />
           </ReactTransitionGroup>
           <LegendGradient

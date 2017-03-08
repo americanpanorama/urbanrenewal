@@ -47,9 +47,7 @@ export default class LegendGradient extends React.Component {
     let maxValue = (this.props.state.cat == 'funding') ? CitiesStore.getCategoryMaxForCity('urban renewal grants dispursed') : CitiesStore.getCategoryMaxForCity('totalFamilies');
     let r = d3.scale.sqrt()
       .domain([0, maxValue ])
-      .range([0, 50/this.props.state.zoom]);
-
-    console.log(maxValue);
+      .range([0, 50]);
 
     return (
       <svg 
@@ -274,10 +272,11 @@ export default class LegendGradient extends React.Component {
             cy={ height/2 }
             r={ r(15000) }
             fill={ this._pickHex([125,200,125], [100,150,200], 0.5) }
+            key='dorlinglegendbackground'
           />
 
           { [10000, 5000, 1000, 100].map(value => (
-            <g>
+            <g key={ 'dorlinglegend' + value }>
               <circle
                 cx={ 150 }
                 cy={ height/2 }
@@ -286,7 +285,7 @@ export default class LegendGradient extends React.Component {
                 stroke='#111'
                 strokeWidth={ 0.5 }
                 transform={ 'translate(0,' + (r(15000) - r(value)) + ')'}
-                key={ 'dorlinglegend' + value }
+                
               />
               <text
                 x={ 80 }

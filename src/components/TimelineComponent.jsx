@@ -284,14 +284,14 @@ export default class Timeline extends React.Component {
             { years.map(year => {
               if (this.props.yearsData[year] && this.props.yearsData[year].totalFamilies) {
                 return (
-                  <g>
+                  <g key={ 'yearData' + year }>
                     <rect
                       x={ xOffsetForYearBar(year) }
                       y={ topY - (maxBarHeight * (this.props.yearsData[year].totalFamilies / maxFamilies)) }
                       width={ barWidth }
                       height={ maxBarHeight * (this.props.yearsData[year].totalFamilies / maxFamilies) }
                       fill={ this._pickHex([125,200,125], [100,150,200], this.props.yearsData[year].percentFamiliesOfColor) }
-                      key={ 'yearData' + year }
+                      
                       stroke={ (year == this.props.state.year && this.props.state.cat == 'families') ? 'yellow' : 'none' }
                       strokeWidth={ 2 }
                     />
@@ -340,14 +340,14 @@ export default class Timeline extends React.Component {
             { years.map(year => {
               if (this.props.yearsData[year] && this.props.yearsData[year]['urban renewal grants dispursed']) {
                 return (
-                  <g>
+                  <g key={ 'yearDataMoney' + year }>
                     <rect
                       x={ xOffsetForYearBar(year) }
                       y={ bottomY }
                       width={ barWidth }
                       height={ maxBarHeight * this.props.yearsData[year]['urban renewal grants dispursed'] / maxFunding }
                       fill={ '#9E7B9B' }
-                      key={ 'yearDataMoney' + year }
+                      
                       stroke={ (year == this.props.state.year && this.props.state.cat == 'funding') ? 'yellow' : 'none' }
                       strokeWidth={ 2 }
                     />

@@ -18,7 +18,7 @@ export default class USMap extends React.Component {
               style={ {
                 fill: '#555559',
                 stroke: '#111',
-                strokeWidth: 0.2,
+                strokeWidth: 0.2/this.props.state.zoom,
                 pointerEvents: 'none'
               } }
             />

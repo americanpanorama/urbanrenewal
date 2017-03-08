@@ -39,7 +39,16 @@ export default class Dorlings extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.r !== nextProps.r || this.props.color !== nextProps.color) {
+    if (this.props.zoom !== nextProps.zoom) {
+      d3.select(ReactDOM.findDOMNode(this))
+        .attr('r', nextProps.r)
+        .style('fill', nextProps.color);
+      this.setState({
+        r: nextProps.r,
+        color: nextProps.color
+      });
+    }
+    else if (this.props.r !== nextProps.r || this.props.color !== nextProps.color) {
       d3.select(ReactDOM.findDOMNode(this))
         .transition()
         //.delay((nextProps.r > this.props.r) ? 750 : 0)
@@ -65,7 +74,7 @@ export default class Dorlings extends React.Component {
           fill: this.state.color,
           fillOpacity: 1,
           stroke: '#333',
-          strokeWidth: 1,
+          strokeWidth: 1/this.props.zoom,
           strokeOpacity: 1
         } }
         onClick={ this.props.onCityClicked }

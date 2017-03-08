@@ -20,7 +20,7 @@ export default class Highways extends React.Component {
               style={ {
                 fill: 'transparent',
                 stroke: (polygon.properties.year_open <= this.props.state.year) ? 'orange' : 'transparent',
-                strokeWidth: (polygon.properties.year_open <= this.props.state.year) ? 0.75 : 0,
+                strokeWidth: (polygon.properties.year_open <= this.props.state.year) ? 0.75/this.props.state.zoom : 0,
               } }
             />
           );

@@ -304,7 +304,8 @@ const CitiesStore = {
               lngLat: [cityData.lng, cityData.lat],
               city_id: cityData.city_id,
               value: cityData.yearsData[year]['totalFamilies'],
-              color: (cityData.yearsData[year]['percentFamiliesOfColor'] >= this.getPOCBottom() && cityData.yearsData[year]['percentFamiliesOfColor'] <= this.getPOCTop()) ? this._pickHex([125,200,125], [100,150,200], cityData.yearsData[year]['percentFamiliesOfColor']) : 'transparent'
+              color: (cityData.yearsData[year]['percentFamiliesOfColor'] >= this.getPOCBottom() && cityData.yearsData[year]['percentFamiliesOfColor'] <= this.getPOCTop()) ? this._pickHex([125,200,125], [100,150,200], cityData.yearsData[year]['percentFamiliesOfColor']) : 'transparent',
+              name: cityData.city
             };
           })
           .sort((a,b) => b.value - a.value) :
@@ -318,7 +319,8 @@ const CitiesStore = {
               lngLat: [cityData.lng, cityData.lat],
               city_id: cityData.city_id,
               value: cityData.yearsData[year]['urban renewal grants dispursed'],
-              color: '#9E7B9B'
+              color: '#9E7B9B',
+              name: cityData.city
             };
           })
           .sort((a,b) => b.value - a.value) :
@@ -369,7 +371,6 @@ const CitiesStore = {
     if (this.data.cities[city_id] && this.data.cities[city_id].projects[project_id]) {
       return this.data.cities[city_id].projects[project_id];
     }
-
   },
 
   getPOC: function() { return this.data.poc; },
