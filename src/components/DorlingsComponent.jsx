@@ -52,6 +52,7 @@ export default class Dorlings extends React.Component {
       d3.select(ReactDOM.findDOMNode(this))
         .transition()
         //.delay((nextProps.r > this.props.r) ? 750 : 0)
+
         .duration(750)
         .attr('r', nextProps.r)
         .style('fill', nextProps.color)
@@ -72,14 +73,12 @@ export default class Dorlings extends React.Component {
         r={ this.state.r }
         style={ {
           fill: this.state.color,
-          fillOpacity: 1,
-          stroke: '#333',
-          strokeWidth: 1/this.props.zoom,
-          strokeOpacity: 1
+          strokeWidth: this.props.strokeWidth
         } }
         onClick={ this.props.onCityClicked }
         id={ this.props.city_id }
         key={ 'city' + this.props.city_id }
+        className={ 'dorling ' + this.props.className }
       />
     );
   }

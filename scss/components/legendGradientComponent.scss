@@ -1,0 +1,46 @@
+.gradientLegend {
+  
+  .percent {
+    text {
+      text-anchor: middle;
+      font-size: 11px;
+      alignment-baseline: middle;
+
+      &.whites {
+        alignment-baseline: hanging;
+      }
+
+      &.poc {
+        alignment-baseline: baseline;
+      }
+
+      &.left {
+        text-anchor: end;
+      }
+
+      &.right {
+        text-anchor: start;
+      }
+    }
+  }
+
+  .mask {
+    height: 20px; 
+    fill: $background-color;
+    fill-opacity: 0.85;
+  }
+}
+
+.dorlingLegend {
+  circle.increment {
+    fill: transparent;
+    stroke: #333;
+    stroke-width: 0.5;
+  }
+
+  text {
+    font-size: 11px;
+    text-anchor: end;
+    alignment-baseline: middle;
+  }
+}

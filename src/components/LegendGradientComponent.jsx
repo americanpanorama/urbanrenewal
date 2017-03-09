@@ -73,7 +73,6 @@ export default class LegendGradient extends React.Component {
             x={ gutter }
             y={ height * 0.25 - 5 }
             fontSize={ 15 }
-            fill='white'
             textAnchor='start'
             alignmentBaseline='middle'
           >
@@ -83,7 +82,6 @@ export default class LegendGradient extends React.Component {
             x={ gutter + barWidth }
             y={ height * 0.75 + 5 }
             fontSize={ 15 }
-            fill='white'
             textAnchor='end'
             alignmentBaseline='middle'
           >
@@ -92,66 +90,49 @@ export default class LegendGradient extends React.Component {
 
           {/* percent labels */}
           { (this.props.percent) ? 
-            <g transform={ 'translate(' + gutter + ')' } >
+            <g 
+              transform={ 'translate(' + gutter + ')' }
+              className='percent'
+            >
               <text
                 dx={ barWidth - (this.props.percent/100 * barWidth) }
                 y={ height / 2 - barHeight / 2 - 9 }
-                fill='white'
-                textAnchor='middle'
-                fontSize={ 11 }
-                alignmentBaseline='middle'
               >
                 { this.props.percent + '%' }
               </text> 
               <text
                 dx={ barWidth - (this.props.percent/100 * barWidth) }
                 y={ height / 2 + barHeight / 2 + 9 }
-                fill='white'
-                textAnchor='middle'
-                fontSize={ 11 }
-                alignmentBaseline='middle'
               >
                 { (100 - this.props.percent) + '%' }
               </text>
             </g> :
-            <g>
+            <g className='percent'>
                <text
                   x={ xForBottom }
                   y={ height / 2 - barHeight / 2 - 9 }
-                  fontSize={ 11 }
-                  fill='white'
-                  textAnchor='start'
-                  alignmentBaseline='baseline'
+                  className='right poc'
                 >
                   { Math.round(this.props.poc[0] * 100) + '%' }
                 </text>
                 <text
                   x={ xForBottom }
                   y={ height / 2 + barHeight / 2 + 9 }
-                  fontSize={ 11 }
-                  fill="white"
-                  textAnchor='start'
-                  alignmentBaseline='hanging'
+                  className='right whites'
                 >
                   { (100 - Math.round(this.props.poc[0] * 100)) + '%' }
                 </text>
                 <text
                   x={ xForTop }
                   y={ height / 2 - barHeight / 2 - 9 }
-                  fontSize={ 11 }
-                  fill='white'
-                  textAnchor='end'
-                  alignmentBaseline='baseline'
+                  className='left poc'
                 >
                   { Math.round(this.props.poc[1] * 100) + '%' }
                 </text>
                 <text
                   x={ xForTop }
                   y={ height / 2 + barHeight / 2 + 9 }
-                  fontSize={ 11 }
-                  fill="white"
-                  textAnchor='end'
-                  alignmentBaseline='hanging'
+                  className='left whites'
                 >
                   { (100 - Math.round(this.props.poc[1] * 100)) + '%' }
                 </text>
@@ -175,9 +156,7 @@ export default class LegendGradient extends React.Component {
                 x={barWidth - (mask[0] * barWidth) + 2 }
                 y={ height / 2 - barHeight / 2 }
                 width={ (mask[0] * barWidth) - 1 } 
-                height="20" 
-                fill="#111"
-                fillOpacity={ 0.9 }
+                className='mask'
               /> :
               ''
             }
@@ -186,9 +165,7 @@ export default class LegendGradient extends React.Component {
                 x={ 0 }
                 y={ height / 2 - barHeight / 2 }
                 width={ (1 - mask[1]) * barWidth} 
-                height="20" 
-                fill="#111"
-                fillOpacity={ 0.9 }
+                className='mask'
               /> :
               ''
             }
@@ -266,13 +243,13 @@ export default class LegendGradient extends React.Component {
           </g>
         </g>
 
-        <g>
+        <g className='dorlingLegend'>
           <circle
             cx={ 150 }
             cy={ height/2 }
             r={ r(15000) }
-            fill={ this._pickHex([125,200,125], [100,150,200], 0.5) }
             key='dorlinglegendbackground'
+            className={ this.props.state.cat }
           />
 
           { [10000, 5000, 1000, 100].map(value => (
@@ -281,19 +258,13 @@ export default class LegendGradient extends React.Component {
                 cx={ 150 }
                 cy={ height/2 }
                 r={ r(value) }
-                fill='transparent'
-                stroke='#111'
-                strokeWidth={ 0.5 }
                 transform={ 'translate(0,' + (r(15000) - r(value)) + ')'}
+                className='increment'
                 
               />
               <text
                 x={ 80 }
                 y={ height/2 + (r(15000) - r(value)) - r(value)  }
-                fill='white'
-                fontSize={ 11 }
-                textAnchor='end'
-                alignmentBaseline='middle'
               >
                 { value + ' families'}
               </text>

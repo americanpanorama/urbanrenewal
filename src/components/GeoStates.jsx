@@ -15,12 +15,8 @@ export default class USMap extends React.Component {
             <path
               key={ polygon.id }
               d={ this.props.path(polygon.geometry) }
-              style={ {
-                fill: '#555559',
-                stroke: '#111',
-                strokeWidth: 0.2/this.props.state.zoom,
-                pointerEvents: 'none'
-              } }
+              strokeWidth={ 0.2/this.props.state.zoom }
+              className='stateMap'
             />
           );
         })}

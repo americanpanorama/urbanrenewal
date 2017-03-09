@@ -10,15 +10,11 @@ export default class Timeline extends React.Component {
     super(props);
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps) {}
 
-  }
+  componentDidMount() {}
 
-  componentDidMount() {
-  }
-
-  componentDidUpdate() {
-  }
+  componentDidUpdate() {}
 
   _pickHex(color1, color2, weight) {
     var p = weight;
@@ -146,13 +142,7 @@ export default class Timeline extends React.Component {
         height={height}
         id='timeline'
       >
-
-        {/* category labels */}
-        <g>
-
-        </g>
-
-        {/* vertical ticks */}
+        {/* vertical ticks 
         <g transform={'translate(' + rightMargin + ')'}>
           { years.map(year => {
             return (
@@ -166,7 +156,7 @@ export default class Timeline extends React.Component {
               />
             );
           })} 
-        </g>
+        </g> */}
 
         <g 
           transform={'translate(0,' + headerHeight + ')'}
@@ -176,7 +166,6 @@ export default class Timeline extends React.Component {
           <text
             dx={ rightMargin / 2 }
             dy={ yearLabelY + 2 }
-            fill='white'
             fontSize={ 20 }
             textAnchor='middle'
             alignmentBaseline='middle'
@@ -187,7 +176,6 @@ export default class Timeline extends React.Component {
           <text
             dx={ rightMargin - 30 }
             dy={ maxBarHeight * 0.5 }
-            fill='white'
             fontSize={ 15 }
             textAnchor='end'
             alignmentBaseline='middle'
@@ -197,7 +185,6 @@ export default class Timeline extends React.Component {
           <text
             dx={ rightMargin - 30 }
             dy={ bottomY + maxBarHeight * 0.5 }
-            fill='white'
             fontSize={ 15 }
             textAnchor='end'
             alignmentBaseline='middle'
@@ -211,11 +198,8 @@ export default class Timeline extends React.Component {
               <text
                 dx={ rightMargin }
                 dy={ topY - (iterator + 1) * familiesTickHeight}
-                fontSize={ 11 }
-                fill='white'
-                textAnchor='end'
-                alignmentBaseline='middle'
                 key={ 'topAxesTick' + iterator }
+                className='axisLabel'
               >
                 { (maxFamilies > 4000) ? ((iterator + 1) * familiesTickInterval / 1000) + 'K' : (iterator + 1) * familiesTickInterval }
               </text>
@@ -236,11 +220,8 @@ export default class Timeline extends React.Component {
               <text
                 dx={ rightMargin }
                 dy={ bottomY + (iterator + 1) * fundingTickHeight}
-                fontSize={ 11 }
-                fill='white'
-                textAnchor='end'
-                alignmentBaseline='middle'
                 key={ 'bottomAxesTick' + iterator }
+                className='axisLabel'
               >
                 { '$' + displayNum + abbr }
               </text>
@@ -253,18 +234,17 @@ export default class Timeline extends React.Component {
         >
           {/* year labels */}
           { years.map(year => {
+            let className = (year < this.props.yearSpan[0] || year > this.props.yearSpan[1]) ? 'yearLabel inactive' : (year == this.props.state.year) ? 'yearLabel selected' : 'yearLabel';
             return (
               <text
                 dx={ xOffsetForYearMiddle(year) }
                 dy={ yearLabelY + 2 }
                 fill={ (year < this.props.yearSpan[0] || year > this.props.yearSpan[1]) ? '#454545' : (year == this.props.state.year) ? 'yellow' : 'white' }
                 fontSize={ (year % 5 == 0) ? yearLabelSize : yearLabelSize - 2 }
-                textAnchor='middle'
-                alignmentBaseline='middle'
                 onClick={ this.props.onClick }
                 id={ year }
                 key={ 'year' + year }
-
+                className={ className }
               >
                 { (year % 5 == 0) ? year : "'" + (year - 1900) }
               </text>
@@ -277,10 +257,9 @@ export default class Timeline extends React.Component {
             x={ xOffsetForYear(this.props.yearSpan[0]) }
             y={ topY }
             width={ (this.props.yearSpan[1] - this.props.yearSpan[0] + 1) * yearWidth }
-            height={ 1 }
-            fill={ this._pickHex([125,200,125], [100,150,200], 0.5) }
+            className='baseline families'
           />
-          <g>
+          <g className='bars'>
             { years.map(year => {
               if (this.props.yearsData[year] && this.props.yearsData[year].totalFamilies) {
                 return (
@@ -291,9 +270,7 @@ export default class Timeline extends React.Component {
                       width={ barWidth }
                       height={ maxBarHeight * (this.props.yearsData[year].totalFamilies / maxFamilies) }
                       fill={ this._pickHex([125,200,125], [100,150,200], this.props.yearsData[year].percentFamiliesOfColor) }
-                      
-                      stroke={ (year == this.props.state.year && this.props.state.cat == 'families') ? 'yellow' : 'none' }
-                      strokeWidth={ 2 }
+                      className={ (year == this.props.state.year && this.props.state.cat == 'families') ? 'bar selected' : 'bar' }
                     />
 
                     { [...Array(Math.floor(this.props.yearsData[year].totalFamilies /familiesTickInterval)).keys()].map(iterator => {
@@ -302,9 +279,8 @@ export default class Timeline extends React.Component {
                           x={ (year - firstYear) * yearWidth  + barOffset }
                           y={ topY - (iterator + 1) * familiesTickHeight}
                           width={ barWidth }
-                          height={ 1 }
-                          fill='#111'
                           key={ 'toptickLine' + year + iterator }
+                          className='grid'
                         />
                       );
                     }) }
@@ -315,10 +291,10 @@ export default class Timeline extends React.Component {
                       y={ topY - maxBarHeight }
                       width={ yearWidth }
                       height={ maxBarHeight }
-                      fill={ 'transparent' }
                       onClick={ this.props.onClick }
                       id={ year + '|families' }
                       key={ 'clickableyearData' + year }
+                      className='clickableBar'
                     />
                   </g>
                 );
@@ -326,30 +302,25 @@ export default class Timeline extends React.Component {
             })}
           </g>
 
-
           {/* funding */}
           {/* baseline */}
           <rect
             x={ xOffsetForYear(this.props.yearSpan[0]) }
             y={ bottomY }
             width={ (this.props.yearSpan[1] - this.props.yearSpan[0] + 1) * yearWidth }
-            height={ 1 }
-            fill={ '#9E7B9B' }
+            className='baseline funding'
           />
           <g>
             { years.map(year => {
               if (this.props.yearsData[year] && this.props.yearsData[year]['urban renewal grants dispursed']) {
                 return (
-                  <g key={ 'yearDataMoney' + year }>
+                  <g className='bars' key={ 'yearDataMoney' + year }>
                     <rect
                       x={ xOffsetForYearBar(year) }
                       y={ bottomY }
                       width={ barWidth }
                       height={ maxBarHeight * this.props.yearsData[year]['urban renewal grants dispursed'] / maxFunding }
-                      fill={ '#9E7B9B' }
-                      
-                      stroke={ (year == this.props.state.year && this.props.state.cat == 'funding') ? 'yellow' : 'none' }
-                      strokeWidth={ 2 }
+                      className={ (year == this.props.state.year && this.props.state.cat == 'funding') ? 'bar funding selected' : 'bar funding' }
                     />
 
                     { [...Array(Math.floor(this.props.yearsData[year]['urban renewal grants dispursed'] /fundingTickInterval)).keys()].map(iterator => {
@@ -358,9 +329,8 @@ export default class Timeline extends React.Component {
                           x={ xOffsetForYearBar(year) }
                           y={ bottomY + (iterator + 1) * fundingTickHeight}
                           width={ barWidth }
-                          height={ 1 }
-                          fill='#111'
                           key={ 'bottomtickLine' + year + iterator }
+                          className='grid'
                         />
                       );
                     }) }
@@ -371,10 +341,9 @@ export default class Timeline extends React.Component {
                       y={ bottomY }
                       width={ yearWidth }
                       height={ maxBarHeight }
-                      fill={ 'transparent' }
                       onClick={ this.props.onClick }
                       id={ year + '|funding' }
-                      key={ 'clickableyearDataFunding' + year }
+                      className='clickableBar'
                     />
                   </g>
                 );
@@ -388,12 +357,7 @@ export default class Timeline extends React.Component {
             x={ xOffsetForYear(1967) }
             y={ topY - maxBarHeight / 2 - 4 }
             text='no displacement data available'
-          />
-
-
-
-
-          
+          />          
         </g>
 
         { (this.props.projects) ? 
@@ -402,7 +366,6 @@ export default class Timeline extends React.Component {
             <text
               dx={ rightMargin - 30 }
               dy={ headerHeight }
-              fill='white'
               fontSize={ 15 }
               textAnchor='end'
               alignmentBaseline='middle'
@@ -430,10 +393,6 @@ export default class Timeline extends React.Component {
           </g>:
           '' 
         }
-
-
-
-
       </svg>
     );
   }

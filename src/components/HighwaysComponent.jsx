@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { PropTypes } from 'react';
+import ReactDOM from 'react-dom';
+import d3 from 'd3';
 
 import HighwaysStore from '../stores/HighwaysStore';
 
@@ -7,25 +9,36 @@ export default class Highways extends React.Component {
 
   constructor (props) {
     super(props);
+    this.state = {
+      strokeWidth: 3/this.props.zoom
+    };
+  }
+
+  componentWillEnter(callback) {
+    console.log(this.props.zoom);
+    d3.select(ReactDOM.findDOMNode(this))
+      .transition()
+      .duration(2000)
+      .attr('stroke-width', 1/this.props.zoom)
+      .each('end', () => {
+        this.setState({
+          strokeWidth: 1/this.props.zoom
+        });
+        callback();
+      });
+  }
+
+  componentWillLeave(callback) {
+    callback();
   }
 
   render () {
     return (
-      <g>
-        { HighwaysStore.getHighwaysList().map(polygon => {
-          return (
-            <path
-              key={ 'highwaysOpened' + polygon.properties.year_open }
-              d={ this.props.path(polygon.geometry) }
-              style={ {
-                fill: 'transparent',
-                stroke: (polygon.properties.year_open <= this.props.state.year) ? 'orange' : 'transparent',
-                strokeWidth: (polygon.properties.year_open <= this.props.state.year) ? 0.75/this.props.state.zoom : 0,
-              } }
-            />
-          );
-        })}
-      </g>
+      <path
+        d={ this.props.d }
+        strokeWidth={ this.state.strokeWidth }
+        className='highway'
+      />
     );
   }
 }

@@ -10,6 +10,7 @@ import Dorlings from './DorlingsComponent.jsx';
 
 import CitiesStore from '../stores/CitiesStore.js';
 import GeographyStore from '../stores/GeographyStore';
+import HighwaysStore from '../stores/HighwaysStore';
 
 export default class USMap extends React.Component {
 
@@ -103,10 +104,20 @@ export default class USMap extends React.Component {
             path={ path }
             state={ this.props.state }
           />
-          <Highways 
-            path={ path }
-            state={ this.props.state }
-          />
+          <ReactTransitionGroup component='g' className='transitionGroup'>
+            { HighwaysStore.getHighwaysList().map(polygon => {
+              if (polygon.properties.year_open <= this.props.state.year) {
+                return (
+                  <Highways 
+                    key={ 'highwaysOpened' + polygon.properties.year_open }
+                    d={ path(polygon.geometry) }
+                    polygon={ polygon }
+                    zoom={ this.props.state.zoom }
+                  />
+                );
+              }
+            })}
+          </ReactTransitionGroup>
           <ReactTransitionGroup component='g' className='transitionGroup'>
             { CitiesStore.getDorlings(this.props.state.year, this.props.state.cat).filter(cityData => projection(cityData.lngLat) !== null).map((cityData, i) => (
               <Dorlings
@@ -116,6 +127,7 @@ export default class USMap extends React.Component {
                 key={'cityCircle' + cityData.city_id }
                 zoom={ this.props.state.zoom }
                 color={ cityData.color }
+                strokeWidth={ 1/this.props.state.zoom }
                 city_id={ cityData.city_id }
                 onCityClicked={ this.props.onCityClicked }
                 selected={ (CitiesStore.getSelectedCity() == cityData.city_id) }
@@ -123,17 +135,32 @@ export default class USMap extends React.Component {
             ))}
           </ReactTransitionGroup>
 
+          {/* selected city on top */}
+          <ReactTransitionGroup component='g' className='transitionGroup'>
+            { CitiesStore.getDorlings(this.props.state.year, this.props.state.cat).filter(cityData => CitiesStore.getSelectedCity() == cityData.city_id).map((cityData, i) => (
+              <Dorlings
+                r={ r(cityData.value) >= 2/this.props.state.zoom ? r(cityData.value) : 2/this.props.state.zoom }
+                cx={ projection(cityData.lngLat)[0] }
+                cy={ projection(cityData.lngLat)[1] }
+                key={'cityCircleSelected' + cityData.city_id }
+                zoom={ this.props.state.zoom }
+                color='transparent'
+                strokeWidth={ 3/this.props.state.zoom }
+                className='selected'
+              />
+            ))}
+          </ReactTransitionGroup>  
+
           { (this.props.state.zoom >= 4) ?
             CitiesStore.getDorlings(this.props.state.year, this.props.state.cat).filter(cityData => projection(cityData.lngLat) !== null).map((cityData, i) => (
                 <text
                   x={ projection(cityData.lngLat)[0] }
                   y={ projection(cityData.lngLat)[1] - r(cityData.value) - 1 }
-                  fill='white'
                   fontSize={ 16 / this.props.state.zoom }
                   key={ 'cityLabel' + cityData.city_id }
-                  textAnchor='middle'
                   onClick={ this.props.onCityClicked }
                   id={ cityData.city_id }
+                  className='cityLabel'
                 > 
                   { cityData.name.replace(/\b\w/g, l => l.toUpperCase()) }
                 </text>

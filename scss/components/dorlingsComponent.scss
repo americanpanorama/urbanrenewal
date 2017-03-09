@@ -1,0 +1,8 @@
+.dorling {
+  stroke: #333;
+
+  &.selected {
+    stroke: $selected-color;
+    pointer-events: none;
+  }
+}
