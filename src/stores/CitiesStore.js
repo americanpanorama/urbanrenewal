@@ -2,7 +2,7 @@ import { EventEmitter } from 'events';
 import AppDispatcher from '../utils/AppDispatcher';
 import { AppActionTypes } from '../utils/AppActionCreator';
 import CartoDBLoader from '../utils/CartoDBLoader';
-import d3 from 'd3';
+import { HelperFunctions } from '../utils/HelperFunctions';
 
 let cases = {
   '1956': [994], // Cincinnati
@@ -36,30 +36,29 @@ const CitiesStore = {
 
     this.dataLoader.query([
       {
-        query: "SELECT max(value) as max, md.category_id, assessed_category, unit_of_measurement from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id group by md.category_id, assessed_category, unit_of_measurement union (select total as max, 1000 as category_id, 'totalFamilies' as assessed_category, 'familiies' as unit_of_measurement from (SELECT sum(value) as total, city_id, year from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id and (c.category_id = 71 or c.category_id = 72) and value is not null group by city_id, year order by sum(value) desc limit 1) tf) ",
+        query: "SELECT max(value) as max, md.category_id, assessed_category, unit_of_measurement from urdr_category_id_key c join combined_dire_char_raw md on c.category_id = md.category_id group by md.category_id, assessed_category, unit_of_measurement union (select total as max, 1000 as category_id, 'totalFamilies' as assessed_category, 'familiies' as unit_of_measurement from (SELECT sum(value) as total, city_id, year from urdr_category_id_key c join combined_dire_char_raw md on c.category_id = md.category_id and (c.category_id = 71 or c.category_id = 72) and value is not null group by city_id, year order by sum(value) desc limit 1) tf) ",
         format: 'JSON'
       },
       { 
-        query: "SELECT sum(value) as total, year, md.category_id from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id group by year, md.category_id order by year, category_id", //"SELECT sum(value) as total, year, md.category_id from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id and case when c.category_id = any(array[71,72]) and quarter != 'December' then false else true end group by year, md.category_id order by year, category_id",
+        query: "select sum(value) as total, fy.year, v.category_id from (SELECT max(year), value, city_id, project_id, category_id FROM digitalscholarshiplab.combined_dire_char_raw where value is not null group by value, city_id, project_id, category_id) v join (SELECT min(year) as year, city_id, project_id, category_id FROM digitalscholarshiplab.combined_dire_char_raw where value is not null group by city_id, project_id, category_id) fy on v.project_id = fy.project_id and v.category_id = fy.category_id group by fy.year, v.category_id", //"SELECT sum(value) as total, year, md.category_id from urdr_category_id_key c join combined_dire_char_raw md on c.category_id = md.category_id group by year, md.category_id order by year, category_id", //"SELECT sum(value) as total, year, md.category_id from urdr_category_id_key c join combined_dire_char_raw md on c.category_id = md.category_id and case when c.category_id = any(array[71,72]) and quarter != 'December' then false else true end group by year, md.category_id order by year, category_id",
         format: 'JSON'
       },
       {
-        query: "select * from (SELECT sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, city, state, year, md.category_id from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id and year = " + year + " join urdr_city_id_key cities on md.city_id = cities.city_id group by cities.the_geom, city, state, cities.city_id, year, md.category_id) year_vals where total is not null", //"select * from (SELECT sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, city, state, year, md.category_id from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id and year = " + year + " and quarter = 'December' join urdr_city_id_key cities on md.city_id = cities.city_id group by cities.the_geom, city, state, cities.city_id, year, md.category_id) year_vals where total is not null",
+        query: "select sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, city, state, year, v2.category_id from (select value, fy.year, v.category_id, v.project_id, v.city_id from (SELECT max(year), value, city_id, project_id, category_id FROM digitalscholarshiplab.combined_dire_char_raw where value is not null group by value, city_id, project_id, category_id) v join (SELECT min(year) as year, city_id, project_id, category_id FROM digitalscholarshiplab.combined_dire_char_raw where value is not null group by city_id, project_id, category_id) fy on v.project_id = fy.project_id and v.category_id = fy.category_id) v2 join urdr_city_id_key cities on v2.city_id = cities.city_id and year = " + year + " group by cities.the_geom, city, state, cities.city_id, year, category_id",//"select * from (SELECT sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, city, state, year, md.category_id from urdr_category_id_key c join combined_dire_char_raw md on c.category_id = md.category_id and year = " + year + " join urdr_city_id_key cities on md.city_id = cities.city_id group by cities.the_geom, city, state, cities.city_id, year, md.category_id) year_vals where total is not null", //"select * from (SELECT sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, city, state, year, md.category_id from urdr_category_id_key c join combined_dire_char_raw md on c.category_id = md.category_id and year = " + year + " and quarter = 'December' join urdr_city_id_key cities on md.city_id = cities.city_id group by cities.the_geom, city, state, cities.city_id, year, md.category_id) year_vals where total is not null",
+        format: 'JSON'
+      },
+      { query: "SELECT d.project_id, d.start_year, d.end_year, d.whites, d.nonwhite, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.city_id, cities.state FROM digitalscholarshiplab.urdr_displacements d join urdr_city_id_key cities on cities.city_id = d.city_id",
         format: 'JSON'
       }
 
     ]).then((responses) => {
-      // assign colors
-      let color = d3.scale.category20()
-        .domain(this.getCategoryIdsWithData());
 
       // category data
       responses[0].forEach(response => { 
         this.data.categories[response.category_id] = {
           category: response.assessed_category,
           unit: response.unit_of_measurement,
-          maxForCity: response.max,
-          color: color(response.category_id)
+          maxForCity: response.max
         };
       });
 
@@ -86,6 +85,35 @@ const CitiesStore = {
         }
       });
 
+      console.log(this.data.cities);
+      this.data.cities = {};
+      responses[3].forEach(response => {
+        let duration = 1 + response.end_year - response.start_year;
+        for (let aYear = response.start_year; aYear <= response.end_year; aYear += 1) {
+          this.data.cities[response.city_id] = (this.data.cities[response.city_id]) ? this.data.cities[response.city_id] : { 
+            city: response.city,
+            city_id: response.city_id,
+            endYear: response.end_year,
+            lat: response.lat,
+            lng: response.lng,
+            projects: {},
+            slug: response.city.replace(/ /g,'') + response.state.toUpperCase(),
+            startYear: response.start_year,
+            state: response.state,
+            tracts: {},
+            yearsData: {} 
+          };
+          if (!this.data.cities[response.city_id].yearsData[aYear]) {
+            this.data.cities[response.city_id].yearsData[aYear] = {};
+          }
+          this.data.cities[response.city_id].yearsData[aYear]['white families'] = response.whites / duration;
+          this.data.cities[response.city_id].yearsData[aYear]['non-white families'] = response.nonwhite / duration;
+          this.data.cities[response.city_id].yearsData[aYear]['totalFamilies'] = response.nonwhite / duration + response.whites / duration;
+          this.data.cities[response.city_id].yearsData[aYear].percentFamiliesOfColor = (response.nonwhite / duration) /  (response.nonwhite / duration + response.whites / duration);
+        }
+      });
+      console.log(this.data.cities);
+
       // load a city if one's specified
       if (citySlug) {
         this.loadCityData(this.getCityIdFromSlug(citySlug));
@@ -103,7 +131,7 @@ const CitiesStore = {
   loadYearData: function(year) {
     this.dataLoader.query([
       {
-        query: "select * from (SELECT sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, city, state, year, md.category_id from urdr_category_id_key c join combined_dir_char md on c.category_id = md.category_id and year = " + year + " join urdr_city_id_key cities on md.city_id = cities.city_id group by cities.the_geom, city, state, cities.city_id, year, md.category_id) year_vals where total is not null",
+        query: "select sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, city, state, year, v2.category_id from (select value, fy.year, v.category_id, v.project_id, v.city_id from (SELECT max(year), value, city_id, project_id, category_id FROM digitalscholarshiplab.combined_dire_char_raw where value is not null group by value, city_id, project_id, category_id) v join (SELECT min(year) as year, city_id, project_id, category_id FROM digitalscholarshiplab.combined_dire_char_raw where value is not null group by city_id, project_id, category_id) fy on v.project_id = fy.project_id and v.category_id = fy.category_id) v2 join urdr_city_id_key cities on v2.city_id = cities.city_id and year = " + year + " group by cities.the_geom, city, state, cities.city_id, year, category_id", //"select * from (SELECT sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, city, state, year, md.category_id from urdr_category_id_key c join combined_dire_char_raw md on c.category_id = md.category_id and year = " + year + " join urdr_city_id_key cities on md.city_id = cities.city_id group by cities.the_geom, city, state, cities.city_id, year, md.category_id) year_vals where total is not null",
         format: 'JSON'
       },
     ]).then((responses) => {
@@ -122,7 +150,7 @@ const CitiesStore = {
   loadCityData: function(city_id) {
     this.dataLoader.query([
       {
-        query: "SELECT value as total, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.state, p.project_id, project, category_id, year, st_asgeojson(p.the_geom) as project_geojson from urdr_city_id_key cities join urdr_id_key p on cities.city_id = " + city_id + " and cities.city_id = p.city_id join combined_dir_char md on p.project_id = md.project_id and value > 0", //"SELECT sum(value) as total, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.state, p.project_id, project, category_id, year, st_asgeojson(p.the_geom) as project_geojson from urdr_city_id_key cities join urdr_id_key p on cities.city_id = " + city_id + " and cities.city_id = p.city_id join combined_dir_char md on p.project_id = md.project_id and case when md.category_id = any(array[71,72]) and quarter != 'December' then false else true end group by cities.the_geom, cities.city, cities.state, p.project_id, project, category_id, year, p.the_geom",
+        query:  "select v.*, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.state, fy.year from (SELECT max(year), value as total, d.project_id, project, category_id, st_asgeojson(p.the_geom) as project_geojson FROM digitalscholarshiplab.combined_dire_char_raw d join urdr_id_key p on p.project_id = d.project_id where value is not null and d.city_id = " + city_id + " group by d.project_id, category_id, value, st_asgeojson(p.the_geom), project) v join (SELECT min(year) as year, project_id, category_id FROM digitalscholarshiplab.combined_dire_char_raw where value is not null and city_id = " + city_id + " group by project_id, category_id) fy on v.project_id = fy.project_id and v.category_id = fy.category_id join urdr_city_id_key cities on cities.city_id = " + city_id, //"SELECT value as total, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.state, p.project_id, project, category_id, year, st_asgeojson(p.the_geom) as project_geojson from urdr_city_id_key cities join urdr_id_key p on cities.city_id = " + city_id + " and cities.city_id = p.city_id join combined_dire_char_raw md on p.project_id = md.project_id and value > 0", //"SELECT sum(value) as total, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.state, p.project_id, project, category_id, year, st_asgeojson(p.the_geom) as project_geojson from urdr_city_id_key cities join urdr_id_key p on cities.city_id = " + city_id + " and cities.city_id = p.city_id join combined_dire_char_raw md on p.project_id = md.project_id and case when md.category_id = any(array[71,72]) and quarter != 'December' then false else true end group by cities.the_geom, cities.city, cities.state, p.project_id, project, category_id, year, p.the_geom",
         format: 'JSON'
       },
       {
@@ -220,17 +248,6 @@ const CitiesStore = {
     this.data.cities[response.city_id].yearsData[response.year][this.getCategoryName(response.category_id)] = response.total;
   },
 
-  _pickHex: function(color1, color2, weight) {
-    var p = weight;
-    var w = p * 2 - 1;
-    var w1 = (w/1+1) / 2;
-    var w2 = 1 - w1;
-    var rgb = [Math.round(color1[0] * w1 + color2[0] * w2),
-        Math.round(color1[1] * w1 + color2[1] * w2),
-        Math.round(color1[2] * w1 + color2[2] * w2)];
-    return 'rgb(' + rgb + ')';
-  },
-
   cityLoaded: function(city_id) { return (this.data.citiesLoaded.indexOf(city_id) !== -1); },
 
   yearLoaded: function(year) { return (this.data.yearsLoaded.indexOf(year) !== -1); },
@@ -293,6 +310,25 @@ const CitiesStore = {
       [];
   },
 
+  getFamiliesDisplaced: function(year) {
+    return (this.data && this.data.loaded) ?
+      this.getCitiesList()
+        .filter(cityData => cityData.yearsData[year] && cityData.yearsData[year]['totalFamilies'] > 0 )
+        .map(cityData => {
+          return {
+            lngLat: [cityData.lng, cityData.lat],
+            city_id: cityData.city_id,
+            'non-white families': cityData.yearsData[year]['non-white families'],
+            'white families': cityData.yearsData[year]['white families'],
+            value: cityData.yearsData[year]['totalFamilies'],
+            color: (cityData.yearsData[year]['percentFamiliesOfColor'] >= this.getPOCBottom() && cityData.yearsData[year]['percentFamiliesOfColor'] <= this.getPOCTop()) ? HelperFunctions.getColorForRace(cityData.yearsData[year]['percentFamiliesOfColor']) : 'transparent',
+            name: cityData.city
+          };
+        })
+        .sort((a,b) => b.value - a.value) :
+      [];
+  },
+
   getDorlings: function(year, cat) {
     // need to add something to select category
     if (cat == 'families') {
@@ -304,7 +340,7 @@ const CitiesStore = {
               lngLat: [cityData.lng, cityData.lat],
               city_id: cityData.city_id,
               value: cityData.yearsData[year]['totalFamilies'],
-              color: (cityData.yearsData[year]['percentFamiliesOfColor'] >= this.getPOCBottom() && cityData.yearsData[year]['percentFamiliesOfColor'] <= this.getPOCTop()) ? this._pickHex([125,200,125], [100,150,200], cityData.yearsData[year]['percentFamiliesOfColor']) : 'transparent',
+              color: (cityData.yearsData[year]['percentFamiliesOfColor'] >= this.getPOCBottom() && cityData.yearsData[year]['percentFamiliesOfColor'] <= this.getPOCTop()) ? HelperFunctions.getColorForRace(cityData.yearsData[year]['percentFamiliesOfColor']) : 'transparent',
               name: cityData.city
             };
           })

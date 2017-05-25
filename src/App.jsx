@@ -217,14 +217,7 @@ class App extends React.Component {
               resetView={ this.resetView }
             />
           </ReactTransitionGroup>
-          <LegendGradient
-            state={ this.state }
-            poc={ CitiesStore.getPOC() }
-            style={ DimensionsStore.getLegendGradientStyle() }
-            onDragUpdate={ this.onDragUpdate }
-            percent={ (CitiesStore.getSelectedCity() && CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year] && CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year].percentFamiliesOfColor) ? Math.round(CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year].percentFamiliesOfColor * 100) : false }
-            
-          />
+
           <TimelineComponent 
             onClick={ this.onYearClicked }
             state={ this.state }
@@ -269,7 +262,14 @@ class App extends React.Component {
           */}
 
 
-
+          <LegendGradient
+            state={ this.state }
+            poc={ CitiesStore.getPOC() }
+            style={ DimensionsStore.getLegendGradientStyle() }
+            onDragUpdate={ this.onDragUpdate }
+            percent={ (CitiesStore.getSelectedCity() && CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year] && CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year].percentFamiliesOfColor) ? Math.round(CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year].percentFamiliesOfColor * 100) : false }
+            
+          />
 
           
         </aside>

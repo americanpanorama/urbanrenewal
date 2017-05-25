@@ -3,11 +3,11 @@ var React = require('react');
 var Handle = React.createClass({
 
   getInitialState: function() {
-    let xForPercent = this.props.width - (this.props.percent * this.props.width);
+    let yForPercent = this.props.height - (this.props.percent * this.props.height);
     return {
-      x: (this.props.max) ? xForPercent : xForPercent - 4, // the visible handle position
-      deX: (this.props.max) ? xForPercent - 2 : xForPercent - 6, // the draggable element x
-      deWidth: 8,
+      y: (this.props.max) ? yForPercent : yForPercent - 4, // the visible handle position
+      deY: (this.props.max) ? yForPercent - 2 : yForPercent - 6, // the draggable element x
+      deHeight: 8,
       isDragging: false,
       max: (this.props.max) ? this.props.max : 1,
       min: (this.props.min) ? this.props.min : 0,
@@ -17,23 +17,22 @@ var Handle = React.createClass({
 
   hover: function(e) {
     // if it's the bottom slider, set the bottom just to the right of the top/max slider
-    let deX = (this.props.max) ? this.props.width - (this.props.max * this.props.width) + 8 : -200;
+    let deY = (this.props.max) ? this.props.height - (this.props.max * this.props.height) : -200;
 
-    let deWidth = 200 - 8; // the 8 is to keep a min distance between them
-    // if it's the bottom, extend from the max to 200 past the width
+    let deHeight = 200 - 8; // the 8 is to keep a min distance between them
+    // if it's the bottom, extend from the max to 200 past the height
     if (this.props.max) {
-      deWidth += this.props.max * this.props.width;
+      deHeight += this.props.max * this.props.height;
     } 
     // if it's the top, extend from 200 below the leftmost point to the min
     else {
-      deWidth += this.props.width - (this.props.min * this.props.width);
+      deHeight += this.props.height - (this.props.min * this.props.height);
     }
 
 
     this.setState({
-      deX: deX,
-      deWidth: deWidth
-      
+      deY: deY,
+      deHeight: deHeight
     });
   },
 
@@ -49,8 +48,8 @@ var Handle = React.createClass({
   deSelectElement: function() {
     this.setState({
       isDragging: false,
-      deWidth: 8,
-      deX: this.state.x - 2,
+      deHeight: 8,
+      deY: this.state.y - 2,
       handleColor: 'yellow'
     });
   },
@@ -58,26 +57,26 @@ var Handle = React.createClass({
   drag: function(e) {
 
     if (this.state.isDragging) {
-      var idx = e.target.id;
-      let deltaX = e.pageX - this.state.mouseX,
+      var idY = e.target.id;
+      let deltaY = e.pageY - this.state.mouseY,
         topOrBottom = (this.props.max) ? 'bottom' : 'top';
 
-      let newX = this.state.x + deltaX;
+      let newY = this.state.y + deltaY;
       // don't let the top go lower than 0 or the bottom higher than the width
-      if (topOrBottom == 'top' && this.state.x + deltaX <= 0) {
-        newX = 0;
-      } else if (topOrBottom == 'bottom' && this.state.x + deltaX >= this.props.width) {
-        newX = this.props.width;
+      if (topOrBottom == 'top' && this.state.y + deltaY <= 0) {
+        newY = 0;
+      } else if (topOrBottom == 'bottom' && this.state.y + deltaY >= this.props.height) {
+        newY = this.props.height;
       }
-      let newValue = (this.props.width - newX)/this.props.width;
+      let newValue = (this.props.height - newY)/this.props.height;
         
       this.props.onUpdate(newValue, topOrBottom);
 
       this.setState({
-        x: newX,
-        mouseX: e.pageX,
+        y: newY,
         mouseY: e.pageY,
-        value: newX
+        mouseX: e.pageX,
+        value: newY
       });
     }
   },
@@ -88,18 +87,18 @@ var Handle = React.createClass({
         <rect 
           className='visibleHandle'
           id={ this.props.id }
-          x={ this.state.x }
-          y={ this.props.y }
-          width={ 4 }
-          height={ this.props.height }
+          x={ this.props.handleOverhang * -1 }
+          y={ this.state.y }
+          width={ this.props.width + this.props.handleOverhang * 2 }
+          height={ 4  }
           fill={ this.state.handleColor }
         />
         <rect className="handle"
           id={ this.props.id }
-          x={ this.state.deX }
-          y={ 0 }
-          width={ this.state.deWidth }
-          height={ 100 }
+          x={ (100 - this.props.width) / -2 }
+          y={ this.state.deY }
+          width={ 100 }
+          height={ this.state.deHeight }
           fill={ 'transparent' }
           fillOpacity={ 0.5 }
           onMouseOver={ this.hover }

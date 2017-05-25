@@ -19,6 +19,7 @@ export default class CityStats extends React.Component {
   }
 
   render() {
+    console.log(this.props);
     return (
       <div className='cityStats'>
         <h2>{ this.props.city + ', ' + this.props.state }</h2>
@@ -26,43 +27,18 @@ export default class CityStats extends React.Component {
           onClick={ this.props.onCityClicked }
           id={ null }
         >close</div>
-        <ul>
-        { Object.keys(this.props.categories).map(category_id => {
-          if (this.props.yearsData[this.props.year] && this.props.yearsData[this.props.year][category_id]) {
+        { Object.keys(this.props.projects).map(project_id => {
+          if (this.props.projects[project_id].yearsData[this.props.year] && (this.props.projects[project_id].yearsData[this.props.year]['white families'] || this.props.projects[project_id].yearsData[this.props.year]['non-white families'])) {
             return (
-              <li 
-                key={ 'cat' + category_id }
-                id={ category_id }
-                onClick={ this.props.onCategoryClicked }
-                style={ { 
-                  borderBottom: '4px solid ' + CitiesStore.getCategoryColor(category_id),
-                  fontWeight: (CitiesStore.getSelectedCategory() == category_id) ? "bold" : "normal",
-                  backgroundColor: (CitiesStore.getSelectedCategory() == category_id) ? CitiesStore.getCategoryColor(category_id) : "transparent",
-                } }
-              >
-                { CitiesStore.getCategoryName(category_id) + ": " + this.formatValue(this.props.yearsData[this.props.year][category_id], CitiesStore.getCategoryUnit(category_id)) }
-                { (CitiesStore.getSelectedCategory() == category_id) ?
-                  <ul className='projects'>
-                  { Object.keys(this.props.projects).map(project_id => {
-                    if (this.props.projects[project_id].yearsData[this.props.year] && this.props.projects[project_id].yearsData[this.props.year][category_id] > 0) {
-                      return (
-                        <li 
-                          key={ 'project' + project_id }
-                        >
-                          { this.props.projects[project_id].project + ": " + this.formatValue(this.props.projects[project_id].yearsData[this.props.year][category_id], CitiesStore.getCategoryUnit(category_id))}
-                        </li>
-                      );
-                    }
-                  }) }
-                  </ul> :
-                  ''
-                 }
-
-              </li>
+              <div>
+                { project_id + this.props.projects[project_id].project + " " + this.props.projects[project_id].yearsData[this.props.year]['white families'] + " " + this.props.projects[project_id].yearsData[this.props.year]['non-white families']}
+              </div>
             );
           }
-        }) }
-        </ul>
+        })
+
+
+        }
       </div>
     );
   }

@@ -7,25 +7,26 @@
       alignment-baseline: middle;
 
       &.whites {
-        alignment-baseline: hanging;
+       
+        text-anchor: start;
       }
 
       &.poc {
         alignment-baseline: baseline;
-      }
-
-      &.left {
         text-anchor: end;
       }
 
-      &.right {
-        text-anchor: start;
+      &.top {
+        alignment-baseline: baseline;
+      }
+
+      &.bottom {
+        alignment-baseline: hanging;
       }
     }
   }
 
   .mask {
-    height: 20px; 
     fill: $background-color;
     fill-opacity: 0.85;
   }

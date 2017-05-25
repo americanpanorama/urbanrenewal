@@ -21,33 +21,52 @@ export default class LegendGradient extends React.Component {
   componentDidUpdate() {
   }
 
-  _pickHex(color1, color2, weight) {
-    var p = weight;
-    var w = p * 2 - 1;
-    var w1 = (w/1+1) / 2;
-    var w2 = 1 - w1;
-    var rgb = [Math.round(color1[0] * w1 + color2[0] * w2),
-        Math.round(color1[1] * w1 + color2[1] * w2),
-        Math.round(color1[2] * w1 + color2[2] * w2)];
-    return 'rgb(' + rgb + ')';
+  _calculateTickInterval(value) {
+    let interval = -1;
+    for (let num = 1; num <= 1000000000; num = num*10) {
+      [1, 2.5, 5].forEach(multiplier => {
+        let testNum = num * multiplier;
+        if (interval == -1 && value / testNum <= 4 && value / testNum >= 1) {
+          interval = testNum;
+        }
+      });
+    }
+    
+    return interval;
   }
 
   render() {
     let width = this.props.style.width,
       height = this.props.style.height,
       dorlingsWidth = 220,
-      gradientWidth = width - dorlingsWidth,
-      gutter = 30,
-      barWidth = gradientWidth - gutter * 2,
-      barHeight = 20,
+      gradientWidth = 40,
+      gutter = 70,
+      marginVertical = 30,
+      barWidth = 20,
+      barHeight = 150 - marginVertical * 2,
+      legendOffset = 10,
+      handleOverhang = 5,
       xForBottom = gutter + ((100 - Math.round(this.props.poc[0] * 100)) * barWidth / 100),
       xForTop = gutter + ((100 - Math.round(this.props.poc[1] * 100)) * barWidth / 100),
       mask = (this.props.percent) ? [this.props.percent/100 - 0.01, this.props.percent/100 + 0.01] : (this.props.poc) ? this.props.poc : [0,1];
 
-    let maxValue = (this.props.state.cat == 'funding') ? CitiesStore.getCategoryMaxForCity('urban renewal grants dispursed') : CitiesStore.getCategoryMaxForCity('totalFamilies');
-    let r = d3.scale.sqrt()
-      .domain([0, maxValue ])
+    let maxValue = 1,
+      maxLegendDorling = 1,
+      legendIncrements = [1];
+    if (this.props.state.cat == 'funding') {
+      maxValue = CitiesStore.getCategoryMaxForCity('urban renewal grants dispursed');
+      maxLegendDorling = 200000000;
+      legendIncrements = [maxLegendDorling, 100000000, 50000000, 10000000, 1000000];
+    } else {
+      maxValue = CitiesStore.getCategoryMaxForCity('totalFamilies');
+      maxLegendDorling = 15000;
+      legendIncrements = [maxLegendDorling, 10000, 5000, 1000, 100];
+    }
+
+    let r =  d3.scale.sqrt()
+      .domain([0, maxValue])
       .range([0, 50]);
+
 
     return (
       <svg 
@@ -55,107 +74,104 @@ export default class LegendGradient extends React.Component {
         height={height}
       >
         <defs>
-          <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop 
-              offset="0%" 
-              style={{stopColor:'rgb(125,200,125)', stopOpacity:1}} />
+          <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style={{stopColor:'rgb(125,200,125)', stopOpacity:1}} />
+            <stop offset="50%" style={{stopColor:'rgb(150,150,150)', stopOpacity:1}} />
             <stop offset="100%" style={{stopColor:'rgb(100,150,200)', stopOpacity:1}} />
           </linearGradient>
         </defs>
 
         <g
           className='gradientLegend'
-          transform='translate(200,0)'
+          transform={ 'translate(200)' }
         >
 
           {/* category labels */}
           <text
-            x={ gutter }
-            y={ height * 0.25 - 5 }
+            x={ gutter - legendOffset }
+            y={ 0 }
             fontSize={ 15 }
-            textAnchor='start'
-            alignmentBaseline='middle'
+            textAnchor='end'
+            alignmentBaseline='hanging'
           >
             people of color
           </text>
           <text
-            x={ gutter + barWidth }
-            y={ height * 0.75 + 5 }
+            x={ gutter + barWidth + legendOffset }
+            y={ height }
             fontSize={ 15 }
-            textAnchor='end'
-            alignmentBaseline='middle'
+            textAnchor='start'
           >
             whites
           </text>
 
-          {/* percent labels */}
-          { (this.props.percent) ? 
-            <g 
-              transform={ 'translate(' + gutter + ')' }
-              className='percent'
-            >
-              <text
-                dx={ barWidth - (this.props.percent/100 * barWidth) }
-                y={ height / 2 - barHeight / 2 - 9 }
-              >
-                { this.props.percent + '%' }
-              </text> 
-              <text
-                dx={ barWidth - (this.props.percent/100 * barWidth) }
-                y={ height / 2 + barHeight / 2 + 9 }
-              >
-                { (100 - this.props.percent) + '%' }
-              </text>
-            </g> :
-            <g className='percent'>
-               <text
-                  x={ xForBottom }
-                  y={ height / 2 - barHeight / 2 - 9 }
-                  className='right poc'
-                >
-                  { Math.round(this.props.poc[0] * 100) + '%' }
-                </text>
+          <g transform={ 'translate(' + gutter + ',' + marginVertical + ')' } >
+            {/* percent labels */}
+            { (this.props.percent) ? 
+              <g 
+                className='percent'
+                
+              > 
                 <text
-                  x={ xForBottom }
-                  y={ height / 2 + barHeight / 2 + 9 }
-                  className='right whites'
+                  x={ legendOffset * -1 }
+                  y={ barHeight - (barHeight * this.props.percent/100 ) }
                 >
-                  { (100 - Math.round(this.props.poc[0] * 100)) + '%' }
-                </text>
+                  { this.props.percent + '%' }
+                </text> 
                 <text
-                  x={ xForTop }
-                  y={ height / 2 - barHeight / 2 - 9 }
-                  className='left poc'
+                  x={ barWidth + legendOffset }
+                  y={ barHeight - (barHeight * this.props.percent/100 ) }
                 >
-                  { Math.round(this.props.poc[1] * 100) + '%' }
+                  { (100 - this.props.percent) + '%' }
                 </text>
-                <text
-                  x={ xForTop }
-                  y={ height / 2 + barHeight / 2 + 9 }
-                  className='left whites'
-                >
-                  { (100 - Math.round(this.props.poc[1] * 100)) + '%' }
-                </text>
-            </g>
-          }
+              </g> :
+              <g className='percent'>
+                 <text
+                    x={ legendOffset * -1 }
+                    y={ barHeight - (barHeight * this.props.poc[0]) }
+                    className='poc bottom'
+                  >
+                    { Math.round(this.props.poc[0] * 100) + '%' }
+                  </text>
+                  <text
+                    x={ barWidth + legendOffset }
+                    y={ barHeight - (barHeight * this.props.poc[0]) }
+                    className='whites bottom'
+                  >
+                    { (100 - Math.round(this.props.poc[0] * 100)) + '%' }
+                  </text>
+                  <text
+                    x={ legendOffset * -1 }
+                    y={ barHeight - (barHeight * this.props.poc[1]) }
+                    className='top poc'
+                  >
+                    { Math.round(this.props.poc[1] * 100) + '%' }
+                  </text>
+                  <text
+                    x={ barWidth + legendOffset }
+                    y={ barHeight - (barHeight * this.props.poc[1]) }
+                    className='top whites'
+                  >
+                    { (100 - Math.round(this.props.poc[1] * 100)) + '%' }
+                  </text>
+              </g>
+            }
 
- 
-
-          {/* gradient rect with masks for disabled ranges */}
-          <g transform={ 'translate(' + gutter + ')' } >
+            {/* gradient rect with masks for disabled ranges */}
             <rect 
               id="rect1" 
               x="0" 
-              y={ height / 2 - barHeight / 2 }
+              y={ 0 }
               width={ barWidth } 
               height={ barHeight } 
               fill="url(#grad1)"
             />
             { (mask[0] > 0) ?
               <rect
-                x={barWidth - (mask[0] * barWidth) + 2 }
-                y={ height / 2 - barHeight / 2 }
-                width={ (mask[0] * barWidth) - 1 } 
+                x={ 0 }
+                y={ (1 - mask[0]) * barHeight }
+                width={ barWidth }
+                height={ (mask[0] * barHeight) } 
                 className='mask'
               /> :
               ''
@@ -163,8 +179,9 @@ export default class LegendGradient extends React.Component {
             { (mask[1] < 1) ?
               <rect
                 x={ 0 }
-                y={ height / 2 - barHeight / 2 }
-                width={ (1 - mask[1]) * barWidth} 
+                y={ 0 }
+                width={ barWidth }
+                height={ barHeight - (mask[1] * barHeight) } 
                 className='mask'
               /> :
               ''
@@ -174,8 +191,9 @@ export default class LegendGradient extends React.Component {
             { (!this.props.percent) ? 
               <g>
                 <Handle
-                  y={ height / 2 - barHeight / 2 - 5 }
-                  height={ barHeight + 10 }
+                  height={ barHeight }
+                  width={ barWidth }
+                  handleOverhang={ handleOverhang }
                   percent={ this.props.poc[0] }
                   max={ this.props.poc[1] }
                   width={ barWidth } 
@@ -183,8 +201,9 @@ export default class LegendGradient extends React.Component {
                 />
 
                 <Handle
-                  y={ height / 2 - barHeight / 2 - 5 }
-                  height={ barHeight + 10 }
+                  height={ barHeight }
+                  width={ barWidth  }
+                  handleOverhang={ handleOverhang }
                   percent={ this.props.poc[1] }
                   min={ this.props.poc[0] }
                   width={ barWidth } 
@@ -192,7 +211,7 @@ export default class LegendGradient extends React.Component {
                 />
               </g> :
               ''  
-            }
+            } 
             
 
             {/* (this.props.percent) ? 
@@ -239,34 +258,34 @@ export default class LegendGradient extends React.Component {
               </g>:
               '' 
             */}
-
           </g>
         </g>
+
 
         <g className='dorlingLegend'>
           <circle
             cx={ 150 }
             cy={ height/2 }
-            r={ r(15000) }
+            r={ r(maxLegendDorling) }
             key='dorlinglegendbackground'
             className={ this.props.state.cat }
           />
 
-          { [10000, 5000, 1000, 100].map(value => (
+          { legendIncrements.map(value => (
             <g key={ 'dorlinglegend' + value }>
               <circle
                 cx={ 150 }
                 cy={ height/2 }
                 r={ r(value) }
-                transform={ 'translate(0,' + (r(15000) - r(value)) + ')'}
+                transform={ 'translate(0,' + (r(maxLegendDorling) - r(value)) + ')'}
                 className='increment'
                 
               />
               <text
                 x={ 80 }
-                y={ height/2 + (r(15000) - r(value)) - r(value)  }
+                y={ height/2 + (r(maxLegendDorling) - r(value)) - r(value)  }
               >
-                { value + ' families'}
+                { (this.props.state.cat == 'families') ? value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' families' : '$' + (value/1000000) + 'M' }
               </text>
 
               />

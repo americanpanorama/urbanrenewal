@@ -3,6 +3,7 @@ import { PropTypes } from 'react';
 import * as d3 from 'd3';
 import ReactTransitionGroup from 'react-addons-transition-group';
 import Timespan from './TimespanComponent.jsx';
+import { HelperFunctions } from '../utils/HelperFunctions';
 
 export default class Timeline extends React.Component {
 
@@ -15,17 +16,6 @@ export default class Timeline extends React.Component {
   componentDidMount() {}
 
   componentDidUpdate() {}
-
-  _pickHex(color1, color2, weight) {
-    var p = weight;
-    var w = p * 2 - 1;
-    var w1 = (w/1+1) / 2;
-    var w2 = 1 - w1;
-    var rgb = [Math.round(color1[0] * w1 + color2[0] * w2),
-        Math.round(color1[1] * w1 + color2[1] * w2),
-        Math.round(color1[2] * w1 + color2[2] * w2)];
-    return 'rgb(' + rgb + ')';
-  }
 
   _calculateTickInterval(value) {
     let interval = -1;
@@ -45,14 +35,14 @@ export default class Timeline extends React.Component {
     let firstYear = 1954,
       years = [...Array(19).keys()].map(num => num+firstYear),
       width = this.props.style.width,
-      rightMargin = 200,
+      rightMargin = 150,
       contentWidth = width - rightMargin,
       yearWidth = contentWidth / years.length,
       yearMiddleOffset = yearWidth / 2,
       barWidth = Math.round(yearWidth * 0.6666),
       barOffset = (yearWidth - barWidth) / 2,
       height = this.props.style.height,
-      headerHeight = 200,
+      headerHeight = 100,
       footerHeight = 0,
       contentHeight = height - headerHeight - footerHeight,
       yearLabelSize = 14,
@@ -269,7 +259,7 @@ export default class Timeline extends React.Component {
                       y={ topY - (maxBarHeight * (this.props.yearsData[year].totalFamilies / maxFamilies)) }
                       width={ barWidth }
                       height={ maxBarHeight * (this.props.yearsData[year].totalFamilies / maxFamilies) }
-                      fill={ this._pickHex([125,200,125], [100,150,200], this.props.yearsData[year].percentFamiliesOfColor) }
+                      fill={ HelperFunctions.getColorForRace(this.props.yearsData[year].percentFamiliesOfColor) }
                       className={ (year == this.props.state.year && this.props.state.cat == 'families') ? 'bar selected' : 'bar' }
                     />
 

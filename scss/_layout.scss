@@ -30,9 +30,14 @@ header {
   text-align: center;
   * {
     display: inline-block;
+    margin: 0;
   }
   h1 {
     padding-right: 10px;
+    font-size: 2em;
+  }
+  h2 {
+    font-size: 1.5em;
   }
 
 }
