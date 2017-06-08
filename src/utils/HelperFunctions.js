@@ -4,15 +4,15 @@ export const HelperFunctions = {
 
   getColorForRace: function(weight) {
     if (weight >= 0.5) {
-      var color1 = [125,200,125],
-        color2 = [150,150,150],
+      var color1 = [44, 160, 44],
+        color2 = [200,200,200],
         scale = d3.scale.linear()
           .domain([0.5, 1])
           .range([0, 1]),
         weight = scale(weight);
     } else {
-      var color1 = [150,150,150],
-        color2 = [100,150,200],
+      var color1 = [200,200,200],
+        color2 = [163, 135, 190],
         scale = d3.scale.linear()
           .domain([0, 0.5])
           .range([0, 1]),
@@ -27,6 +27,8 @@ export const HelperFunctions = {
         Math.round(color1[1] * w1 + color2[1] * w2),
         Math.round(color1[2] * w1 + color2[2] * w2)];
     return 'rgb(' + rgb + ')';
-  }
+  },
+
+
 
 };

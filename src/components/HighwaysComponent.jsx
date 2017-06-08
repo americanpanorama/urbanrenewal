@@ -15,7 +15,6 @@ export default class Highways extends React.Component {
   }
 
   componentWillEnter(callback) {
-    console.log(this.props.zoom);
     d3.select(ReactDOM.findDOMNode(this))
       .transition()
       .duration(2000)

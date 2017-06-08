@@ -14,10 +14,12 @@ import HashManager from './stores/HashManager';
 //import { HashManager } from '@panorama/toolkit';
 import CityMap from './components/CityMap.jsx';
 import LegendGradient from './components/LegendGradientComponent.jsx';
+import CityTimelineComponent from './components/CityTimelineComponent.jsx';
 import TimelineComponent from './components/TimelineComponent.jsx';
 import USMap from './components/USMapComponent.jsx';
 import CityStats from './components/CityStats.jsx';
 import YearStats from './components/YearStats.jsx';
+import CitySnippet from './components/CitySnippetComponent.jsx';
 
 // utils
 // TODO: refactor to use same structure as PanoramaDispatcher;
@@ -39,10 +41,9 @@ class App extends React.Component {
 
   constructor (props) {
     super(props);
-    this.state = this.getDefaultState();
 
     // bind handlers
-    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','zoomToState'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
   }
 
@@ -60,29 +61,9 @@ class App extends React.Component {
     DimensionsStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
     GeographyStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
     HighwaysStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
-
-    // this.setState({
-    //   x: DimensionsStore.getMainPaneWidth() / 2,
-    //   y: DimensionsStore.getNationalMapHeight() / 2
-    // });
-  }
-
-  componentWillUnmount () {
   }
 
   componentDidUpdate () { this.changeHash(); }
-
-  getDefaultState () {
-    return {
-      year: (HashManager.getState().year) ? HashManager.getState().year : 1958,
-      cat: (HashManager.getState().cat) ? HashManager.getState().cat : 'families',
-      x: (HashManager.getState().view) ? parseInt(HashManager.getState().view.split('/')[0]) : 0,
-      y: (HashManager.getState().view) ? parseInt(HashManager.getState().view.split('/')[1]) : 0,
-      zoom: (HashManager.getState().view) ? parseInt(HashManager.getState().view.split('/')[2]) : 1
-    };
-  }
-
-
 
   // ============================================================ //
   // Handlers
@@ -96,7 +77,7 @@ class App extends React.Component {
     });
   }
 
-  onDragUpdate(value, topOrBottom) { AppActions.POCSelected(value, topOrBottom); }
+  onDragUpdate(value, leftOrRight) { AppActions.POCSelected(value, leftOrRight); }
 
   onMapMoved (event) {
   }
@@ -112,10 +93,7 @@ class App extends React.Component {
 
     let cat = (event.target.id.indexOf('families') !== -1) ? 'families' : (event.target.id.indexOf('funding') !== -1) ? 'funding' : this.state.cat;
 
-    
-
     this.setState({
-      year: year,
       cat: cat
     });
 
@@ -136,18 +114,21 @@ class App extends React.Component {
     let nextZoom = this.state.zoom / 2;
     this.setState({
       zoom: (this.state.zoom >= 2) ? nextZoom : 1,
-      x: DimensionsStore.getMainPaneWidth()  / 2 - (DimensionsStore.getNationalMapHeight()  / 2 - this.state.x) / this.state.zoom * (nextZoom),
+      x: DimensionsStore.getMainPaneWidth()  / 2 - (DimensionsStore.getMainPaneWidth()  / 2 - this.state.x) / this.state.zoom * (nextZoom),
       y: DimensionsStore.getNationalMapHeight()  / 2 - (DimensionsStore.getNationalMapHeight()  / 2 - this.state.y) / this.state.zoom * (nextZoom)
     });
   }
 
-  resetView() {
-    this.setState({
-      x: 0,
-      y: 0,
-      zoom: 1
-    });
+  zoomToState(e) {
+    const b = GeographyStore.getBoundsForState(e.target.id),
+      centroid = GeographyStore.getCentroidForState(e.target.id),
+      z = .8 / Math.max((b[1][0] - b[0][0]) / DimensionsStore.getMainPaneWidth(), (b[1][1] - b[0][1]) / DimensionsStore.getNationalMapHeight()),
+      x = (DimensionsStore.getMainPaneWidth() / 2) - (DimensionsStore.getMainPaneWidth() * z * (centroid[0] / DimensionsStore.getMainPaneWidth())),
+      y = (DimensionsStore.getNationalMapHeight() / 2) - (DimensionsStore.getNationalMapHeight() * z * (centroid[1] /  DimensionsStore.getNationalMapHeight()));
+    AppActions.mapMoved(x,y,z);
   }
+
+  resetView() { AppActions.mapMoved(0,0,1); }
 
   handleMouseUp() {
     this.dragging = false;
@@ -157,10 +138,7 @@ class App extends React.Component {
   handleMouseDown(e) {
     this.dragging = true;
     //Set coords
-    this.coords = {
-      x: e.pageX,
-      y: e.pageY
-    };
+    //AppActions.mapMoved(e.pageX,e.pageY,GeographyStore.getZ());
   }
 
   handleMouseMove(e) {
@@ -188,47 +166,107 @@ class App extends React.Component {
 
   changeHash () {
     HashManager.updateHash({ 
-      year: this.state.year,
-      view: [this.state.x, this.state.y, this.state.zoom].join('/'),
+      year: CitiesStore.getSelectedYear(),
+      view: [GeographyStore.getX(), GeographyStore.getY(), GeographyStore.getZ()].join('/'),
       city: CitiesStore.getSlug(),
-      cat: this.state.cat
+      cat: CitiesStore.getSelectedCategory()
     });
   }
 
   render () {
+    console.log(CitiesStore.getVisibleCitiesByState());
     return (
-      <div>
-        <header style={ DimensionsStore.getHeaderStyle() }>
-          <h1>Renewing Inequality</h1>
-          <h2>1954-1972</h2>
-        </header>
+        <div className='container full-height'>
+          <div className='row full-height'>
+            <div className='columns eight full-height'>
+              <header style={ DimensionsStore.getHeaderStyle() }>
+                <h1>Renewing Inequality</h1>
+                <h2>1954-1972</h2>
+              </header>
 
-        <article style={ DimensionsStore.getMainStyle() }>
-          <ReactTransitionGroup>
-            <USMap 
-              state={ this.state }
-              onCityClicked={ this.onCityClicked }
-              style={ DimensionsStore.getNationalMapStyle() }
-              onMapClicked={ this.onZoomIn }
-              handleMouseUp={ this.handleMouseUp }
-              handleMouseDown={ this.handleMouseDown }
-              handleMouseMove={ this.handleMouseMove }
-              zoomOut={ this.zoomOut }
-              resetView={ this.resetView }
-            />
-          </ReactTransitionGroup>
+              <div 
+                className='mainPanel row template-tile' 
+                { ...DimensionsStore.getMainPanelDimensions() }
+              >
+                <svg 
+                  { ...DimensionsStore.getMapDimensions() }
+                  className='theMap'
+                >
+                  <ReactTransitionGroup component='g'>
+                    <USMap 
+                      x={ GeographyStore.getX() }
+                      y={ GeographyStore.getY() }
+                      z={ GeographyStore.getZ() }
+                      onCityClicked={ this.onCityClicked }
+                      onStateClicked={ this.zoomToState }
+                      resetView={ this.resetView }
+                      //onMapClicked={ this.onZoomIn }
+                      handleMouseUp={ this.handleMouseUp }
+                      handleMouseDown={ this.handleMouseDown }
+                      handleMouseMove={ this.handleMouseMove }
+                      //zoomOut={ this.zoomOut }
+                      
+                    />
+                  </ReactTransitionGroup>
 
-          <TimelineComponent 
-            onClick={ this.onYearClicked }
-            state={ this.state }
-            year={ this.state.year }
-            yearSpan={ (CitiesStore.getSelectedCity()) ? [CitiesStore.getCityData(CitiesStore.getSelectedCity()).startYear, CitiesStore.getCityData(CitiesStore.getSelectedCity()).endYear] : [1954, 1972] }
-            yearsData={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData : CitiesStore.getYearsTotals() }
-            projects={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).projects : false }
-            name={ (CitiesStore.getSelectedCity()) ? (CitiesStore.getCityData(CitiesStore.getSelectedCity()).city + ', ' + CitiesStore.getCityData(CitiesStore.getSelectedCity()).state).toUpperCase() : 'United States' }
-            style={ DimensionsStore.getTimelineStyle() }
-          />
-        </article>
+                  
+
+                {/* JSX Comment 
+                  <g
+                    transform={ 'translate(0 ' + DimensionsStore.getNationalMapHeight() + ')' }
+                  >
+
+                    <TimelineComponent 
+                      onClick={ this.onYearClicked }
+                      state={ this.state }
+                      year={ this.state.year }
+                      yearSpan={ (CitiesStore.getSelectedCity()) ? [CitiesStore.getCityData(CitiesStore.getSelectedCity()).startYear, CitiesStore.getCityData(CitiesStore.getSelectedCity()).endYear] : [1954, 1972] }
+                      yearsData={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData : CitiesStore.getYearsTotals() }
+                      projects={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).projects : false }
+                      name={ (CitiesStore.getSelectedCity()) ? (CitiesStore.getCityData(CitiesStore.getSelectedCity()).city + ', ' + CitiesStore.getCityData(CitiesStore.getSelectedCity()).state).toUpperCase() : 'United States' }
+                      style={ DimensionsStore.getTimelineStyle() }
+                    />
+
+                  </g>*/}
+                </svg>
+
+                <LegendGradient
+                  state={ this.state }
+                  poc={ CitiesStore.getPOC() }
+                  onDragUpdate={ this.onDragUpdate }
+                  percent={ (CitiesStore.getSelectedCity() && CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year] && CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year].percentFamiliesOfColor) ? Math.round(CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year].percentFamiliesOfColor * 100) : false }
+                />
+
+              {/* JSX Comment 
+          
+                { (CitiesStore.getSelectedCity()) ?
+                  <CityTimelineComponent 
+                    onClick={ this.onYearClicked }
+                    state={ this.state }
+                    year={ this.state.year }
+                    yearSpan={ (CitiesStore.getSelectedCity()) ? [CitiesStore.getCityData(CitiesStore.getSelectedCity()).startYear, CitiesStore.getCityData(CitiesStore.getSelectedCity()).endYear] : [1954, 1972] }
+                    yearsData={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData : CitiesStore.getYearsTotals() }
+                    projects={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).projects : false }
+                    maxForYear={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).maxDisplacmentsForYear }
+                    name={ (CitiesStore.getSelectedCity()) ? (CitiesStore.getCityData(CitiesStore.getSelectedCity()).city + ', ' + CitiesStore.getCityData(CitiesStore.getSelectedCity()).state).toUpperCase() : 'United States' }
+                    style={ DimensionsStore.getTimelineStyle() }
+                  /> :
+                  <TimelineComponent 
+                    onClick={ this.onYearClicked }
+                    state={ this.state }
+                    year={ this.state.year }
+                    yearSpan={ (CitiesStore.getSelectedCity()) ? [CitiesStore.getCityData(CitiesStore.getSelectedCity()).startYear, CitiesStore.getCityData(CitiesStore.getSelectedCity()).endYear] : [1954, 1972] }
+                    yearsData={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData : CitiesStore.getYearsTotals() }
+                    projects={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).projects : false }
+                    name={ (CitiesStore.getSelectedCity()) ? (CitiesStore.getCityData(CitiesStore.getSelectedCity()).city + ', ' + CitiesStore.getCityData(CitiesStore.getSelectedCity()).state).toUpperCase() : 'United States' }
+                    style={ DimensionsStore.getTimelineStyle() }
+                  />
+                }*/}
+              </div> 
+            </div>
+          </div>
+
+
         
         <aside
           style={ DimensionsStore.getSidebarStyle() }
@@ -240,13 +278,33 @@ class App extends React.Component {
               year={ this.state.year }
               onCityClicked={ this.onCityClicked }
               onCategoryClicked={ this.onCategoryClicked }
-            /> :
-            <YearStats
+            /> : 
+            <div className='stateList'>
+              { CitiesStore.getVisibleCitiesByState().map(state => {
+                return (
+                  <div key={ 'state' + state.abbr }>
+                    <h2>{ state.name }</h2>
+                    { state.cities.map(city => {
+                      return (
+                        <CitySnippet
+                          { ...city }
+                          displayPop={ true }
+                          key={ 'city' + city.city_id }
+                          onCityClick={ this.onCityClicked }
+                        />
+                      );
+                    })}
+                  </div>
+                );
+              })} 
+            </div>
+          }
+
+          {/* <YearStats
               year={ this.state.year }
               totals={ CitiesStore.getYearTotals(this.state.year) }
               onCategoryClicked={ this.onCategoryClicked }
-            />
-          }
+            />*/}
 
           {/* (cases[this.state.year]) ? 
             cases[this.state.year].map((cityId, i)=> {
@@ -262,14 +320,7 @@ class App extends React.Component {
           */}
 
 
-          <LegendGradient
-            state={ this.state }
-            poc={ CitiesStore.getPOC() }
-            style={ DimensionsStore.getLegendGradientStyle() }
-            onDragUpdate={ this.onDragUpdate }
-            percent={ (CitiesStore.getSelectedCity() && CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year] && CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year].percentFamiliesOfColor) ? Math.round(CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year].percentFamiliesOfColor * 100) : false }
-            
-          />
+          
 
           
         </aside>

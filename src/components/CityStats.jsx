@@ -19,7 +19,6 @@ export default class CityStats extends React.Component {
   }
 
   render() {
-    console.log(this.props);
     return (
       <div className='cityStats'>
         <h2>{ this.props.city + ', ' + this.props.state }</h2>

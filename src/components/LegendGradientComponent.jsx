@@ -4,56 +4,17 @@ import * as d3 from 'd3';
 import ReactTransitionGroup from 'react-addons-transition-group';
 import Handle from './HandleComponent.jsx';
 import CitiesStore from '../stores/CitiesStore.js';
+import DimensionsStore from  '../stores/DimensionsStore.js';
 
 export default class LegendGradient extends React.Component {
 
-  constructor (props) {
-    super(props);
-  }
-
-  componentWillReceiveProps(nextProps) {
-
-  }
-
-  componentDidMount() {
-  }
-
-  componentDidUpdate() {
-  }
-
-  _calculateTickInterval(value) {
-    let interval = -1;
-    for (let num = 1; num <= 1000000000; num = num*10) {
-      [1, 2.5, 5].forEach(multiplier => {
-        let testNum = num * multiplier;
-        if (interval == -1 && value / testNum <= 4 && value / testNum >= 1) {
-          interval = testNum;
-        }
-      });
-    }
-    
-    return interval;
-  }
+  constructor (props) { super(props); }
 
   render() {
-    let width = this.props.style.width,
-      height = this.props.style.height,
-      dorlingsWidth = 220,
-      gradientWidth = 40,
-      gutter = 70,
-      marginVertical = 30,
-      barWidth = 20,
-      barHeight = 150 - marginVertical * 2,
-      legendOffset = 10,
-      handleOverhang = 5,
-      xForBottom = gutter + ((100 - Math.round(this.props.poc[0] * 100)) * barWidth / 100),
-      xForTop = gutter + ((100 - Math.round(this.props.poc[1] * 100)) * barWidth / 100),
-      mask = (this.props.percent) ? [this.props.percent/100 - 0.01, this.props.percent/100 + 0.01] : (this.props.poc) ? this.props.poc : [0,1];
-
     let maxValue = 1,
       maxLegendDorling = 1,
       legendIncrements = [1];
-    if (this.props.state.cat == 'funding') {
+    if (CitiesStore.getSelectedCategory() == 'funding') {
       maxValue = CitiesStore.getCategoryMaxForCity('urban renewal grants dispursed');
       maxLegendDorling = 200000000;
       legendIncrements = [maxLegendDorling, 100000000, 50000000, 10000000, 1000000];
@@ -70,42 +31,52 @@ export default class LegendGradient extends React.Component {
 
     return (
       <svg 
-        width={width}  
-        height={height}
+        width={ DimensionsStore.getLegendWidth() }  
+        height={150}
+        className='legend'
       >
         <defs>
-          <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" style={{stopColor:'rgb(125,200,125)', stopOpacity:1}} />
-            <stop offset="50%" style={{stopColor:'rgb(150,150,150)', stopOpacity:1}} />
-            <stop offset="100%" style={{stopColor:'rgb(100,150,200)', stopOpacity:1}} />
+          <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style={{stopColor:'rgb(44,160,44)', stopOpacity:1}} />
+            <stop offset="50%" style={{stopColor:'rgb(200,200,200)', stopOpacity:1}} />
+            <stop offset="100%" style={{stopColor:'rgb(163, 135, 190)', stopOpacity:1}} />
           </linearGradient>
         </defs>
 
+        <rect
+          x={0}
+          y={0}
+          width={ DimensionsStore.getLegendWidth() }  
+          height={150}
+          className='legendBackground'
+        />
+
         <g
           className='gradientLegend'
-          transform={ 'translate(200)' }
         >
 
           {/* category labels */}
           <text
-            x={ gutter - legendOffset }
-            y={ 0 }
+            x={ DimensionsStore.getLegendGradientLabelsX() }
+            y={ DimensionsStore.getLegendGradientTopLabelY() }
             fontSize={ 15 }
-            textAnchor='end'
-            alignmentBaseline='hanging'
+            textAnchor='middle'
+            alignmentBaseline='bottom'
           >
             people of color
           </text>
           <text
-            x={ gutter + barWidth + legendOffset }
-            y={ height }
+            x={ DimensionsStore.getLegendGradientLabelsX() }
+            y={ DimensionsStore.getLegendGradientBottomLabelY() }
             fontSize={ 15 }
-            textAnchor='start'
+            textAnchor='middle'
+            alignmentBaseline='hanging'
+
           >
             whites
           </text>
 
-          <g transform={ 'translate(' + gutter + ',' + marginVertical + ')' } >
+          <g>
             {/* percent labels */}
             { (this.props.percent) ? 
               <g 
@@ -113,46 +84,46 @@ export default class LegendGradient extends React.Component {
                 
               > 
                 <text
-                  x={ legendOffset * -1 }
-                  y={ barHeight - (barHeight * this.props.percent/100 ) }
+                  x={ DimensionsStore.getLegendGradientDimensions().x }
+                  y={ DimensionsStore.getLegendGradientTopTextY() }
                 >
                   { this.props.percent + '%' }
                 </text> 
                 <text
-                  x={ barWidth + legendOffset }
-                  y={ barHeight - (barHeight * this.props.percent/100 ) }
+                  x={ 78 }
+                  y={ DimensionsStore.getLegendGradientBottomTextY() }
                 >
                   { (100 - this.props.percent) + '%' }
                 </text>
               </g> :
               <g className='percent'>
                  <text
-                    x={ legendOffset * -1 }
-                    y={ barHeight - (barHeight * this.props.poc[0]) }
-                    className='poc bottom'
+                    x={ DimensionsStore.getLegendGradientDimensions().x }
+                    y={ DimensionsStore.getLegendGradientBottomTextY() }
+                    className='whites left'
                   >
-                    { Math.round(this.props.poc[0] * 100) + '%' }
+                    { (100 - Math.round(this.props.poc[1] * 100)) + '%' }
                   </text>
                   <text
-                    x={ barWidth + legendOffset }
-                    y={ barHeight - (barHeight * this.props.poc[0]) }
-                    className='whites bottom'
+                    x={ DimensionsStore.getLegendGradientDimensions().x + DimensionsStore.getLegendGradientDimensions().width }
+                    y={ DimensionsStore.getLegendGradientBottomTextY() }
+                    className='whites right'
                   >
                     { (100 - Math.round(this.props.poc[0] * 100)) + '%' }
                   </text>
                   <text
-                    x={ legendOffset * -1 }
-                    y={ barHeight - (barHeight * this.props.poc[1]) }
-                    className='top poc'
+                    x={ DimensionsStore.getLegendGradientDimensions().x }
+                    y={ DimensionsStore.getLegendGradientTopTextY() }
+                    className='poc left'
                   >
                     { Math.round(this.props.poc[1] * 100) + '%' }
                   </text>
                   <text
-                    x={ barWidth + legendOffset }
-                    y={ barHeight - (barHeight * this.props.poc[1]) }
-                    className='top whites'
+                    x={ DimensionsStore.getLegendGradientDimensions().x + DimensionsStore.getLegendGradientDimensions().width }
+                    y={ DimensionsStore.getLegendGradientTopTextY() }
+                    className='poc right'
                   >
-                    { (100 - Math.round(this.props.poc[1] * 100)) + '%' }
+                    { Math.round(this.props.poc[0] * 100) + '%' }
                   </text>
               </g>
             }
@@ -160,29 +131,29 @@ export default class LegendGradient extends React.Component {
             {/* gradient rect with masks for disabled ranges */}
             <rect 
               id="rect1" 
-              x="0" 
-              y={ 0 }
-              width={ barWidth } 
-              height={ barHeight } 
+              { ... DimensionsStore.getLegendGradientDimensions() }
               fill="url(#grad1)"
             />
-            { (mask[0] > 0) ?
+            {(this.props.poc[0] > 0) ?
               <rect
-                x={ 0 }
-                y={ (1 - mask[0]) * barHeight }
-                width={ barWidth }
-                height={ (mask[0] * barHeight) } 
-                className='mask'
+                x={ DimensionsStore.getLegendGradientPercentX(this.props.poc[0]) }
+                y={ DimensionsStore.getLegendGradientDimensions().y }
+                width={ DimensionsStore.getLegendGradientPercentX(0) - DimensionsStore.getLegendGradientPercentX(this.props.poc[0]) }
+                height={ DimensionsStore.getLegendGradientDimensions().height } 
+                fill='black'
+                fillOpacity={ 0.9 }
+                //className='mask'
               /> :
               ''
             }
-            { (mask[1] < 1) ?
+            {(this.props.poc[1] < 1) ?
               <rect
-                x={ 0 }
-                y={ 0 }
-                width={ barWidth }
-                height={ barHeight - (mask[1] * barHeight) } 
-                className='mask'
+                x={ DimensionsStore.getLegendGradientPercentX(1) }
+                y={ DimensionsStore.getLegendGradientDimensions().y }
+                width={ DimensionsStore.getLegendGradientPercentX(this.props.poc[1]) - DimensionsStore.getLegendGradientPercentX(1) }
+                height={ DimensionsStore.getLegendGradientDimensions().height } 
+                fill='black'
+                fillOpacity={ 0.9 }
               /> :
               ''
             }
@@ -191,22 +162,14 @@ export default class LegendGradient extends React.Component {
             { (!this.props.percent) ? 
               <g>
                 <Handle
-                  height={ barHeight }
-                  width={ barWidth }
-                  handleOverhang={ handleOverhang }
                   percent={ this.props.poc[0] }
                   max={ this.props.poc[1] }
-                  width={ barWidth } 
                   onUpdate={ this.props.onDragUpdate }
                 />
 
                 <Handle
-                  height={ barHeight }
-                  width={ barWidth  }
-                  handleOverhang={ handleOverhang }
                   percent={ this.props.poc[1] }
                   min={ this.props.poc[0] }
-                  width={ barWidth } 
                   onUpdate={ this.props.onDragUpdate }
                 />
               </g> :
@@ -214,7 +177,7 @@ export default class LegendGradient extends React.Component {
             } 
             
 
-            {/* (this.props.percent) ? 
+             { (this.props.percent) ? 
               <g>
                 <rect
                   x={ barWidth - (this.props.percent/100 * barWidth) }
@@ -257,35 +220,34 @@ export default class LegendGradient extends React.Component {
                 </text> 
               </g>:
               '' 
-            */}
+            }
           </g>
         </g>
-
 
         <g className='dorlingLegend'>
           <circle
             cx={ 150 }
-            cy={ height/2 }
-            r={ r(maxLegendDorling) }
+            cy={ 150}
+            r={ DimensionsStore.getDorlingRadius(maxLegendDorling) }
             key='dorlinglegendbackground'
-            className={ this.props.state.cat }
+            className={ CitiesStore.getSelectedCategory() }
           />
 
           { legendIncrements.map(value => (
             <g key={ 'dorlinglegend' + value }>
               <circle
                 cx={ 150 }
-                cy={ height/2 }
-                r={ r(value) }
-                transform={ 'translate(0,' + (r(maxLegendDorling) - r(value)) + ')'}
+                cy={ 150 }
+                r={ DimensionsStore.getDorlingRadius(value) }
+                transform={ 'translate(0,' + (DimensionsStore.getDorlingRadius(maxLegendDorling) - DimensionsStore.getDorlingRadius(value)) + ')'}
                 className='increment'
                 
               />
               <text
                 x={ 80 }
-                y={ height/2 + (r(maxLegendDorling) - r(value)) - r(value)  }
+                y={ 150 + (DimensionsStore.getDorlingRadius(maxLegendDorling) - DimensionsStore.getDorlingRadius(value)) - DimensionsStore.getDorlingRadius(value)  }
               >
-                { (this.props.state.cat == 'families') ? value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' families' : '$' + (value/1000000) + 'M' }
+                { (CitiesStore.getSelectedCategory() == 'families') ? value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' families' : '$' + (value/1000000) + 'M' }
               </text>
 
               />

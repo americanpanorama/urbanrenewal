@@ -10,13 +10,27 @@ $breakpoint-width-narrow: 750px;
 $breakpoint-width-wide: 1280px;
 
 // colors
-$background-color: #232d37;
+$background-color: #cdb8cb;
+$map-background-color: lighten(#000, 50%);
 $modal-overlay-color: rgba(51, 51, 51, 0.25);
-$text-color: #eee;
+$text-color: #111;
 $text-link-color: #207a9e;
 $tile-border-color: rgb(225, 225, 225);
 $funding-color: #9E7B9B;
 $families-color: #969696;
 $selected-color: #F0F757;
-$highway-color: #EB8258;
-$basemap-color: #666;
+$highway-color: #D8AE37; // mustard
+$basemap-color: lighten(#000, 90%);
+$state-lines-color: lighten(#000, 50%);
+
+// old theme
+//$background-color: #232d37;
+//$modal-overlay-color: rgba(51, 51, 51, 0.25);
+//$text-color: #eee;
+//$text-link-color: #207a9e;
+//$tile-border-color: rgb(225, 225, 225);
+//$funding-color: #9E7B9B;
+//$families-color: #969696;
+//$selected-color: #F0F757;
+//$highway-color: #EB8258;
+//$basemap-color: #666;

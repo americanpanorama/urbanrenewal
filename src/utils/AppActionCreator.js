@@ -56,12 +56,11 @@ export const AppActions = {
     });
   },
 
-  POCSelected: (value, topOrBottom) => {
-    console.log(value, topOrBottom);
+  POCSelected: (value, leftOrRight) => {
     AppDispatcher.dispatch({
       type: AppActionTypes.POCSelected,
       value: value,
-      topOrBottom: topOrBottom
+      leftOrRight: leftOrRight
     });
   },
 
@@ -69,10 +68,12 @@ export const AppActions = {
    * Dispatch action when map is zoomed or panned.
    * @param {Object} mapState   { zoom, center: { lat, lng } }
    */
-  mapMoved: (mapState) => {
+  mapMoved: (x,y,z) => {
     AppDispatcher.dispatch({
       type: AppActionTypes.mapMoved,
-      value: mapState
+      x: x,
+      y: y,
+      z: z
     });
   },
 

@@ -1,13 +1,15 @@
 var React = require('react');
+import DimensionsStore from  '../stores/DimensionsStore.js';
 
 var Handle = React.createClass({
 
   getInitialState: function() {
-    let yForPercent = this.props.height - (this.props.percent * this.props.height);
+    let xForPercent = DimensionsStore.getLegendGradientPercentX(this.props.percent);
     return {
-      y: (this.props.max) ? yForPercent : yForPercent - 4, // the visible handle position
-      deY: (this.props.max) ? yForPercent - 2 : yForPercent - 6, // the draggable element x
-      deHeight: 8,
+      x: (this.props.max) ? xForPercent : xForPercent - 4, // the visible handle position
+      deX: (this.props.max) ? xForPercent - 2 : xForPercent - 6, // the draggable element x
+      deWidth: 8,
+      percent: this.props.percent,
       isDragging: false,
       max: (this.props.max) ? this.props.max : 1,
       min: (this.props.min) ? this.props.min : 0,
@@ -16,23 +18,13 @@ var Handle = React.createClass({
   },
 
   hover: function(e) {
-    // if it's the bottom slider, set the bottom just to the right of the top/max slider
-    let deY = (this.props.max) ? this.props.height - (this.props.max * this.props.height) : -200;
-
-    let deHeight = 200 - 8; // the 8 is to keep a min distance between them
-    // if it's the bottom, extend from the max to 200 past the height
-    if (this.props.max) {
-      deHeight += this.props.max * this.props.height;
-    } 
-    // if it's the top, extend from 200 below the leftmost point to the min
-    else {
-      deHeight += this.props.height - (this.props.min * this.props.height);
-    }
-
+    // if it's the right slider, set the bottom just to the right of the top/max slider; if it's left set it 1/5 of the way to the left of the bar (i.e. a fictional percent of 120% or 1.2)
+    const deX = (this.props.max) ? DimensionsStore.getLegendGradientPercentX(this.props.max) + 4 : DimensionsStore.getLegendGradientPercentX(1.2),
+      deWidth = (this.props.max) ? DimensionsStore.getLegendGradientPercentX(-0.2) - deX : DimensionsStore.getLegendGradientPercentX(this.props.min) - deX - 4;
 
     this.setState({
-      deY: deY,
-      deHeight: deHeight
+      deX: deX,
+      deWidth: deWidth
     });
   },
 
@@ -40,7 +32,6 @@ var Handle = React.createClass({
     this.setState({
       isDragging: true,
       mouseX: e.pageX,
-      mouseY: e.pageY,
       handleColor: 'red'
     });
   },
@@ -48,35 +39,27 @@ var Handle = React.createClass({
   deSelectElement: function() {
     this.setState({
       isDragging: false,
-      deHeight: 8,
-      deY: this.state.y - 2,
+      deWidth: 8,
+      deX: this.state.x - 2,
       handleColor: 'yellow'
     });
   },
 
   drag: function(e) {
-
     if (this.state.isDragging) {
-      var idY = e.target.id;
-      let deltaY = e.pageY - this.state.mouseY,
-        topOrBottom = (this.props.max) ? 'bottom' : 'top';
+      const leftOrRight = (this.props.max) ? 'right' : 'left',
+        deltaX = e.pageX - this.state.mouseX;
 
-      let newY = this.state.y + deltaY;
-      // don't let the top go lower than 0 or the bottom higher than the width
-      if (topOrBottom == 'top' && this.state.y + deltaY <= 0) {
-        newY = 0;
-      } else if (topOrBottom == 'bottom' && this.state.y + deltaY >= this.props.height) {
-        newY = this.props.height;
-      }
-      let newValue = (this.props.height - newY)/this.props.height;
-        
-      this.props.onUpdate(newValue, topOrBottom);
+      let newPercent = this.props.percent - deltaX/DimensionsStore.getLegendGradientDimensions().width;
+      // don't let the right go lower than 0 or the bottom higher than the width
+      newPercent = (newPercent > 1) ? 1 : (newPercent < 0) ? 0 : newPercent;
+
+      this.props.onUpdate(newPercent, leftOrRight);
 
       this.setState({
-        y: newY,
-        mouseY: e.pageY,
-        mouseX: e.pageX,
-        value: newY
+        x: DimensionsStore.getLegendGradientPercentX(newPercent),
+        percent: newPercent,
+        mouseX: e.pageX
       });
     }
   },
@@ -87,18 +70,18 @@ var Handle = React.createClass({
         <rect 
           className='visibleHandle'
           id={ this.props.id }
-          x={ this.props.handleOverhang * -1 }
-          y={ this.state.y }
-          width={ this.props.width + this.props.handleOverhang * 2 }
-          height={ 4  }
+          x={ this.state.x }
+          y={ DimensionsStore.getLegendGradientDimensions().y - 2 }
+          width={ 4  }
+          height={ DimensionsStore.getLegendGradientDimensions().height + 4  }
           fill={ this.state.handleColor }
         />
         <rect className="handle"
           id={ this.props.id }
-          x={ (100 - this.props.width) / -2 }
-          y={ this.state.deY }
-          width={ 100 }
-          height={ this.state.deHeight }
+          x={ this.state.deX }
+          y={ DimensionsStore.getLegendGradientDimensions().y - 4 }
+          width={ this.state.deWidth }
+          height={ DimensionsStore.getLegendGradientDimensions().height + 8 }
           fill={ 'transparent' }
           fillOpacity={ 0.5 }
           onMouseOver={ this.hover }

@@ -1,4 +1,12 @@
+.timeline {
+  fill: $basemap-color;
+}
+
 #timeline {
+
+  position: fixed;
+  left: 0px;
+  top: 670px;
 
   text {
     fill: $text-color;

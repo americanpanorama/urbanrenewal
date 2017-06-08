@@ -1,3 +1,12 @@
+.legendBackground {
+  fill: white;
+  fill-opacity: 0.9;
+  stroke: black;
+  stroke-width: 1px;
+  rx: 15px;
+  ry: 15px;
+}
+
 .gradientLegend {
   
   .percent {
@@ -7,21 +16,21 @@
       alignment-baseline: middle;
 
       &.whites {
-       
-        text-anchor: start;
+       alignment-baseline: hanging;
+        
       }
 
       &.poc {
         alignment-baseline: baseline;
+        
+      }
+
+      &.left {
         text-anchor: end;
       }
 
-      &.top {
-        alignment-baseline: baseline;
-      }
-
-      &.bottom {
-        alignment-baseline: hanging;
+      &.right {
+        text-anchor: start;
       }
     }
   }
