@@ -4,7 +4,7 @@ import { AppActionTypes } from '../utils/AppActionCreator';
 import CartoDBLoader from '../utils/CartoDBLoader';
 import GeographyStore from './GeographyStore';
 import DimensionsStore from './DimensionsStore';
-import { HelperFunctions } from '../utils/HelperFunctions';
+import { getColorForRace } from '../utils/HelperFunctions';
 import StateAbbrs from '../../data/stateAbbrs.json';
 
 const CitiesStore = {
@@ -369,7 +369,7 @@ const CitiesStore = {
             'non-white families': cityData.yearsData[year]['non-white families'],
             'white families': cityData.yearsData[year]['white families'],
             value: cityData.yearsData[year]['totalFamilies'],
-            color: (cityData.yearsData[year]['percentFamiliesOfColor'] >= this.getPOCBottom() && cityData.yearsData[year]['percentFamiliesOfColor'] <= this.getPOCTop()) ? HelperFunctions.getColorForRace(cityData.yearsData[year]['percentFamiliesOfColor']) : 'transparent',
+            color: (cityData.yearsData[year]['percentFamiliesOfColor'] >= this.getPOCBottom() && cityData.yearsData[year]['percentFamiliesOfColor'] <= this.getPOCTop()) ? getColorForRace(cityData.yearsData[year]['percentFamiliesOfColor']) : 'transparent',
             name: cityData.city
           };
         })
@@ -390,7 +390,7 @@ const CitiesStore = {
               cy: GeographyStore.projectedY([cityData.lng, cityData.lat]),
               city_id: cityData.city_id,
               value: cityData.yearsData[this.data.selectedYear]['totalFamilies'],
-              color: (cityData.yearsData[this.data.selectedYear]['percentFamiliesOfColor'] >= this.getPOCBottom() && cityData.yearsData[this.data.selectedYear]['percentFamiliesOfColor'] <= this.getPOCTop()) ? HelperFunctions.getColorForRace(cityData.yearsData[this.data.selectedYear]['percentFamiliesOfColor']) : 'transparent',
+              color: (cityData.yearsData[this.data.selectedYear]['percentFamiliesOfColor'] >= this.getPOCBottom() && cityData.yearsData[this.data.selectedYear]['percentFamiliesOfColor'] <= this.getPOCTop()) ? getColorForRace(cityData.yearsData[this.data.selectedYear]['percentFamiliesOfColor']) : 'transparent',
               name: cityData.city
             };
           })

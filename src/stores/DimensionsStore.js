@@ -20,9 +20,11 @@ const DimensionsStore = {
     mainPaneWidth: 0,
     sidebarTitleHeight: 0,
 
-    legendWidth: 200,
-    gradientHeight: 10,
+    legendWidth: 400,
+    legendHeight: 100,
+    legendVerticalGutter: 3,
     gradientTopBottomMargins: 20,
+    
 
     dorlingsMaxRadius: 10
   },
@@ -36,7 +38,26 @@ const DimensionsStore = {
     this.data.mainPaneHeight = this.data.windowHeight - this.data.headerHeight - 2*this.data.containerPadding;
     this.data.sidebarTitleHeight = (document.getElementsByClassName('sidebarTitle').length > 0) ? document.getElementsByClassName('sidebarTitle')[0].offsetHeight: 30;
     this.data.nationalMapHeight = this.data.mainPaneHeight - this.data.containerPadding * 2;
-    this.data.dorlingsMaxRadius= this.data.mainPaneWidth / 10;
+    this.data.nationalMapWidth = this.data.mainPaneWidth - this.data.containerPadding * 2;
+    this.data.dorlingsMaxRadius= this.data.mainPaneWidth / 20;
+
+
+
+    this.data.legendRight = this.data.nationalMapWidth * 0.077 + this.data.containerPadding; // lines up roughly with the western edge of Maine on full size map
+    
+    this.data.legendHeight = 2 * this.data.dorlingsMaxRadius + this.data.legendVerticalGutter * 2;
+
+    this.data.legendDorlingWidth =  4 * this.data.dorlingsMaxRadius + this.data.legendVerticalGutter * 2; // I'm estimating the labels take the same width as the diameter 3 for gutters on either side
+    this.data.legendDorlingHeight = 2 * this.data.dorlingsMaxRadius + this.data.legendVerticalGutter * 2; // 3 for gutters on either side
+
+    this.data.legendGradientHeight = this.data.legendHeight - this.data.legendVerticalGutter * 2;
+    
+    this.data.legendGradientHorizontalGutter = this.data.dorlingsMaxRadius;
+    this.data.legendGradientWidth = this.data.dorlingsMaxRadius * 4+ this.data.legendGradientHorizontalGutter * 2;
+
+    this.data.legendGradientHeightQuints = this.data.legendGradientHeight / 5;
+
+    this.data.legendWidth =  this.data.legendDorlingWidth + this.data.legendGradientWidth;
 
     this.emit(AppActionTypes.storeChanged);
   },
@@ -62,7 +83,7 @@ const DimensionsStore = {
 
   getNationalMapHeight: function() { return this.data.nationalMapHeight; },
 
-  getNationalMapWidth: function() { return this.data.mainPaneWidth - this.data.containerPadding * 2; },
+  getNationalMapWidth: function() { return this.data.nationalMapWidth; },
 
   getMapScale: function() { return Math.min(1.36 * this.getNationalMapWidth(), 2.08 * this.getNationalMapHeight()); }, // I calculated these with trial and error--sure there's a more precise way as this will be fragile if the width changes 
 
@@ -95,26 +116,127 @@ const DimensionsStore = {
 
   getLegendWidth: function() { return this.data.legendWidth; },
 
-  getLegendGradientDimensions: function() {
+  getLegendDimensions: function() { 
     return {
-      x: this.data.legendWidth * .15,
-      y: this.data.gradientTopBottomMargins * 2,
-      width: this.data.legendWidth * .7,
-      height: this.data.gradientHeight
+      width: this.data.legendWidth,
+      height: this.data.legendHeight,
+      right: this.data.legendRight
     };
   },
 
-  getLegendGradientPercentX: function(percent) { return this.getLegendGradientDimensions().x + this.getLegendGradientDimensions().width * (1 - percent); },
+  getLegendGradientDimensions: function() {
+    return {
+      width: this.data.legendGradientWidth,
+      height: this.data.legendHeight
+    };
+  },
 
-  getLegendGradientLabelsX: function() { return this.data.legendWidth / 2; },
+  getLegendGradientHorizontalGutter: function() { return this.data.legendGradientHorizontalGutter; },
 
-  getLegendGradientTopLabelY: function() { return this.data.gradientTopBottomMargins - 3; },
+  getLegendGradientInteriorDimensions: function() {
+    return {
+      x: 0,
+      y: this.data.legendGradientHeightQuints * 2 + 2,
+      width: this.data.dorlingsMaxRadius * 4,
+      height: this.data.legendGradientHeightQuints - 4
+    };
+  },
 
-  getLegendGradientBottomLabelY: function() { return this.data.gradientTopBottomMargins * 3 + this.data.gradientHeight + 3; },
+  getLegendGradientPOCLabelAttrs: function() {
+    return {
+      x: this.getLegendGradientPercentX(0.75), 
+      y: this.data.legendGradientHeightQuints,
+      fontSize: this.data.dorlingsMaxRadius / 2.5,
+      textAnchor: 'middle',
+      alignmentBaseline: 'baseline'
+    };
+  },
 
-  getLegendGradientTopTextY: function() { return this.data.gradientTopBottomMargins * 2 - 3; },
+  getLegendGradientPOC0Attrs: function() {
+    return {
+      x: this.getLegendGradientPercentX(0), 
+      y: this.data.legendGradientHeightQuints * 2,
+      fontSize: this.data.dorlingsMaxRadius / 3,
+      textAnchor: 'start',
+      alignmentBaseline: 'baseline'
+    };
+  },
 
-  getLegendGradientBottomTextY: function() { return this.data.gradientTopBottomMargins * 2 + this.data.gradientHeight + 3; },
+  getLegendGradientPOC100Attrs: function() {
+    return {
+      x: this.getLegendGradientPercentX(1), 
+      y: this.data.legendGradientHeightQuints * 2,
+      fontSize: this.data.dorlingsMaxRadius / 3,
+      textAnchor: 'end',
+      alignmentBaseline: 'baseline'
+    };
+  },
+
+  getLegendGradientWhitesLabelAttrs: function() {
+    return {
+      x: this.getLegendGradientPercentX(0.25), 
+      y: this.data.legendGradientHeightQuints * 4,
+      fontSize: this.data.dorlingsMaxRadius / 2.5,
+      textAnchor: 'middle',
+      alignmentBaseline: 'hanging'
+    };
+  },
+
+  getLegendGradientWhites0Attrs: function() {
+    return {
+      x: this.getLegendGradientPercentX(1), 
+      y: this.data.legendGradientHeightQuints * 3,
+      fontSize: this.data.dorlingsMaxRadius / 3,
+      textAnchor: 'end',
+      alignmentBaseline: 'hanging'
+    };
+  },
+
+  getLegendGradientWhites100Attrs: function() {
+    return {
+      x: this.getLegendGradientPercentX(0), 
+      y: this.data.legendGradientHeightQuints * 3,
+      fontSize: this.data.dorlingsMaxRadius / 3,
+      textAnchor: 'start',
+      alignmentBaseline: 'hanging'
+    };
+  },
+
+  getLegendGradientPercentX: function(percent) { return this.getLegendGradientInteriorDimensions().x + this.getLegendGradientInteriorDimensions().width * (1 - percent); },
+
+  getLegendGradientTopLabelX: function() { return this.data.dorlingsMaxRadius + this.data.legendGradientWidth * 0.25; },
+
+  getLegendGradientBottomLabelX: function() { return this.data.dorlingsMaxRadius + this.data.legendGradientWidth * 0.75; },
+
+  getLegendGradientTopLabelY: function() { return this.data.dorlingsMaxRadius * 2 / 5 - 3; },
+
+  getLegendGradientBottomLabelY: function() { return this.data.dorlingsMaxRadius * 2 / 5 * 4 + 3; },
+
+  getLegendGradientTopTextY: function() { return this.data.dorlingsMaxRadius * 2 / 5 * 2 - 3; },
+
+  getLegendGradientBottomTextY: function() { return this.data.dorlingsMaxRadius * 2 / 5 * 3 + 3; },
+
+  getLegendDorlingsDimensions: function() {
+    return {
+      width: this.data.legendDorlingWidth,
+      height: this.data.legendDorlingHeight
+    };  
+  },
+
+  getLegendDorlingsCircleDimensions: function() {
+    return {
+      cx: this.data.legendDorlingWidth - 3 - this.data.dorlingsMaxRadius,
+      cy: 3 + this.data.dorlingsMaxRadius
+    };
+  },
+
+  getLegendDorlingsTextPositioning: function(v, max) {
+    return {
+      x: this.getLegendDorlingsCircleDimensions().cx - this.data.dorlingsMaxRadius - 0,
+      y: this.getLegendDorlingsCircleDimensions().cy + DimensionsStore.getDorlingRadius(max) - DimensionsStore.getDorlingRadius(v) - DimensionsStore.getDorlingRadius(v),
+      fontSize: DimensionsStore.getDorlingRadius(max) / 2.5
+    };
+  },
 
   getMainPaneStyle: function() {
     return { height: this.data.tilesHeight + 'px' };
@@ -124,7 +246,6 @@ const DimensionsStore = {
     return {
       marginTop: this.data.headerHeight,
       width: this.data.sidebarWidth,
-      paddingRight: this.data.containerPadding
     };
   },
 
@@ -142,6 +263,8 @@ const DimensionsStore = {
   },
 
   getDorlingsMaxRadius: function() { return this.data.dorlingsMaxRadius; },
+
+  getCitySnippetWidth: function() { return this.getSidebarStyle().width - 10; }
 
 
 };

@@ -50,7 +50,7 @@ var Handle = React.createClass({
       const leftOrRight = (this.props.max) ? 'right' : 'left',
         deltaX = e.pageX - this.state.mouseX;
 
-      let newPercent = this.props.percent - deltaX/DimensionsStore.getLegendGradientDimensions().width;
+      let newPercent = this.props.percent - deltaX/DimensionsStore.getLegendGradientInteriorDimensions().width;
       // don't let the right go lower than 0 or the bottom higher than the width
       newPercent = (newPercent > 1) ? 1 : (newPercent < 0) ? 0 : newPercent;
 
@@ -71,17 +71,17 @@ var Handle = React.createClass({
           className='visibleHandle'
           id={ this.props.id }
           x={ this.state.x }
-          y={ DimensionsStore.getLegendGradientDimensions().y - 2 }
+          y={ DimensionsStore.getLegendGradientInteriorDimensions().y - 2 }
           width={ 4  }
-          height={ DimensionsStore.getLegendGradientDimensions().height + 4  }
+          height={ DimensionsStore.getLegendGradientInteriorDimensions().height + 4  }
           fill={ this.state.handleColor }
         />
         <rect className="handle"
           id={ this.props.id }
           x={ this.state.deX }
-          y={ DimensionsStore.getLegendGradientDimensions().y - 4 }
+          y={ DimensionsStore.getLegendGradientInteriorDimensions().y - 4 }
           width={ this.state.deWidth }
-          height={ DimensionsStore.getLegendGradientDimensions().height + 8 }
+          height={ DimensionsStore.getLegendGradientInteriorDimensions().height + 8 }
           fill={ 'transparent' }
           fillOpacity={ 0.5 }
           onMouseOver={ this.hover }

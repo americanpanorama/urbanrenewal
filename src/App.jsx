@@ -14,6 +14,7 @@ import HashManager from './stores/HashManager';
 //import { HashManager } from '@panorama/toolkit';
 import CityMap from './components/CityMap.jsx';
 import LegendGradient from './components/LegendGradientComponent.jsx';
+import LegendDorlings from './components/LegendDorlingsComponent.jsx';
 import CityTimelineComponent from './components/CityTimelineComponent.jsx';
 import TimelineComponent from './components/TimelineComponent.jsx';
 import USMap from './components/USMapComponent.jsx';
@@ -42,8 +43,12 @@ class App extends React.Component {
   constructor (props) {
     super(props);
 
+    this.state = {
+      legendVisible: true
+    };
+
     // bind handlers
-    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','zoomToState'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
   }
 
@@ -73,8 +78,7 @@ class App extends React.Component {
   }
 
   storeChanged () {
-    this.setState({
-    });
+    this.setState({});
   }
 
   onDragUpdate(value, leftOrRight) { AppActions.POCSelected(value, leftOrRight); }
@@ -99,6 +103,8 @@ class App extends React.Component {
 
     AppActions.dateSelected(year);
   }
+
+  toggleLegendVisibility() { this.setState({ legendVisible: !this.state.legendVisible }); }
 
   onZoomIn(event) {
     let nextZoom = this.state.zoom*2;
@@ -129,6 +135,8 @@ class App extends React.Component {
   }
 
   resetView() { AppActions.mapMoved(0,0,1); }
+
+
 
   handleMouseUp() {
     this.dragging = false;
@@ -174,7 +182,6 @@ class App extends React.Component {
   }
 
   render () {
-    console.log(CitiesStore.getVisibleCitiesByState());
     return (
         <div className='container full-height'>
           <div className='row full-height'>
@@ -230,12 +237,28 @@ class App extends React.Component {
                   </g>*/}
                 </svg>
 
-                <LegendGradient
-                  state={ this.state }
-                  poc={ CitiesStore.getPOC() }
-                  onDragUpdate={ this.onDragUpdate }
-                  percent={ (CitiesStore.getSelectedCity() && CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year] && CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year].percentFamiliesOfColor) ? Math.round(CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year].percentFamiliesOfColor * 100) : false }
-                />
+                { (this.state.legendVisible) ?
+                  <div 
+                    className='mapLegend'
+                    style={ DimensionsStore.getLegendDimensions() }
+                  >
+                    <LegendGradient
+                      state={ this.state }
+                      poc={ CitiesStore.getPOC() }
+                      onDragUpdate={ this.onDragUpdate }
+                      percent={ (CitiesStore.getSelectedCity() && CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year] && CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year].percentFamiliesOfColor) ? Math.round(CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year].percentFamiliesOfColor * 100) : false }
+                    />
+                    <LegendDorlings />
+                  </div> : ''
+                }
+
+
+                <div 
+                  className='toggleLegend'
+                  onClick={ this.toggleLegendVisibility }
+                >
+                  { (this.state.legendVisible) ? 'hide legend' : 'show legend' }
+                </div>
 
               {/* JSX Comment 
           
@@ -288,6 +311,7 @@ class App extends React.Component {
                       return (
                         <CitySnippet
                           { ...city }
+                          numWithDisplacements={ Object.keys(city.projects).filter(id => (city.projects[id].yearsData[CitiesStore.getSelectedYear()] && city.projects[id].yearsData[CitiesStore.getSelectedYear()].totalFamilies && city.projects[id].yearsData[CitiesStore.getSelectedYear()].totalFamilies > 0)).length}
                           displayPop={ true }
                           key={ 'city' + city.city_id }
                           onCityClick={ this.onCityClicked }

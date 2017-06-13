@@ -1,13 +1,6 @@
-.legendBackground {
-  fill: white;
-  fill-opacity: 0.9;
-  stroke: black;
-  stroke-width: 1px;
-  rx: 15px;
-  ry: 15px;
-}
-
 .gradientLegend {
+
+  float:left;
   
   .percent {
     text {
@@ -41,16 +34,23 @@
   }
 }
 
-.dorlingLegend {
+.legendDorlings {
+  float: right;
   circle.increment {
-    fill: transparent;
     stroke: #333;
     stroke-width: 0.5;
   }
 
   text {
-    font-size: 11px;
     text-anchor: end;
     alignment-baseline: middle;
   }
+}
+
+.toggleLegend {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  color: white;
+  pointer-events: auto;
 }

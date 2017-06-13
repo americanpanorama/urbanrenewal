@@ -117,7 +117,7 @@ export default class USMap extends React.Component {
             { CitiesStore.getDorlings().map((cityData, i) => (
               <Dorlings
                 { ...cityData }
-                r={ DimensionsStore.getDorlingRadius(cityData.value) }
+                r={ DimensionsStore.getDorlingRadius(cityData.value) / this.props.z }
                 key={'cityCircle' + cityData.city_id }
                 zoom={ this.props.z }
                 strokeWidth={ 1/this.props.z }
