@@ -3,7 +3,7 @@ import { PropTypes } from 'react';
 import * as d3 from 'd3';
 import ReactTransitionGroup from 'react-addons-transition-group';
 import Timespan from './TimespanComponent.jsx';
-import { HelperFunctions } from '../utils/HelperFunctions';
+import { getColorForRace } from '../utils/HelperFunctions';
 
 export default class Timeline extends React.Component {
 
@@ -32,17 +32,17 @@ export default class Timeline extends React.Component {
   }
 
   render() {
-    let firstYear = 1954,
-      years = [...Array(19).keys()].map(num => num+firstYear),
-      width = this.props.style.width,
+    let firstYear = 1955,
+      years = [...Array(12).keys()].map(num => num+firstYear),
+      width = 400,
       rightMargin = 150,
       contentWidth = width - rightMargin,
       yearWidth = contentWidth / years.length,
       yearMiddleOffset = yearWidth / 2,
       barWidth = Math.round(yearWidth * 0.6666),
       barOffset = (yearWidth - barWidth) / 2,
-      height = this.props.style.height,
-      headerHeight = 100,
+      height = 250,
+      headerHeight = 0,
       footerHeight = 0,
       contentHeight = height - headerHeight - footerHeight,
       yearLabelSize = 14,
@@ -152,7 +152,7 @@ export default class Timeline extends React.Component {
           transform={'translate(0,' + headerHeight + ')'}
         >  
 
-          {/* header */}
+          {/* header 
           <text
             dx={ rightMargin / 2 }
             dy={ yearLabelY + 2 }
@@ -180,13 +180,13 @@ export default class Timeline extends React.Component {
             alignmentBaseline='middle'
           >
             funding
-          </text>
+          </text> */}
 
           {/* axes */}
           { [...Array(Math.floor(maxFamilies /familiesTickInterval)).keys()].map(iterator => {
             return (
               <text
-                dx={ rightMargin }
+                dx={ 20 }
                 dy={ topY - (iterator + 1) * familiesTickHeight}
                 key={ 'topAxesTick' + iterator }
                 className='axisLabel'
@@ -220,7 +220,7 @@ export default class Timeline extends React.Component {
         </g>
 
         <g 
-          transform={'translate(' + rightMargin +',' + headerHeight + ')'}
+          transform={'translate(' + 20 +',' + headerHeight + ')'}
         >
           {/* year labels */}
           { years.map(year => {
@@ -259,7 +259,7 @@ export default class Timeline extends React.Component {
                       y={ topY - (maxBarHeight * (this.props.yearsData[year].totalFamilies / maxFamilies)) }
                       width={ barWidth }
                       height={ maxBarHeight * (this.props.yearsData[year].totalFamilies / maxFamilies) }
-                      fill={ HelperFunctions.getColorForRace(this.props.yearsData[year].percentFamiliesOfColor) }
+                      fill={ getColorForRace(this.props.yearsData[year].percentFamiliesOfColor) }
                       className={ (year == this.props.state.year && this.props.state.cat == 'families') ? 'bar selected' : 'bar' }
                     />
 

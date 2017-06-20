@@ -16,7 +16,7 @@ export default class LegendGradient extends React.Component {
         <defs>
           <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" style={{stopColor:'rgb(44,160,44)', stopOpacity:1}} />
-            <stop offset="50%" style={{stopColor:'rgb(200,200,200)', stopOpacity:1}} />
+            <stop offset="50%" style={{stopColor:'rgb(255,231,97)', stopOpacity:1}} />
             <stop offset="100%" style={{stopColor:'rgb(163, 135, 190)', stopOpacity:1}} />
           </linearGradient>
         </defs>

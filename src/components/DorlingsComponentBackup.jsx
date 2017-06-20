@@ -16,7 +16,7 @@ export default class Dorlings extends React.Component {
   componentWillEnter(callback) {
     d3.select(ReactDOM.findDOMNode(this))
       .transition()
-      .duration(0)
+      .duration(750)
       .attr('r', this.props.r)
       .each('end', () => {
         this.setState({
@@ -66,35 +66,20 @@ export default class Dorlings extends React.Component {
   }
 
   render () {
-    const labelSize = (8 * this.state.r  / 15 < 12) ? 12 : (8 * this.state.r  / 15 > 18) ? 18 : 8 * this.state.r  / 15;
     return (
-      <g>
-        <circle
-          cx={ this.props.cx }
-          cy={ this.props.cy }
-          r={ this.state.r }
-          style={ {
-            fill: this.state.color,
-            fillOpacity: 1,
-            strokeWidth: this.props.strokeWidth
-          } }
-          onClick={ this.props.onCityClicked }
-          id={ this.props.city_id }
-          key={ 'city' + this.props.city_id }
-          className={ 'dorling ' + this.props.className }
-        />
-        { (this.state.r > 15) ?
-          <text
-            x={ this.props.cx }
-            y={ this.props.cy }
-            textAnchor='middle'
-            alignmentBaseline='middle'
-            fontSize={ labelSize }
-          >
-            {this.props.name.replace(/\w\S*/g, txt =>  txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())}
-          </text> : ''
-        }
-      </g>
+      <circle
+        cx={ this.props.cx }
+        cy={ this.props.cy }
+        r={ this.state.r }
+        style={ {
+          fill: this.state.color,
+          strokeWidth: this.props.strokeWidth
+        } }
+        onClick={ this.props.onCityClicked }
+        id={ this.props.city_id }
+        key={ 'city' + this.props.city_id }
+        className={ 'dorling ' + this.props.className }
+      />
     );
   }
 }

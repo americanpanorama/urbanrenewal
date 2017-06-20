@@ -16,11 +16,13 @@ import CityMap from './components/CityMap.jsx';
 import LegendGradient from './components/LegendGradientComponent.jsx';
 import LegendDorlings from './components/LegendDorlingsComponent.jsx';
 import CityTimelineComponent from './components/CityTimelineComponent.jsx';
-import TimelineComponent from './components/TimelineComponent.jsx';
+import TimelineYearComponent from './components/TimelineYearComponent.jsx';
 import USMap from './components/USMapComponent.jsx';
 import CityStats from './components/CityStats.jsx';
 import YearStats from './components/YearStats.jsx';
 import CitySnippet from './components/CitySnippetComponent.jsx';
+import DorlingCartogram from './components/DorlingCartogramComponent.jsx';
+import Scatterplot from './components/ScatterplotComponent.jsx';
 
 // utils
 // TODO: refactor to use same structure as PanoramaDispatcher;
@@ -195,47 +197,54 @@ class App extends React.Component {
                 className='mainPanel row template-tile' 
                 { ...DimensionsStore.getMainPanelDimensions() }
               >
-                <svg 
-                  { ...DimensionsStore.getMapDimensions() }
-                  className='theMap'
-                >
-                  <ReactTransitionGroup component='g'>
-                    <USMap 
-                      x={ GeographyStore.getX() }
-                      y={ GeographyStore.getY() }
-                      z={ GeographyStore.getZ() }
-                      onCityClicked={ this.onCityClicked }
-                      onStateClicked={ this.zoomToState }
-                      resetView={ this.resetView }
-                      //onMapClicked={ this.onZoomIn }
-                      handleMouseUp={ this.handleMouseUp }
-                      handleMouseDown={ this.handleMouseDown }
-                      handleMouseMove={ this.handleMouseMove }
-                      //zoomOut={ this.zoomOut }
-                      
-                    />
-                  </ReactTransitionGroup>
 
-                  
-
-                {/* JSX Comment 
-                  <g
-                    transform={ 'translate(0 ' + DimensionsStore.getNationalMapHeight() + ')' }
+                { CitiesStore.getSelectedCity() ? 
+                  <CityMap
+                    cityData= { CitiesStore.getCityData(CitiesStore.getSelectedCity()) }
+                  />
+                  :
+                  <svg 
+                    { ...DimensionsStore.getMapDimensions() }
+                    className='theMap'
                   >
+                    <ReactTransitionGroup component='g'>
+                      <Scatterplot
+                        x={ GeographyStore.getX() }
+                        y={ GeographyStore.getY() }
+                        z={ GeographyStore.getZ() }
+                        onCityClicked={ this.onCityClicked }
+                        onStateClicked={ this.zoomToState }
+                        resetView={ this.resetView }
+                        //onMapClicked={ this.onZoomIn }
+                        handleMouseUp={ this.handleMouseUp }
+                        handleMouseDown={ this.handleMouseDown }
+                        handleMouseMove={ this.handleMouseMove }
+                        //zoomOut={ this.zoomOut }
+                      />
+                    </ReactTransitionGroup>
 
-                    <TimelineComponent 
-                      onClick={ this.onYearClicked }
-                      state={ this.state }
-                      year={ this.state.year }
-                      yearSpan={ (CitiesStore.getSelectedCity()) ? [CitiesStore.getCityData(CitiesStore.getSelectedCity()).startYear, CitiesStore.getCityData(CitiesStore.getSelectedCity()).endYear] : [1954, 1972] }
-                      yearsData={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData : CitiesStore.getYearsTotals() }
-                      projects={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).projects : false }
-                      name={ (CitiesStore.getSelectedCity()) ? (CitiesStore.getCityData(CitiesStore.getSelectedCity()).city + ', ' + CitiesStore.getCityData(CitiesStore.getSelectedCity()).state).toUpperCase() : 'United States' }
-                      style={ DimensionsStore.getTimelineStyle() }
-                    />
 
-                  </g>*/}
-                </svg>
+                    
+
+                  {/* JSX Comment 
+                    <g
+                      transform={ 'translate(0 ' + DimensionsStore.getNationalMapHeight() + ')' }
+                    >
+
+                      <TimelineComponent 
+                        onClick={ this.onYearClicked }
+                        state={ this.state }
+                        year={ this.state.year }
+                        yearSpan={ (CitiesStore.getSelectedCity()) ? [CitiesStore.getCityData(CitiesStore.getSelectedCity()).startYear, CitiesStore.getCityData(CitiesStore.getSelectedCity()).endYear] : [1954, 1972] }
+                        yearsData={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData : CitiesStore.getYearsTotals() }
+                        projects={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).projects : false }
+                        name={ (CitiesStore.getSelectedCity()) ? (CitiesStore.getCityData(CitiesStore.getSelectedCity()).city + ', ' + CitiesStore.getCityData(CitiesStore.getSelectedCity()).state).toUpperCase() : 'United States' }
+                        style={ DimensionsStore.getTimelineStyle() }
+                      />
+
+                    </g>*/}
+                  </svg>
+                }
 
                 { (this.state.legendVisible) ?
                   <div 
@@ -259,32 +268,6 @@ class App extends React.Component {
                 >
                   { (this.state.legendVisible) ? 'hide legend' : 'show legend' }
                 </div>
-
-              {/* JSX Comment 
-          
-                { (CitiesStore.getSelectedCity()) ?
-                  <CityTimelineComponent 
-                    onClick={ this.onYearClicked }
-                    state={ this.state }
-                    year={ this.state.year }
-                    yearSpan={ (CitiesStore.getSelectedCity()) ? [CitiesStore.getCityData(CitiesStore.getSelectedCity()).startYear, CitiesStore.getCityData(CitiesStore.getSelectedCity()).endYear] : [1954, 1972] }
-                    yearsData={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData : CitiesStore.getYearsTotals() }
-                    projects={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).projects : false }
-                    maxForYear={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).maxDisplacmentsForYear }
-                    name={ (CitiesStore.getSelectedCity()) ? (CitiesStore.getCityData(CitiesStore.getSelectedCity()).city + ', ' + CitiesStore.getCityData(CitiesStore.getSelectedCity()).state).toUpperCase() : 'United States' }
-                    style={ DimensionsStore.getTimelineStyle() }
-                  /> :
-                  <TimelineComponent 
-                    onClick={ this.onYearClicked }
-                    state={ this.state }
-                    year={ this.state.year }
-                    yearSpan={ (CitiesStore.getSelectedCity()) ? [CitiesStore.getCityData(CitiesStore.getSelectedCity()).startYear, CitiesStore.getCityData(CitiesStore.getSelectedCity()).endYear] : [1954, 1972] }
-                    yearsData={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData : CitiesStore.getYearsTotals() }
-                    projects={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).projects : false }
-                    name={ (CitiesStore.getSelectedCity()) ? (CitiesStore.getCityData(CitiesStore.getSelectedCity()).city + ', ' + CitiesStore.getCityData(CitiesStore.getSelectedCity()).state).toUpperCase() : 'United States' }
-                    style={ DimensionsStore.getTimelineStyle() }
-                  />
-                }*/}
               </div> 
             </div>
           </div>
@@ -324,6 +307,8 @@ class App extends React.Component {
             </div>
           }
 
+
+
           {/* <YearStats
               year={ this.state.year }
               totals={ CitiesStore.getYearTotals(this.state.year) }
@@ -348,6 +333,35 @@ class App extends React.Component {
 
           
         </aside>
+
+          <div
+            style = { DimensionsStore.getTimelineAttrs() }
+            className='timelineControls'
+          >
+            { (CitiesStore.getSelectedCity()) ?
+              <CityTimelineComponent 
+                onClick={ this.onYearClicked }
+                state={ this.state }
+                year={ this.state.year }
+                yearSpan={ (CitiesStore.getSelectedCity()) ? [CitiesStore.getCityData(CitiesStore.getSelectedCity()).startYear, CitiesStore.getCityData(CitiesStore.getSelectedCity()).endYear] : [1954, 1972] }
+                yearsData={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData : CitiesStore.getYearsTotals() }
+                projects={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).projects : false }
+                maxForYear={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).maxDisplacmentsForYear }
+                name={ (CitiesStore.getSelectedCity()) ? (CitiesStore.getCityData(CitiesStore.getSelectedCity()).city + ', ' + CitiesStore.getCityData(CitiesStore.getSelectedCity()).state).toUpperCase() : 'United States' }
+                style={ DimensionsStore.getTimelineStyle() }
+              /> :
+              <TimelineYearComponent 
+                onClick={ this.onYearClicked }
+                state={ this.state }
+                year={ this.state.year }
+                yearSpan={ (CitiesStore.getSelectedCity()) ? [CitiesStore.getCityData(CitiesStore.getSelectedCity()).startYear, CitiesStore.getCityData(CitiesStore.getSelectedCity()).endYear] : [1954, 1972] }
+                yearsData={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData : CitiesStore.getYearsTotals() }
+                projects={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).projects : false }
+                name={ (CitiesStore.getSelectedCity()) ? (CitiesStore.getCityData(CitiesStore.getSelectedCity()).city + ', ' + CitiesStore.getCityData(CitiesStore.getSelectedCity()).state).toUpperCase() : 'United States' }
+                style={ DimensionsStore.getTimelineStyle() }
+              />
+            }
+          </div>
       </div>
     );
   }

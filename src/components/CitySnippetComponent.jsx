@@ -18,6 +18,9 @@ export default class CitySnippet extends React.Component {
 
       return path();
     };
+
+    let totalFamilies = (CitiesStore.getSelectedYear()) ? this.props.yearsData[CitiesStore.getSelectedYear()].totalFamilies : this.props.totalFamilies,
+      percentFamiliesOfColor = (CitiesStore.getSelectedYear()) ? this.props.yearsData[CitiesStore.getSelectedYear()].percentFamiliesOfColor : this.props.percentFamiliesOfColor;
     
     return (
 
@@ -49,7 +52,7 @@ export default class CitySnippet extends React.Component {
             fontSize={ 12 }
           >
             <tspan fontWeight='bold' alignmentBaseline='hanging'>
-              { Math.round(this.props.yearsData[CitiesStore.getSelectedYear()].totalFamilies).toLocaleString() + ' ' }
+              { Math.round(totalFamilies).toLocaleString() + ' ' }
             </tspan>
             Families
           </text>
@@ -57,15 +60,15 @@ export default class CitySnippet extends React.Component {
           <rect
             x={DimensionsStore.getCitySnippetWidth() * 1/3}
             y={4}
-            width={DimensionsStore.getCitySnippetWidth()* 2/3 * this.props.yearsData[CitiesStore.getSelectedYear()].percentFamiliesOfColor}
+            width={DimensionsStore.getCitySnippetWidth()* 2/3 * percentFamiliesOfColor}
             height={12}
             className='poc'
           />
 
           <rect
-            x={DimensionsStore.getCitySnippetWidth()* 1/3 + DimensionsStore.getCitySnippetWidth()* 2/3* this.props.yearsData[CitiesStore.getSelectedYear()].percentFamiliesOfColor}
+            x={DimensionsStore.getCitySnippetWidth()* 1/3 + DimensionsStore.getCitySnippetWidth()* 2/3* percentFamiliesOfColor}
             y={4}
-            width={DimensionsStore.getCitySnippetWidth()* 2/3* (1 - this.props.yearsData[CitiesStore.getSelectedYear()].percentFamiliesOfColor) }
+            width={DimensionsStore.getCitySnippetWidth()* 2/3* (1 - percentFamiliesOfColor) }
             height={12}
             className='white'
           />
@@ -98,31 +101,31 @@ export default class CitySnippet extends React.Component {
 
 
 
-          { (this.props.yearsData[CitiesStore.getSelectedYear()].percentFamiliesOfColor > 0.2) ?
+          { (percentFamiliesOfColor > 0.2) ?
             <text
-              x={ DimensionsStore.getCitySnippetWidth()* 1/3 + DimensionsStore.getCitySnippetWidth()* 2/3* this.props.yearsData[CitiesStore.getSelectedYear()].percentFamiliesOfColor - 5 }
+              x={ DimensionsStore.getCitySnippetWidth()* 1/3 + DimensionsStore.getCitySnippetWidth()* 2/3* percentFamiliesOfColor - 5 }
               y={6}
               textAnchor='end'
               alignmentBaseline='hanging'
               fontSize={ 8 }
               fill='white'
             >
-              { Math.round(this.props.yearsData[CitiesStore.getSelectedYear()].percentFamiliesOfColor * 100) + '%' }
+              { Math.round(percentFamiliesOfColor * 100) + '%' }
             </text> : ''
           }
 
 
 
-          { (this.props.yearsData[CitiesStore.getSelectedYear()].percentFamiliesOfColor < 0.8) ?
+          { (percentFamiliesOfColor < 0.8) ?
             <text
-              x={ DimensionsStore.getCitySnippetWidth()* 1/3 + DimensionsStore.getCitySnippetWidth()* 2/3* this.props.yearsData[CitiesStore.getSelectedYear()].percentFamiliesOfColor + 5 }
+              x={ DimensionsStore.getCitySnippetWidth()* 1/3 + DimensionsStore.getCitySnippetWidth()* 2/3* percentFamiliesOfColor + 5 }
               y={6}
               textAnchor='beginning'
               alignmentBaseline='hanging'
               fontSize={ 8 }
               fill='white'
             >
-              { Math.round((1 -this.props.yearsData[CitiesStore.getSelectedYear()].percentFamiliesOfColor) * 100) + '%' }
+              { Math.round((1 -percentFamiliesOfColor) * 100) + '%' }
             </text> : ''
           }
         </svg>

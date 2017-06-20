@@ -36,6 +36,8 @@ const DimensionsStore = {
     this.data.sidebarWidth =(document.getElementsByClassName('dataViewer').length > 0) ? document.getElementsByClassName('dataViewer')[0].offsetWidth : this.data.windowWidth * 0.322 - 2*this.data.containerPadding;
     this.data.mainPaneWidth = (document.getElementsByClassName('main-pane').length > 0) ? document.getElementsByClassName('main-pane')[0].offsetWidth : (this.data.windowWidth) * (2/3 - 0.015*11/12) - this.data.containerPadding ; // this is complicated--I deduced it from the calcuations in _skeleton.scss
     this.data.mainPaneHeight = this.data.windowHeight - this.data.headerHeight - 2*this.data.containerPadding;
+
+    this.data.sidebarHeight = (this.data.windowHeight - this.data.headerHeight - 2 * this.data.containerPadding) * 2/3 ;
     this.data.sidebarTitleHeight = (document.getElementsByClassName('sidebarTitle').length > 0) ? document.getElementsByClassName('sidebarTitle')[0].offsetHeight: 30;
     this.data.nationalMapHeight = this.data.mainPaneHeight - this.data.containerPadding * 2;
     this.data.nationalMapWidth = this.data.mainPaneWidth - this.data.containerPadding * 2;
@@ -58,6 +60,8 @@ const DimensionsStore = {
     this.data.legendGradientHeightQuints = this.data.legendGradientHeight / 5;
 
     this.data.legendWidth =  this.data.legendDorlingWidth + this.data.legendGradientWidth;
+
+    this.data.timelineHeight = (this.data.windowHeight - this.data.headerHeight - 2 * this.data.containerPadding) * 1/3 - this.data.containerPadding;
 
     this.emit(AppActionTypes.storeChanged);
   },
@@ -246,12 +250,20 @@ const DimensionsStore = {
     return {
       marginTop: this.data.headerHeight,
       width: this.data.sidebarWidth,
+      height: this.data.sidebarHeight
     };
   },
 
   getSidebarHeightStyle: function() {
     // same as the main panel style as it's just the height
     return this.getMainPaneStyle();
+  },
+
+  getTimelineAttrs: function() {
+    return {
+      width: this.data.sidebarWidth,
+      height: this.data.timelineHeight - this.data.containerPadding * 2
+    };
   },
 
   getDorlingRadius: function(v) {

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { PropTypes } from 'react';
 import * as d3 from 'd3';
 import ReactTransitionGroup from 'react-addons-transition-group';
-import { HelperFunctions } from '../utils/HelperFunctions';
+import { getColorForRace } from '../utils/HelperFunctions';
 
 export default class Timespan extends React.Component {
 
@@ -38,9 +38,9 @@ export default class Timespan extends React.Component {
           y={ 0 }
           width={ this.props.width }
           height={ this.props.height }
-          fill={ HelperFunctions.getColorForRace(this.props.projectData.percentFamiliesOfColor) }
+          fill={ getColorForRace(this.props.projectData.percentFamiliesOfColor) }
           fillOpacity={ this.props.projectData.totalFamilies / (1 + this.props.projectData.endYear - this.props.projectData.startYear) / this.props.maxForYear }
-          stroke={ HelperFunctions.getColorForRace(this.props.projectData.percentFamiliesOfColor) }
+          stroke={ getColorForRace(this.props.projectData.percentFamiliesOfColor) }
           strokeWidth='0.25'
         />
         <text

@@ -48,7 +48,7 @@ export default class CityMap extends React.Component {
           zoom={ 12 }  
           className='the_map'
           style={ {
-            height: 400
+            height: 600
 
           } }
         >
@@ -78,6 +78,7 @@ export default class CityMap extends React.Component {
 
           { (this.props.cityData.projects) ?
             Object.keys(this.props.cityData.projects).map(projectId => {
+              console.log(this.props.cityData.projects[projectId]);
               if (this.props.cityData.projects[projectId].theGeojson) {
                 return (
                   <GeoJSON
@@ -87,7 +88,7 @@ export default class CityMap extends React.Component {
                       weight: 3,
                       color: 'black',
                       dashArray: '5, 5',
-                      fillColor: 'transparent'
+                      fillColor: 'purple'
                     } }
                   />
                 );
@@ -98,6 +99,7 @@ export default class CityMap extends React.Component {
 
         </Map>
 
+      {/* JSX Comment 
         <div>
           <h2>{ this.props.cityData.city }</h2>
           <div>Population (YEAR): XXXX</div>
@@ -120,7 +122,7 @@ export default class CityMap extends React.Component {
             }) :
             ''
           }
-        </div>
+        </div> */}
 
 
       </div>
