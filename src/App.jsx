@@ -24,11 +24,13 @@ import CitySnippet from './components/CitySnippetComponent.jsx';
 import DorlingCartogram from './components/DorlingCartogramComponent.jsx';
 import Scatterplot from './components/ScatterplotComponent.jsx';
 
+
 // utils
 // TODO: refactor to use same structure as PanoramaDispatcher;
 // Having `flux` as a dependency, and two different files, is overkill.
 import { AppActions, AppActionTypes } from './utils/AppActionCreator';
 import AppDispatcher from './utils/AppDispatcher';
+import { calculateDorlingsPosition } from './utils/HelperFunctions';
 
 // config
 
@@ -50,7 +52,7 @@ class App extends React.Component {
     };
 
     // bind handlers
-    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
   }
 
@@ -59,6 +61,7 @@ class App extends React.Component {
   // ============================================================ //
 
   componentWillMount () {
+    console.time('mounting');
     AppActions.loadInitialData(this.state, HashManager.getState());
   }
 
@@ -68,6 +71,11 @@ class App extends React.Component {
     DimensionsStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
     GeographyStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
     HighwaysStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
+
+    
+
+
+
   }
 
   componentDidUpdate () { this.changeHash(); }
@@ -93,6 +101,8 @@ class App extends React.Component {
   onCategoryClicked(event) { AppActions.categorySelected(event.target.id); }
 
   onCityClicked(event) { AppActions.citySelected(event.target.id); }
+
+  onViewSelected(event) { AppActions.viewSelected(event.target.id); }
 
   onYearClicked(event) {
     let year = parseInt(event.target.id);
@@ -208,12 +218,13 @@ class App extends React.Component {
                     className='theMap'
                   >
                     <ReactTransitionGroup component='g'>
-                      <Scatterplot
+                      <USMap
                         x={ GeographyStore.getX() }
                         y={ GeographyStore.getY() }
                         z={ GeographyStore.getZ() }
                         onCityClicked={ this.onCityClicked }
                         onStateClicked={ this.zoomToState }
+                        onViewSelected={ this.onViewSelected }
                         resetView={ this.resetView }
                         //onMapClicked={ this.onZoomIn }
                         handleMouseUp={ this.handleMouseUp }

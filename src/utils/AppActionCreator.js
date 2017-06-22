@@ -9,6 +9,7 @@ export const AppActionTypes = {
   categorySelected: 'categorySelected',
   citySelected: 'citySelected',
   dateSelected: 'dateSelected',
+  viewSelected: 'viewSelected',
   mapMoved: 'mapMoved',
   windowResized: 'windowResized'
 
@@ -53,6 +54,13 @@ export const AppActions = {
     AppDispatcher.dispatch({
       type: AppActionTypes.itemSelected,
       value: item
+    });
+  },
+
+  viewSelected: (view) => {
+    AppDispatcher.dispatch({
+      type: AppActionTypes.viewSelected,
+      value: view
     });
   },
 

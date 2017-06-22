@@ -4,8 +4,9 @@ import { AppActionTypes } from '../utils/AppActionCreator';
 import CartoDBLoader from '../utils/CartoDBLoader';
 import GeographyStore from './GeographyStore';
 import DimensionsStore from './DimensionsStore';
-import { getColorForRace } from '../utils/HelperFunctions';
+import { getColorForRace, calculateDorlingsPosition } from '../utils/HelperFunctions';
 import StateAbbrs from '../../data/stateAbbrs.json';
+import DorlingLocations from '../../data/dorlingLngLats.json';
 
 const CitiesStore = {
 
@@ -14,6 +15,7 @@ const CitiesStore = {
     selectedYear: null,
     selectedCategory: 'families',
     selectedCity: null,
+    selectedView: 'cartogram',
     poc: [0, 1],
 
     // the city data propers
@@ -23,6 +25,7 @@ const CitiesStore = {
       'percentFamiliesOfColor': {category: 'Percent families of color'}
     },
     yearsTotals: {},
+    dorlingXYs: {},
 
     // util variables to prevent reloading data that's already been loaded
     loaded: false,
@@ -35,6 +38,9 @@ const CitiesStore = {
   getCityDataQuery: function(year) { return "select sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.state, year, v2.category_id, pop_1940, pop_1950, pop_1960, pop_1970, white_1960, white_1970, nonwhite_1960, nonwhite_1970 from (select value, fy.year, v.category_id, v.project_id, v.city_id from (SELECT max(year), value, city_id, project_id, category_id FROM digitalscholarshiplab.combined_dire_char_raw where value is not null group by value, city_id, project_id, category_id) v join (SELECT min(year) as year, city_id, project_id, category_id FROM digitalscholarshiplab.combined_dire_char_raw where value is not null group by city_id, project_id, category_id) fy on v.project_id = fy.project_id and v.category_id = fy.category_id) v2 join urdr_city_id_key cities on v2.city_id = cities.city_id and year = " + year + " join ur_city_census_data on v2.city_id = ur_city_census_data.city_id group by cities.the_geom, cities.city, cities.state, cities.city_id, year, category_id, pop_1940, pop_1950, pop_1960, pop_1970, white_1960, white_1970, nonwhite_1960, nonwhite_1970"; },
 
   loadInitialData: function(year, citySlug, selectedCategory) {
+
+    console.time('CitiesStoreData');
+
     // initiate year keys on yearsTotal
     [...Array(25).keys()].map(num => num+1949).forEach(year => this.data.yearsTotals[year] = {});
 
@@ -61,6 +67,10 @@ const CitiesStore = {
 
     ]).then((responses) => {
 
+      console.timeEnd('CitiesStoreData');
+      console.time('CitiesStoreProcessing');
+
+      
       // category data
       responses[0].forEach(response => { 
         this.data.categories[response.category_id] = {
@@ -164,7 +174,8 @@ const CitiesStore = {
           this.data.cities[response.city_id].maxDisplacmentsForYear = (this.data.cities[response.city_id].projects[response.project_id].yearsData[aYear].totalFamilies  > this.data.cities[response.city_id].maxDisplacmentsForYear) ? this.data.cities[response.city_id].projects[response.project_id].yearsData[aYear].totalFamilies : this.data.cities[response.city_id].maxDisplacmentsForYear;
         }
       });
-
+      
+      
       // load a city if one's specified
       if (citySlug) {
         this.loadCityData(this.getCityIdFromSlug(citySlug));
@@ -175,8 +186,35 @@ const CitiesStore = {
 
       this.setSelectedYear(year);
 
+      
+      // organize dorlingXY json into object to speed up access
+      // this.data.dorlingXYs[this.data.selectedYear] = {};
+      // DorlingLocations.find(d => d.year == this.data.selectedYear).cities.forEach(cityData => {
+      //   this.data.dorlingXYs[this.data.selectedYear][cityData.city_id] = [ GeographyStore.projectedX(cityData.dorlingLngLat), GeographyStore.projectedY(cityData.dorlingLngLat) ];
+      // });
+
+      DorlingLocations.forEach(yearData => {
+        this.data.dorlingXYs[yearData.year] = (!this.data.dorlingXYs[yearData.year]) ? {} : this.data.dorlingXYs[yearData.year];
+        // load the selected year 
+        
+        console.time('cats');
+        yearData.cities.forEach(cityData => {
+          this.data.dorlingXYs[yearData.year][cityData.city_id] = [ GeographyStore.projectedX(cityData.dorlingLngLat), GeographyStore.projectedY(cityData.dorlingLngLat) ];
+        });
+        console.timeEnd('cats');
+      });
+      
+
       this.data.loaded = true;
       this.data.yearsLoaded.push(year);
+
+      console.timeEnd('CitiesStoreProcessing');
+      console.timeEnd('mounting');
+
+
+
+      //console.log(calculateDorlingsPosition());
+
       this.emit(AppActionTypes.storeChanged);
     });
   },
@@ -340,6 +378,11 @@ const CitiesStore = {
     this.emit(AppActionTypes.storeChanged);
   },
 
+  setSelectedView: function(view) {
+    this.data.selectedView = view;
+    this.emit(AppActionTypes.storeChanged);
+  },
+
   setSelectedYear: function(year) {
     this.data.selectedYear = year;
     this.emit(AppActionTypes.storeChanged);
@@ -354,6 +397,8 @@ const CitiesStore = {
     this.data.poc[1] = value;
     this.emit(AppActionTypes.storeChanged);
   },
+
+  getSelectedView: function() { return this.data.selectedView; },
 
   getCityId: function(project_id) { return Object.keys(this.data.cities).filter(city_id => this.data.cities[city_id].projects.hasOwnProperty(project_id))[0]; },
 
@@ -395,6 +440,8 @@ const CitiesStore = {
         .sort((a,b) => b.value - a.value) :
       [];
   },
+
+  getDorlingXY: function(city_id) { return (this.data.loaded) ? this.data.dorlingXYs[this.data.selectedYear][city_id] : [0,0]; },
 
   getDorlings: function() {
     // need to add something to select category
@@ -444,14 +491,27 @@ const CitiesStore = {
           .filter(cityData => GeographyStore.projected([cityData.lng, cityData.lat]) !== null)
           .filter(cityData => (this.data.selectedYear) ? cityData.yearsData[this.data.selectedYear] && cityData.yearsData[this.data.selectedYear]['totalFamilies'] > 0 : cityData.totalFamilies && cityData.totalFamilies > 0)
           .map(cityData => {
+            let cx, cy;
+            if (this.data.selectedView == 'scatterplot') {
+              const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4),
+                l = Math.sqrt(2*shortside*shortside);
+              cx = (this.getCityData(cityData.city_id).pop_1960 && this.getCityData(cityData.city_id).nonwhite_1960) ? (this.getCityData(cityData.city_id).nonwhite_1960 / this.getCityData(cityData.city_id).pop_1960) * l : -900;
+              cy = l - this.getCityData(cityData.city_id).percentFamiliesOfColor * l;
+              [cx, cy] = DimensionsStore.translateScatterplotPoint([cx, cy]);
+            } else if (this.data.selectedView == 'cartogram') {
+              [cx, cy] = this.getDorlingXY(cityData.city_id);
+            } else {
+              [cx, cy] = GeographyStore.projected([cityData.lng, cityData.lat]);
+            }
+
             return {
               lngLat: [cityData.lng, cityData.lat],
               x: GeographyStore.projectedX([cityData.lng, cityData.lat]),
               y: GeographyStore.projectedY([cityData.lng, cityData.lat]),
               x0: GeographyStore.projectedX([cityData.lng, cityData.lat]),
               y0: GeographyStore.projectedY([cityData.lng, cityData.lat]),
-              cx: GeographyStore.projectedX([cityData.lng, cityData.lat]),
-              cy: GeographyStore.projectedY([cityData.lng, cityData.lat]),
+              cx: cx,
+              cy: cy,
               r: DimensionsStore.getDorlingRadius((this.data.selectedYear && false) ? cityData.yearsData[this.data.selectedYear]['totalFamilies'] : cityData.totalFamilies), 
               city_id: cityData.city_id,
               value: (this.data.selectedYear && false) ? cityData.yearsData[this.data.selectedYear]['totalFamilies'] : cityData.totalFamilies,
@@ -479,6 +539,31 @@ const CitiesStore = {
     } else {
       return [];
     }
+  },
+
+  getDorlingsForceForYear: function(year) {
+    return (this.data && this.data.loaded) ?
+      this.getCitiesList()
+        .filter(cityData => GeographyStore.projected([cityData.lng, cityData.lat]) !== null)
+        .filter(cityData => (year) ? cityData.yearsData[year] && cityData.yearsData[year]['totalFamilies'] > 0 : cityData.totalFamilies && cityData.totalFamilies > 0)
+        .map(cityData => {
+          return {
+            lngLat: [cityData.lng, cityData.lat],
+            x: GeographyStore.projectedX([cityData.lng, cityData.lat]),
+            y: GeographyStore.projectedY([cityData.lng, cityData.lat]),
+            x0: GeographyStore.projectedX([cityData.lng, cityData.lat]),
+            y0: GeographyStore.projectedY([cityData.lng, cityData.lat]),
+            cx: GeographyStore.projectedX([cityData.lng, cityData.lat]),
+            cy: GeographyStore.projectedY([cityData.lng, cityData.lat]),
+            r: DimensionsStore.getDorlingRadius((year && false) ? cityData.yearsData[year]['totalFamilies'] : cityData.totalFamilies), 
+            city_id: cityData.city_id,
+            value: (year && false) ? cityData.yearsData[year]['totalFamilies'] : cityData.totalFamilies,
+            color: (year && cityData.yearsData[year]['percentFamiliesOfColor'] >= this.getPOCBottom() && cityData.yearsData[year]['percentFamiliesOfColor'] <= this.getPOCTop()) ? getColorForRace(cityData.yearsData[year]['percentFamiliesOfColor']) : (cityData.percentFamiliesOfColor >= this.getPOCBottom() && cityData.percentFamiliesOfColor <= this.getPOCTop()) ? getColorForRace(cityData.percentFamiliesOfColor) : 'transparent',
+            name: cityData.city
+          };
+        })
+        .sort((a,b) => b.value - a.value) :
+      [];
   },
 
   getVisibleCityIds: function() {
@@ -630,6 +715,10 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
     } else {
       CitiesStore.loadCityData(action.value);
     }
+    break;
+
+  case AppActionTypes.viewSelected:
+    CitiesStore.setSelectedView(action.value);
     break;
 
   case AppActionTypes.dateSelected:

@@ -55,15 +55,18 @@ export default class USMap extends React.Component {
 
   render () {
 
+    {/* JSX Comment 
+    console.log(CitiesStore.getDorlingXY(494));
+
     var nodes = CitiesStore.getDorlingsForce().reverse();
 
-    for (var alpha = 1; alpha > 0; alpha = alpha - 0.01) {
+    for (var alpha = 1; alpha > 0; alpha = alpha - 0.001) {
 
 
       var q = d3.geom.quadtree(nodes, DimensionsStore.getNationalMapWidth(), DimensionsStore.getNationalMapHeight());
       nodes.forEach(node => { 
-        node.y += (node.y0 - node.y) * alpha *0.15;
-        node.x += (node.x0 - node.x) * alpha *0.15;
+        node.y += (node.y0 - node.y) * alpha * node.r/DimensionsStore.data.dorlingsMaxRadius;
+        node.x += (node.x0 - node.x) * alpha * node.r/DimensionsStore.data.dorlingsMaxRadius;
 
         // collide 
         var k = 0.5;
@@ -135,7 +138,7 @@ export default class USMap extends React.Component {
     //   .size([DimensionsStore.getNationalMapWidth(), DimensionsStore.getNationalMapHeight()])
     //   .nodes(nodes)
     //   .on("tick", tick)
-    //   .start();
+    //   .start(); */}
 
     return (
       <g 
@@ -167,13 +170,14 @@ export default class USMap extends React.Component {
 
           {/* dorlings */}
           <ReactTransitionGroup component='g' className='transitionGroup'>
-            { nodes.map((cityData, i) => (
+            { CitiesStore.getDorlings().map((cityData, i) => (
               <Dorlings
                 { ...cityData }
+                dorlingXY={ CitiesStore.getDorlingXY(cityData.city_id) }
                 r={ DimensionsStore.getDorlingRadius(cityData.value) / this.props.z }
                 key={'cityCircle' + cityData.city_id }
                 zoom={ this.props.z }
-                strokeWidth={ 1/this.props.z }
+                strokeWidth={ 0.5/this.props.z }
                 onCityClicked={ this.props.onCityClicked }
                 selected={ (CitiesStore.getSelectedCity() == cityData.city_id) }
               />

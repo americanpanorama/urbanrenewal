@@ -276,7 +276,19 @@ const DimensionsStore = {
 
   getDorlingsMaxRadius: function() { return this.data.dorlingsMaxRadius; },
 
-  getCitySnippetWidth: function() { return this.getSidebarStyle().width - 10; }
+  getCitySnippetWidth: function() { return this.getSidebarStyle().width - 10; },
+
+
+
+
+  // SCATTERPLOT DIMENSIONS
+
+  translateScatterplotPoint: function(point) {
+    const cx = this.getNationalMapWidth() / 2 - (Math.sqrt((point[0] * point[0]) / 2) -  Math.sqrt((point[1] * point[1]) / 2)),
+      cy = this.getNationalMapHeight() * 0.9 - Math.sqrt((point[0] * point[0]) / 2) -  Math.sqrt((point[1] * point[1]) / 2);
+
+    return [cx,cy];
+  },
 
 
 };

@@ -54,12 +54,6 @@ export default class USMap extends React.Component {
   }
 
   render () {
-    const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4);
-
-    let l = Math.sqrt(2*shortside*shortside);
-
-    const transform = (false && CitiesStore.getSelectedView() == 'scatterplot') ? 'translate('+DimensionsStore.getNationalMapWidth()/2+','+DimensionsStore.getNationalMapHeight()*0.9 + ') scale(' + this.state.z + ') rotate(225)' : 'translate('+this.state.x+','+this.state.y+') scale(' + this.state.z + ')';
-
     return (
       <g 
         width={ DimensionsStore.getNationalMapWidth() }  
@@ -70,96 +64,23 @@ export default class USMap extends React.Component {
         onMouseDown={this.props.handleMouseDown }
         onMouseMove={this.props.handleMouseMove }
       >
-
-        { ( CitiesStore.getSelectedView() == 'scatterplot') ? 
-          <g transform={ 'translate('+DimensionsStore.getNationalMapWidth()/2+','+DimensionsStore.getNationalMapHeight()*0.9 + ') scale(' + this.state.z + ') rotate(225)' }>
-            <rect
-              x={0}
-              y={0}
-              width={l}
-              height={l}
-              fill="url(#graphgradient2)"
-
-            />
-
-            { [...Array(11).keys()].map(decile => {
-              return (
-                <line
-                  x1={l*decile/10}
-                  y1={0}
-                  x2={l*decile/10}
-                  y2={l}
-                  stroke='silver'
-                  strokeWidth={1}
-                  key={'x' + decile}
-                />
-              );
-            }) }
-
-            { [...Array(11).keys()].map(decile => {
-              return (
-                <line
-                  y1={l*decile/10}
-                  x1={0}
-                  y2={l*decile/10}
-                  x2={l}
-                  stroke='silver'
-                  strokeWidth={1}
-                  key={'y' + decile}
-                />
-              );
-            }) }
-
-            <line
-              x1={l}
-              y1={0}
-              x2={0}
-              y2={l}
-              stroke='yellow'
-              strokeWidth={3}
-            />
-          </g> : ''
-        }
-
-
-
         <g 
           ref='nationalMap'
-          transform={ 'translate('+this.state.x+','+this.state.y+') scale(' + this.state.z + ')' }
+          transform={'translate('+this.state.x+','+this.state.y+') scale(' + this.state.z + ')'}
         >
 
-          <defs>
-            <linearGradient id="graphgradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" style={{stopColor:'rgb(163, 135, 190)', stopOpacity:1}} />
-              <stop offset="50%" style={{stopColor:'rgb(255,231,97)', stopOpacity:1}} />
-              <stop offset="100%" style={{stopColor:'rgb(44,160,44)', stopOpacity:1}} />
-            </linearGradient>
-            <linearGradient id="graphgradient2" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style={{stopColor:'rgb(44,160,44)', stopOpacity:1}} />
-              <stop offset="50%" style={{stopColor:'rgb(128,128,128)', stopOpacity:1}} />
-              <stop offset="100%" style={{stopColor:'rgb(163, 135, 190)', stopOpacity:1}} />
-            </linearGradient>
-            <marker id="arrow" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto" markerUnits="strokeWidth">
-              <path d="M0,0 L0,6 L9,3 z" fill="#fff" />
-            </marker>
-          </defs>
-
-
-
-          {/* background: the states for map and cartogram, gradient field for scatterplot */}
-          { ( CitiesStore.getSelectedView() !== 'scatterplot') ?
-            GeographyStore.getStatesGeojson().map(polygon => {
-              return (
-                <path
-                  key={ 'statepolygon' + polygon.id }
-                  d={ GeographyStore.getPath(polygon.geometry) }
-                  strokeWidth={ 1 / this.state.z }
-                  stroke={ 'silver' }
-                  className='stateMap'
-                />
-              );
-            }) : ''
-          }
+          {/* the states */}
+          { GeographyStore.getStatesGeojson().map(polygon => {
+            return (
+              <path
+                key={ polygon.id }
+                d={ GeographyStore.getPath(polygon.geometry) }
+                strokeWidth={ 1 / this.state.z }
+                stroke={ 'silver' }
+                className='stateMap'
+              />
+            );
+          })}
 
           {/* for outline hovers */}
           { GeographyStore.getStatesGeojson().map(polygon => {
@@ -193,19 +114,17 @@ export default class USMap extends React.Component {
 
           {/* dorlings */}
           <ReactTransitionGroup component='g' className='transitionGroup'>
-            { CitiesStore.getDorlingsForce().map((cityData, i) => {
-              return (
-                <Dorlings
-                  { ...cityData }
-                  r={ DimensionsStore.getDorlingRadius(cityData.value) / this.props.z }
-                  key={'cityCircle' + cityData.city_id }
-                  zoom={ this.props.z }
-                  strokeWidth={ 1/this.props.z }
-                  onCityClicked={ this.props.onCityClicked }
-                  selected={ (CitiesStore.getSelectedCity() == cityData.city_id) }
-                />
-              );  
-            })}
+            { CitiesStore.getDorlings().map((cityData, i) => (
+              <Dorlings
+                { ...cityData }
+                r={ DimensionsStore.getDorlingRadius(cityData.value) / this.props.z }
+                key={'cityCircle' + cityData.city_id }
+                zoom={ this.props.z }
+                strokeWidth={ 1/this.props.z }
+                onCityClicked={ this.props.onCityClicked }
+                selected={ (CitiesStore.getSelectedCity() == cityData.city_id) }
+              />
+            ))}
           </ReactTransitionGroup> 
 
           {/* selected city on top 
@@ -276,43 +195,6 @@ export default class USMap extends React.Component {
         >
           reset
         </text>
-
-        <text 
-          x={30} 
-          y={20} 
-          fontSize={20}
-          textAnchor='middle'
-          fill='yellow'
-          id='map'
-          onClick={ this.props.onViewSelected }
-        >
-          map
-        </text>
-
-        <text 
-          x={30} 
-          y={50} 
-          fontSize={20}
-          textAnchor='middle'
-          fill='yellow'
-          id='cartogram'
-          onClick={ this.props.onViewSelected }
-        >
-          cartogram
-        </text>
-
-        <text 
-          x={30} 
-          y={80} 
-          fontSize={20}
-          textAnchor='middle'
-          fill='yellow'
-          id='scatterplot'
-          onClick={ this.props.onViewSelected }
-        >
-          scatterplot
-        </text>
-
         
       </g>
     );
