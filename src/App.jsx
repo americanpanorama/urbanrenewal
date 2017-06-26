@@ -52,7 +52,7 @@ class App extends React.Component {
     };
 
     // bind handlers
-    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
   }
 
@@ -101,6 +101,10 @@ class App extends React.Component {
   onCategoryClicked(event) { AppActions.categorySelected(event.target.id); }
 
   onCityClicked(event) { AppActions.citySelected(event.target.id); }
+
+  onCityInspected(event) { AppActions.cityInspected(event.target.id); }
+
+  onCityOut() { AppActions.cityInspected(null); }
 
   onViewSelected(event) { AppActions.viewSelected(event.target.id); }
 
@@ -189,11 +193,13 @@ class App extends React.Component {
       year: CitiesStore.getSelectedYear(),
       view: [GeographyStore.getX(), GeographyStore.getY(), GeographyStore.getZ()].join('/'),
       city: CitiesStore.getSlug(),
-      cat: CitiesStore.getSelectedCategory()
+      cat: CitiesStore.getSelectedCategory(),
+      viz: CitiesStore.getSelectedView()
     });
   }
 
   render () {
+    console.log(CitiesStore.getCityData(CitiesStore.getInspectedCity()));
     return (
         <div className='container full-height'>
           <div className='row full-height'>
@@ -222,9 +228,12 @@ class App extends React.Component {
                         x={ GeographyStore.getX() }
                         y={ GeographyStore.getY() }
                         z={ GeographyStore.getZ() }
+                        selectedView= { CitiesStore.getSelectedView() }
                         onCityClicked={ this.onCityClicked }
                         onStateClicked={ this.zoomToState }
                         onViewSelected={ this.onViewSelected }
+                        onCityHover={ this.onCityInspected }
+                        onCityOut={ this.onCityOut }
                         resetView={ this.resetView }
                         //onMapClicked={ this.onZoomIn }
                         handleMouseUp={ this.handleMouseUp }
@@ -288,9 +297,9 @@ class App extends React.Component {
         <aside
           style={ DimensionsStore.getSidebarStyle() }
         >
-          { CitiesStore.getSelectedCity() ? 
+          { CitiesStore.getInspectedCity() ? 
             <CityStats 
-              { ...CitiesStore.getCityData(CitiesStore.getSelectedCity()) }
+              { ...CitiesStore.getCityData(CitiesStore.getInspectedCity()) }
               categories={ CitiesStore.getCategories() }
               year={ this.state.year }
               onCityClicked={ this.onCityClicked }

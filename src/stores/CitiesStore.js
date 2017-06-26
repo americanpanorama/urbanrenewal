@@ -4,9 +4,10 @@ import { AppActionTypes } from '../utils/AppActionCreator';
 import CartoDBLoader from '../utils/CartoDBLoader';
 import GeographyStore from './GeographyStore';
 import DimensionsStore from './DimensionsStore';
-import { getColorForRace, calculateDorlingsPosition } from '../utils/HelperFunctions';
+import { getColorForRace, calculateDorlingsPosition, calculateDorlingsPositionUnprojected } from '../utils/HelperFunctions';
 import StateAbbrs from '../../data/stateAbbrs.json';
 import DorlingLocations from '../../data/dorlingLngLats.json';
+import DorlingXYs from '../../data/dorlingXYs.json';
 
 const CitiesStore = {
 
@@ -15,6 +16,7 @@ const CitiesStore = {
     selectedYear: null,
     selectedCategory: 'families',
     selectedCity: null,
+    inspectedCity: null,
     selectedView: 'cartogram',
     poc: [0, 1],
 
@@ -37,9 +39,11 @@ const CitiesStore = {
 
   getCityDataQuery: function(year) { return "select sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.state, year, v2.category_id, pop_1940, pop_1950, pop_1960, pop_1970, white_1960, white_1970, nonwhite_1960, nonwhite_1970 from (select value, fy.year, v.category_id, v.project_id, v.city_id from (SELECT max(year), value, city_id, project_id, category_id FROM digitalscholarshiplab.combined_dire_char_raw where value is not null group by value, city_id, project_id, category_id) v join (SELECT min(year) as year, city_id, project_id, category_id FROM digitalscholarshiplab.combined_dire_char_raw where value is not null group by city_id, project_id, category_id) fy on v.project_id = fy.project_id and v.category_id = fy.category_id) v2 join urdr_city_id_key cities on v2.city_id = cities.city_id and year = " + year + " join ur_city_census_data on v2.city_id = ur_city_census_data.city_id group by cities.the_geom, cities.city, cities.state, cities.city_id, year, category_id, pop_1940, pop_1950, pop_1960, pop_1970, white_1960, white_1970, nonwhite_1960, nonwhite_1970"; },
 
-  loadInitialData: function(year, citySlug, selectedCategory) {
+  loadInitialData: function(year, citySlug, viz, selectedCategory) {
 
     console.time('CitiesStoreData');
+
+    this.setSelectedView(viz);
 
     // initiate year keys on yearsTotal
     [...Array(25).keys()].map(num => num+1949).forEach(year => this.data.yearsTotals[year] = {});
@@ -193,13 +197,14 @@ const CitiesStore = {
       //   this.data.dorlingXYs[this.data.selectedYear][cityData.city_id] = [ GeographyStore.projectedX(cityData.dorlingLngLat), GeographyStore.projectedY(cityData.dorlingLngLat) ];
       // });
 
-      DorlingLocations.forEach(yearData => {
+      DorlingXYs.forEach(yearData => {
         this.data.dorlingXYs[yearData.year] = (!this.data.dorlingXYs[yearData.year]) ? {} : this.data.dorlingXYs[yearData.year];
         // load the selected year 
         
         console.time('cats');
         yearData.cities.forEach(cityData => {
-          this.data.dorlingXYs[yearData.year][cityData.city_id] = [ GeographyStore.projectedX(cityData.dorlingLngLat), GeographyStore.projectedY(cityData.dorlingLngLat) ];
+          //this.data.dorlingXYs[yearData.year][cityData.city_id] = [ GeographyStore.projectedX(cityData.dorlingLngLat), GeographyStore.projectedY(cityData.dorlingLngLat) ];
+          this.data.dorlingXYs[yearData.year][cityData.city_id] = [ cityData.x * DimensionsStore.getMapScale() + DimensionsStore.getNationalMapWidth() / 2, cityData.y * DimensionsStore.getMapScale() + DimensionsStore.getNationalMapHeight() / 2 ];
         });
         console.timeEnd('cats');
       });
@@ -214,6 +219,7 @@ const CitiesStore = {
 
 
       //console.log(calculateDorlingsPosition());
+      console.log(calculateDorlingsPositionUnprojected());
 
       this.emit(AppActionTypes.storeChanged);
     });
@@ -370,6 +376,11 @@ const CitiesStore = {
 
   setSelectedCategory: function(category_id) {
     this.data.selectedCategory = category_id;
+    this.emit(AppActionTypes.storeChanged);
+  },
+
+  setInspectedCity: function(city_id) {
+    this.data.inspectedCity = city_id;
     this.emit(AppActionTypes.storeChanged);
   },
 
@@ -640,6 +651,8 @@ const CitiesStore = {
 
   getSelectedCategory: function() { return this.data.selectedCategory; },
 
+  getInspectedCity: function() { return this.data.inspectedCity; },
+
   getSelectedCity: function() { return this.data.selectedCity; },
 
   getSlug: function() { 
@@ -701,8 +714,9 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
 
   case AppActionTypes.loadInitialData:
     const year = (action.hashState.year) ? action.hashState.year : null,
-      category = (action.hashState.cat) ? action.hashState.cat : 'families';
-    CitiesStore.loadInitialData(year, action.hashState.city, category);
+      category = (action.hashState.cat) ? action.hashState.cat : 'families',
+      viz = (action.hashState.viz) ? action.hashState.viz : 'cartogram' ;
+    CitiesStore.loadInitialData(year, action.hashState.city, viz, category);
     break;
 
   case AppActionTypes.categorySelected:
@@ -714,6 +728,14 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
       CitiesStore.setSelectedCity(action.value);
     } else {
       CitiesStore.loadCityData(action.value);
+    }
+    break;
+
+  case AppActionTypes.cityInspected:
+    if (!action.value || CitiesStore.cityLoaded(action.value)) {
+      CitiesStore.setInspectedCity(action.value);
+    } else {
+      CitiesStore.setInspectedCity(action.value);
     }
     break;
 

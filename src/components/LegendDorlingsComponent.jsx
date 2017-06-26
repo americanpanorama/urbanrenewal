@@ -46,7 +46,7 @@ export default class LegendDorlings extends React.Component {
                 { ...DimensionsStore.getLegendDorlingsCircleDimensions() }  
                 r={ DimensionsStore.getDorlingRadius(value) }
                 transform={ 'translate(0,' + (DimensionsStore.getDorlingRadius(maxLegendDorling) - DimensionsStore.getDorlingRadius(value)) + ')'}
-                fill={ getColorForRace(1 - i / (legendIncrements.length - 1)) }
+                fill={ 'transparent' }
                 className='increment'
                 
               />

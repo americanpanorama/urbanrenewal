@@ -7,6 +7,7 @@ export const AppActionTypes = {
   loadInitialData: 'loadInitialData',
   itemSelected: 'itemSelected',
   categorySelected: 'categorySelected',
+  cityInspected: 'cityInspected',
   citySelected: 'citySelected',
   dateSelected: 'dateSelected',
   viewSelected: 'viewSelected',
@@ -29,6 +30,13 @@ export const AppActions = {
     AppDispatcher.dispatch({
       type: AppActionTypes.categorySelected,
       value: category_id
+    });
+  },
+
+  cityInspected: (city_id) => {
+    AppDispatcher.dispatch({
+      type: AppActionTypes.cityInspected,
+      value: city_id
     });
   },
 

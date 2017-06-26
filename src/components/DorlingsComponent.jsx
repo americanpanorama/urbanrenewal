@@ -56,7 +56,7 @@ export default class Dorlings extends React.Component {
     else if (this.props.r !== nextProps.r || this.props.color !== nextProps.color || this.props.cx !== nextProps.cx || this.props.cy !== nextProps.cy ) {
       d3.select(ReactDOM.findDOMNode(this)).select('circle')
         .transition()
-        .delay((CitiesStore.getSelectedView() == 'scatterplot') ? (DimensionsStore.getNationalMapHeight() * 0.9 - nextProps.cy) * 10 : 0)
+        .delay((CitiesStore.getSelectedView() == 'scatterplot') ? Math.min((DimensionsStore.getNationalMapHeight() * 0.9 - nextProps.cy) * 10, 5000) : 0)
         .duration(750)
         .attr('r', nextProps.r)
         .attr('cx', nextProps.cx)
@@ -87,6 +87,8 @@ export default class Dorlings extends React.Component {
             strokeWidth: this.props.strokeWidth
           } }
           onClick={ this.props.onCityClicked }
+          onMouseEnter={ this.props.onCityHover }
+          onMouseLeave={ this.props.onCityOut }
           id={ this.props.city_id }
           key={ 'city' + this.props.city_id }
           className={ 'dorling ' + this.props.className }

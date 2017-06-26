@@ -41,7 +41,7 @@ const DimensionsStore = {
     this.data.sidebarTitleHeight = (document.getElementsByClassName('sidebarTitle').length > 0) ? document.getElementsByClassName('sidebarTitle')[0].offsetHeight: 30;
     this.data.nationalMapHeight = this.data.mainPaneHeight - this.data.containerPadding * 2;
     this.data.nationalMapWidth = this.data.mainPaneWidth - this.data.containerPadding * 2;
-    this.data.dorlingsMaxRadius= this.data.mainPaneWidth / 20;
+    this.data.dorlingsMaxRadius= this.data.nationalMapWidth / 22;
 
 
 
@@ -89,7 +89,7 @@ const DimensionsStore = {
 
   getNationalMapWidth: function() { return this.data.nationalMapWidth; },
 
-  getMapScale: function() { return Math.min(1.36 * this.getNationalMapWidth(), 2.08 * this.getNationalMapHeight()); }, // I calculated these with trial and error--sure there's a more precise way as this will be fragile if the width changes 
+  getMapScale: function() { return Math.min(1.2 * this.getNationalMapWidth(), 2 * this.getNationalMapHeight()); }, // I calculated these with trial and error--sure there's a more precise way as this will be fragile if the width changes 
 
   getMainStyle: function() {
     return {
