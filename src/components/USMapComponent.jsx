@@ -93,10 +93,6 @@ export default class USMap extends React.Component {
     }
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return true;
-  }
-
   render () {
     const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4);
 
@@ -115,7 +111,12 @@ export default class USMap extends React.Component {
         onMouseMove={this.props.handleMouseMove }
       >
 
-        <MapChartField selectedView={ this.props.selectedView } z={ this.props.z }/>
+        <MapChartField 
+          selectedView={ this.props.selectedView } 
+          x={ this.props.x }
+          y={ this.props.y }
+          z={ this.props.z }
+        />
 
 
 
@@ -145,7 +146,7 @@ export default class USMap extends React.Component {
                 r={ DimensionsStore.getDorlingRadius(cityData.value) / this.props.z }
                 key={'cityCircle' + cityData.city_id }
                 zoom={ this.props.z }
-                strokeWidth={ 1/this.props.z }
+                strokeWidth={ 0.5/this.props.z }
                 onCityClicked={ this.props.onCityClicked }
                 onCityHover={ this.props.onCityHover }
                 onCityOut={ this.props.onCityHover }

@@ -21,7 +21,6 @@ export default class CityStats extends React.Component {
   }
 
   render() {
-    console.log(this.props);
     return (
       <div className='cityStats'>
         <h2>{ this.props.city + ', ' + this.props.state }</h2>
@@ -36,8 +35,8 @@ export default class CityStats extends React.Component {
 
 
 
-        <CityTimelineComponent {...this.props } style={{width: 200}}/>
-        { Object.keys(this.props.projects).map(project_id => {
+        <CityTimelineComponent {...this.props } />
+        {/* Object.keys(this.props.projects).map(project_id => {
           return (
             <div key={ 'projectDetails' + project_id }>
               <svg
@@ -90,13 +89,10 @@ export default class CityStats extends React.Component {
                 }
 
               </svg>
-              {/* project_id + this.props.projects[project_id].project + " " + this.props.projects[project_id].yearsData[this.props.year]['white families'] + " " + this.props.projects[project_id].yearsData[this.props.year]['non-white families'] */}
+              { project_id + this.props.projects[project_id].project + " " + this.props.projects[project_id].yearsData[this.props.year]['white families'] + " " + this.props.projects[project_id].yearsData[this.props.year]['non-white families'] }
             </div>
           );
-        })
-
-
-        }
+        }) */}
       </div>
     );
   }

@@ -199,14 +199,10 @@ const CitiesStore = {
 
       DorlingXYs.forEach(yearData => {
         this.data.dorlingXYs[yearData.year] = (!this.data.dorlingXYs[yearData.year]) ? {} : this.data.dorlingXYs[yearData.year];
-        // load the selected year 
-        
-        console.time('cats');
         yearData.cities.forEach(cityData => {
           //this.data.dorlingXYs[yearData.year][cityData.city_id] = [ GeographyStore.projectedX(cityData.dorlingLngLat), GeographyStore.projectedY(cityData.dorlingLngLat) ];
           this.data.dorlingXYs[yearData.year][cityData.city_id] = [ cityData.x * DimensionsStore.getMapScale() + DimensionsStore.getNationalMapWidth() / 2, cityData.y * DimensionsStore.getMapScale() + DimensionsStore.getNationalMapHeight() / 2 ];
         });
-        console.timeEnd('cats');
       });
       
 
@@ -214,12 +210,11 @@ const CitiesStore = {
       this.data.yearsLoaded.push(year);
 
       console.timeEnd('CitiesStoreProcessing');
-      console.timeEnd('mounting');
 
 
 
       //console.log(calculateDorlingsPosition());
-      console.log(calculateDorlingsPositionUnprojected());
+      //console.log(calculateDorlingsPositionUnprojected());
 
       this.emit(AppActionTypes.storeChanged);
     });
@@ -577,12 +572,66 @@ const CitiesStore = {
       [];
   },
 
+  getProjectTimelineBars: function(cityId) {
+    let projects = Object.keys(this.data.cities[cityId].projects).map(id => this.data.cities[cityId].projects[id]),
+      years = [1955,1956,1957,1958,1959,1960,1961,1962,1963,1964,1965,1966];
+
+    // sort to put the longest first
+    //projects = projects.sort((a,b) => b.totalFamilies - a.totalFamilies);
+
+    // calculate "grid" placement for each project
+    let rows = [new Array(12)];
+    projects.forEach((project, i) => {
+      let availableRow = false;
+      rows.forEach((row, rowNum) => {
+        let canFit = true;
+          
+        // test whether the project can fit in the space
+        for (let col = years.indexOf(project.startYear); col <= years.indexOf(project.endYear); col ++) {
+          if (rows[rowNum][col]) {
+            canFit = false;
+          }
+          // for one year spans pad it
+          if (project.startYear == project.endYear) {
+            if ((col > 0 && rows[rowNum][col-1]) || (col <= years.indexOf(project.endYear) && rows[rowNum][col+1])) {
+              canFit = false;
+            }
+          }
+        }
+        if (canFit && !availableRow) {
+          availableRow = rowNum;
+        }
+      });
+
+      projects[i].row = (availableRow !== false) ? availableRow : rows.length;
+      if (!availableRow) {
+        rows.push(new Array(years.length));
+      }
+      for (let col = years.indexOf(project.startYear); col <= years.indexOf(project.endYear); col ++) {
+        rows[projects[i].row][col] = 'x';
+        // for one year spans pad it
+        if (project.startYear == project.endYear) {
+          if (col > 0) {
+            rows[projects[i].row][col-1] = 'x';
+          } 
+          if (col <= years.indexOf(project.endYear)) {
+            rows[projects[i].row][col+1] = 'x';
+          } 
+        }
+      }
+    });
+
+    return projects;
+  },
+
   getVisibleCityIds: function() {
     const bb = GeographyStore.getBoundingBox();
     // get those inside the box
     let inside = this.getDorlings()
       .filter(d => d.cx >= bb[0][0] && d.cx <= bb[1][0] && d.cy >= bb[0][1] && d.cy <= bb[1][1])
       .map(d => d.city_id);
+
+    return inside;
     
     let intersects = this.getDorlings()
       .filter(d => {

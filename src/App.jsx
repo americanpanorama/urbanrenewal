@@ -54,14 +54,11 @@ class App extends React.Component {
     // bind handlers
     const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
+
+    console.time('update');
   }
 
-  // ============================================================ //
-  // React Lifecycle
-  // ============================================================ //
-
   componentWillMount () {
-    console.time('mounting');
     AppActions.loadInitialData(this.state, HashManager.getState());
   }
 
@@ -71,30 +68,21 @@ class App extends React.Component {
     DimensionsStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
     GeographyStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
     HighwaysStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
-
-    
-
-
-
   }
 
-  componentDidUpdate () { this.changeHash(); }
+  componentDidUpdate () { this.changeHash();     console.timeEnd('update'); console.timeEnd('render'); }
 
   // ============================================================ //
   // Handlers
   // ============================================================ //
 
-  hashChanged (event, suppressRender) {
-  }
+  hashChanged (event, suppressRender) { }
 
-  storeChanged () {
-    this.setState({});
-  }
+  storeChanged () { this.setState({});}
 
   onDragUpdate(value, leftOrRight) { AppActions.POCSelected(value, leftOrRight); }
 
-  onMapMoved (event) {
-  }
+  onMapMoved (event) { }
 
   onWindowResize (event) { AppActions.windowResized(); }
 
@@ -152,8 +140,6 @@ class App extends React.Component {
 
   resetView() { AppActions.mapMoved(0,0,1); }
 
-
-
   handleMouseUp() {
     this.dragging = false;
     this.coords = {};
@@ -199,7 +185,7 @@ class App extends React.Component {
   }
 
   render () {
-    console.log(CitiesStore.getCityData(CitiesStore.getInspectedCity()));
+    console.time('render');
     return (
         <div className='container full-height'>
           <div className='row full-height'>
@@ -306,7 +292,7 @@ class App extends React.Component {
               onCategoryClicked={ this.onCategoryClicked }
             /> : 
             <div className='stateList'>
-              { CitiesStore.getVisibleCitiesByState().map(state => {
+              {/* CitiesStore.getVisibleCitiesByState().map(state => {
                 return (
                   <div key={ 'state' + state.abbr }>
                     <h2>{ state.name }</h2>
@@ -323,7 +309,7 @@ class App extends React.Component {
                     })}
                   </div>
                 );
-              })} 
+              }) */} 
             </div>
           }
 

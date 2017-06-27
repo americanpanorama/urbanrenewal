@@ -43,8 +43,6 @@ const DimensionsStore = {
     this.data.nationalMapWidth = this.data.mainPaneWidth - this.data.containerPadding * 2;
     this.data.dorlingsMaxRadius= this.data.nationalMapWidth / 22;
 
-
-
     this.data.legendRight = this.data.nationalMapWidth * 0.077 + this.data.containerPadding; // lines up roughly with the western edge of Maine on full size map
     
     this.data.legendHeight = 2 * this.data.dorlingsMaxRadius + this.data.legendVerticalGutter * 2;
@@ -62,6 +60,8 @@ const DimensionsStore = {
     this.data.legendWidth =  this.data.legendDorlingWidth + this.data.legendGradientWidth;
 
     this.data.timelineHeight = (this.data.windowHeight - this.data.headerHeight - 2 * this.data.containerPadding) * 1/3 - this.data.containerPadding;
+
+    this.data.timelineProjectHeight = 18;
 
     this.emit(AppActionTypes.storeChanged);
   },
@@ -289,6 +289,27 @@ const DimensionsStore = {
 
     return [cx,cy];
   },
+
+
+  // PROJECT TIMELINE DIMENSIONS
+
+  getCityTimelineStyle: function() {
+    return {
+      width: this.data.sidebarWidth - 2 * this.data.containerPadding
+    };
+  },
+
+  getTimelineYearWidth: function() { return this.getCityTimelineStyle().width / 12; },
+
+  getTimelineYearsSpanWidth: function(year1, year2) { return this.getTimelineYearWidth() * (year2-year1); },
+
+  getTimelineProjectHeight: function() { return this.data.timelineProjectHeight; },
+
+  getTimelineXOffsetForYear: function(year) { return (year - 1955) * this.getTimelineYearWidth(); },
+
+ 
+      // xOffsetForYearMiddle = (year) => xOffsetForYear(year) + yearMiddleOffset,
+      // xOffsetForYearBar = (year) => xOffsetForYear(year) + barOffset;
 
 
 };

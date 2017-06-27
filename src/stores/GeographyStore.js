@@ -19,24 +19,24 @@ const GeographyStore = {
 
   dataLoader: CartoDBLoader,
 
-  loadInitialData: function() {
-    this.dataLoader.query([
-      {
-        //query: "SELECT ST_transform(the_geom_webmercator, 2163) as the_geom_webmercator FROM states where start_n < 19600101 and end_n > 19600101 and name != 'Alaska' and name != 'Hawaii'",
-        query: "SELECT the_geom FROM states where start_n < 19600101 and end_n > 19600101 and name != 'Alaska' and name != 'Hawaii'",
-        format: 'geojson'
-      }
-    ]).then((responses) => {
-      responses.forEach(response => {
-        if (responses.length > 0) {
-          this.data.lower48Geojson = responses[0];
+  // loadInitialData: function() {
+  //   this.dataLoader.query([
+  //     {
+  //       //query: "SELECT ST_transform(the_geom_webmercator, 2163) as the_geom_webmercator FROM states where start_n < 19600101 and end_n > 19600101 and name != 'Alaska' and name != 'Hawaii'",
+  //       query: "SELECT the_geom FROM states where start_n < 19600101 and end_n > 19600101 and name != 'Alaska' and name != 'Hawaii'",
+  //       format: 'geojson'
+  //     }
+  //   ]).then((responses) => {
+  //     responses.forEach(response => {
+  //       if (responses.length > 0) {
+  //         this.data.lower48Geojson = responses[0];
 
-          this.data.loaded = true;
-          this.emit(AppActionTypes.storeChanged);
-        }
-      });
-    });
-  },
+  //         this.data.loaded = true;
+  //         this.emit(AppActionTypes.storeChanged);
+  //       }
+  //     });
+  //   });
+  // },
 
   setXYZ: function(x,y,z) {
     this.data.x = Math.round(x * 100) / 100;
@@ -252,7 +252,7 @@ Object.assign(GeographyStore, EventEmitter.prototype);
 GeographyStore.dispatchToken = AppDispatcher.register((action) => {
   switch (action.type) {
   case AppActionTypes.loadInitialData:
-    GeographyStore.loadInitialData(action.state);
+    //GeographyStore.loadInitialData(action.state);
     const x = (action.hashState.view) ? parseFloat(action.hashState.view.split('/')[0]) : 0,
       y = (action.hashState.view) ? parseFloat(action.hashState.view.split('/')[1]) : 0,
       z = (action.hashState.view) ? parseFloat(action.hashState.view.split('/')[2]) : 1;

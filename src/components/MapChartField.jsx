@@ -212,6 +212,7 @@ export default class MapChartField extends React.Component {
                   textAnchor='middle'
                   style={{fill:'white'}}
                   transform={'rotate(180 ' + x + ' ' + y + ')'}
+                  key={ 'xLabel' + decile }
                 >
                   { 100 -decile * 10 + '%' }
                 </text>
@@ -260,6 +261,7 @@ export default class MapChartField extends React.Component {
                   textAnchor='middle'
                   style={{fill:'white'}}
                   transform={'rotate(90 ' + x + ' ' + y + ')'}
+                  key={ 'yLabelWhite' + decile }
                 >
                   { 100 -decile * 10 + '%' }
                 </text>
@@ -276,6 +278,7 @@ export default class MapChartField extends React.Component {
                   textAnchor='middle'
                   style={{fill:'white'}}
                   transform={'rotate(90 ' + x + ' ' + y + ')'}
+                  key={ 'yLabelPOC' + decile }
                 >
                   { 100 - decile * 10 + '%' }
                 </text>

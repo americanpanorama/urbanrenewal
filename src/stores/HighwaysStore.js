@@ -50,7 +50,7 @@ Object.assign(HighwaysStore, EventEmitter.prototype);
 HighwaysStore.dispatchToken = AppDispatcher.register((action) => {
   switch (action.type) {
   case AppActionTypes.loadInitialData:
-    HighwaysStore.loadInitialData(action.state);
+    //HighwaysStore.loadInitialData(action.state);
     break;
   }
   return true;
