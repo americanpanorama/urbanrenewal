@@ -34,23 +34,23 @@ export default class USMap extends React.Component {
   componentWillLeave(callback) { callback(); }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.z !== nextProps.z || this.props.x !== nextProps.x || this.props.y !== nextProps.y) {
-      this.setState({
-        dorlingZoom: nextProps.z
-      });
-      d3.select(this.refs['nationalMap'])
-        .transition()
-        .duration(750)
-        .attr("transform", "translate("+nextProps.x+","+nextProps.y+")scale(" + nextProps.z +")")
-        .each('end', () => {
-          this.setState({
-            x: nextProps.x,
-            y: nextProps.y,
-            z: nextProps.z
-          });
-        });
-    }
-    if (nextProps.selectedView == 'scatterplot') {
+    // if (this.props.z !== nextProps.z || this.props.x !== nextProps.x || this.props.y !== nextProps.y) {
+    //   this.setState({
+    //     dorlingZoom: nextProps.z
+    //   });
+    //   d3.select(this.refs['nationalMap'])
+    //     .transition()
+    //     .duration(750)
+    //     .attr("transform", "translate("+nextProps.x+","+nextProps.y+")scale(" + nextProps.z +")")
+    //     .each('end', () => {
+    //       this.setState({
+    //         x: nextProps.x,
+    //         y: nextProps.y,
+    //         z: nextProps.z
+    //       });
+    //     });
+    // }
+    if (this.props.selectedView !== 'scatterplot' && nextProps.selectedView == 'scatterplot') {
       d3.select(this.refs['scatterplotField'])
         .transition()
         .duration(0)
@@ -94,6 +94,9 @@ export default class USMap extends React.Component {
   }
 
   render () {
+
+    //console.log(CitiesStore.getDorlingsForce());
+
     const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4);
 
     let l = Math.sqrt(2*shortside*shortside);
@@ -149,7 +152,7 @@ export default class USMap extends React.Component {
                 strokeWidth={ 0.5/this.props.z }
                 onCityClicked={ this.props.onCityClicked }
                 onCityHover={ this.props.onCityHover }
-                onCityOut={ this.props.onCityHover }
+                onCityOut={ this.props.onCityOut }
                 selected={ (CitiesStore.getSelectedCity() == cityData.city_id) }
               />
             );  

@@ -290,6 +290,46 @@ const DimensionsStore = {
     return [cx,cy];
   },
 
+  getScatterplotLength: function() {
+    const shortside = Math.min(this.data.nationalMapWidth, this.data.nationalMapHeight) * 0.4;
+    return Math.sqrt(2*shortside*shortside);
+  },
+
+  getScatterplotLengthDecile: function(decile) { return this.getScatterplotLength() / 10 * decile; },
+
+  // MAIN TIMELINE DIMENSIONS
+
+  getMainTimelineBarWidth: function() { 
+    const numYears = 1966-1948, 
+      numGutters = 1966-1955;
+
+    return 2 * (this.getTimelineAttrs().width / ((numYears * 2) + numGutters));
+  },
+
+  getMainTimlineXOffset: function(year) {
+    // years run from 1949-55 through individual years until 66
+    const w49_55 = this.getMainTimelineBarWidth() * (1955-1948),
+      wOtherYear = (this.getTimelineAttrs().width - w49_55) / (1966-1955);
+    return (year == 1955) ? 0 : w49_55 + (year - 1956) * wOtherYear;
+  },
+
+  getMainTimlineBarXOffset: function(year) {  return (year == 1955) ? 0 : this.getMainTimlineXOffset(year) + this.getMainTimelineBarWidth() / 6; },
+
+  getMainTimelineLabelXOffset: function(year) { 
+    // years run from 1949-55 through individual years until 66
+    const w49_55 = this.getMainTimelineBarWidth() * (1955-1948),
+      wOtherYear = (this.getTimelineAttrs().width - w49_55) / (1966-1955);
+    return (year == 1955) ? w49_55 / 2 : w49_55 + (year - 1956) * wOtherYear + wOtherYear / 2;
+  },
+
+  getMainTimelineLabelY: function() { return this.getTimelineAttrs().height - this.data.containerPadding; },
+
+  getMainTimelineBarHeight: function(year) { 
+    return (this.getMainTimelineLabelY() - this.data.containerPadding) * (CitiesStore.getYearTotals(year).white + CitiesStore.getYearTotals(year).nonwhite) / CitiesStore.getYearsTotalsMax(); 
+  },
+
+  getMainTimelineBarY: function(year) { return 10; },
+
 
   // PROJECT TIMELINE DIMENSIONS
 

@@ -70,6 +70,12 @@ export default class Dorlings extends React.Component {
             color: nextProps.color
           });
         });
+      d3.select(ReactDOM.findDOMNode(this)).select('text')
+        .transition()
+        .delay((CitiesStore.getSelectedView() == 'scatterplot') ? Math.min((DimensionsStore.getNationalMapHeight() * 0.9 - nextProps.cy) * 10, 5000) : 0)
+        .duration(750)
+        .attr('x', nextProps.cx)
+        .attr('y', nextProps.cy);
     }
   }
 
@@ -81,6 +87,7 @@ export default class Dorlings extends React.Component {
           cx={ this.state.cx }
           cy={ this.state.cy }
           r={ this.state.r }
+          //r={ this.state.r }
           style={ {
             fill: this.state.color,
             fillOpacity: 1,
@@ -95,8 +102,8 @@ export default class Dorlings extends React.Component {
         />
         { (this.state.r > 15) ?
           <text
-            x={ (this.props.dorlingXY) ?  this.props.dorlingXY[0] : this.props.cx }
-            y={ (this.props.dorlingXY) ?  this.props.dorlingXY[1] : this.props.cy }
+            x={ this.state.cx }
+            y={ this.state.cy }
             textAnchor='middle'
             alignmentBaseline='middle'
             fontSize={ labelSize }

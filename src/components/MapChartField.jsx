@@ -13,10 +13,6 @@ import DimensionsStore from '../stores/DimensionsStore';
 export default class MapChartField extends React.Component {
 
   constructor (props) { 
-    const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4);
-
-    let l = Math.sqrt(2*shortside*shortside);
-
     super(props); 
     this.state = {
       x: this.props.x,
@@ -25,7 +21,7 @@ export default class MapChartField extends React.Component {
       dorlingZoom: this.props.z,
       scatterplotOpacity: (this.props.selectedView == 'scatterplot') ? 1 : 0,
       USMapOpacity: (this.props.selectedView == 'scatterplot') ? 0 : 1,
-      maskHeight: 2*  Math.sqrt(l*l/2)
+      maskHeight: (this.props.selectedView == 'scatterplot') ? 0 : 2*  Math.sqrt(DimensionsStore.getScatterplotLength()*DimensionsStore.getScatterplotLength()/2)
     };
   }
 
@@ -34,9 +30,6 @@ export default class MapChartField extends React.Component {
   componentWillLeave(callback) { callback(); }
 
   componentWillReceiveProps(nextProps) {
-    const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4);
-
-    let l = Math.sqrt(2*shortside*shortside);
     if (this.props.z !== nextProps.z || this.props.x !== nextProps.x || this.props.y !== nextProps.y) {
       this.setState({
         dorlingZoom: nextProps.z
@@ -109,10 +102,10 @@ export default class MapChartField extends React.Component {
       d3.select(this.refs['scatterplotMask'])
         .transition()
         .duration(10000)
-        .attr('height', 2*  Math.sqrt(l*l/2))
+        .attr('height', 2*  Math.sqrt(DimensionsStore.getScatterplotLength()*DimensionsStore.getScatterplotLength()/2))
         .each('end', () => {
           this.setState({
-            maskHeight: 2*  Math.sqrt(l*l/2)
+            maskHeight: 2*  Math.sqrt(DimensionsStore.getScatterplotLength()*DimensionsStore.getScatterplotLength()/2)
           });
         });
     }
@@ -123,10 +116,6 @@ export default class MapChartField extends React.Component {
   }
 
   render () {
-    const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4);
-
-    let l = Math.sqrt(2*shortside*shortside);
-
     const transform = (false && CitiesStore.getSelectedView() == 'scatterplot') ? 'translate('+DimensionsStore.getNationalMapWidth()/2+','+DimensionsStore.getNationalMapHeight()*0.9 + ') scale(' + this.state.z + ') rotate(225)' : 'translate('+this.state.x+','+this.state.y+') scale(' + this.state.z + ')';
 
     return (
@@ -139,18 +128,18 @@ export default class MapChartField extends React.Component {
           <rect
             x={0}
             y={0}
-            width={l}
-            height={l}
+            width={ DimensionsStore.getScatterplotLength() }
+            height={ DimensionsStore.getScatterplotLength() }
             fill="url(#graphgradient2)"
           />
 
           { [...Array(11).keys()].map(decile => {
             return (
               <line
-                x1={l*decile/10}
+                x1={ DimensionsStore.getScatterplotLengthDecile(decile) }
                 y1={0}
-                x2={l*decile/10}
-                y2={l}
+                x2={ DimensionsStore.getScatterplotLengthDecile(decile) }
+                y2={ DimensionsStore.getScatterplotLength() }
                 stroke='silver'
                 strokeWidth={1}
                 key={'x' + decile}
@@ -161,10 +150,10 @@ export default class MapChartField extends React.Component {
           { [...Array(11).keys()].map(decile => {
             return (
               <line
-                y1={l*decile/10}
+                y1={ DimensionsStore.getScatterplotLengthDecile(decile) }
                 x1={0}
-                y2={l*decile/10}
-                x2={l}
+                y2={ DimensionsStore.getScatterplotLengthDecile(decile) }
+                x2={ DimensionsStore.getScatterplotLength() }
                 stroke='silver'
                 strokeWidth={1}
                 key={'y' + decile}
@@ -173,38 +162,38 @@ export default class MapChartField extends React.Component {
           }) }
 
           <line
-            x1={l}
+            x1={DimensionsStore.getScatterplotLength()}
             y1={0}
             x2={0}
-            y2={l}
+            y2={DimensionsStore.getScatterplotLength()}
             stroke='yellow'
             strokeWidth={3}
           />
 
           <g>
             <text
-              x={ l * 0.5}
-              y={ l * 1.1 }
+              x={ DimensionsStore.getScatterplotLength() * 0.5}
+              y={ DimensionsStore.getScatterplotLength() * 1.1 }
               textAnchor='middle'
               style={{fill:'white', fontSize: '1.3em'}}
-              transform={'rotate(180 ' + l * 0.5 + ' ' + l*1.1 + ')'}
+              transform={'rotate(180 ' + DimensionsStore.getScatterplotLength() * 0.5 + ' ' + DimensionsStore.getScatterplotLength() *1.1 + ')'}
             >
               OVERALL POPULATION
             </text>
 
             <text
-              x={ l * 0.5}
-              y={ l * 1.05 }
+              x={ DimensionsStore.getScatterplotLength() * 0.5}
+              y={ DimensionsStore.getScatterplotLength() * 1.05 }
               textAnchor='middle'
               style={{fill:'white'}}
-              transform={'rotate(180 ' + l * 0.5 + ' ' + l*1.05 + ')'}
+              transform={'rotate(180 ' + DimensionsStore.getScatterplotLength() * 0.5 + ' ' +  DimensionsStore.getScatterplotLength() *1.05 + ')'}
             >
               % white
             </text>
 
             { [...Array(10).keys()].map(decile => {
-              let x = decile * l/10,
-                y = l * 1.01;
+              let x = decile * DimensionsStore.getScatterplotLength()/10,
+                y = DimensionsStore.getScatterplotLength() * 1.01;
               return (
                 <text
                   x={ x }
@@ -222,38 +211,38 @@ export default class MapChartField extends React.Component {
 
           <g>
             <text
-              x={ l * 1.1}
-              y={ l * 0.5 }
+              x={ DimensionsStore.getScatterplotLength() * 1.1}
+              y={ DimensionsStore.getScatterplotLength() * 0.5 }
               textAnchor='middle'
               style={{fill:'white', fontSize: '1.3em'}}
-              transform={'rotate(90 ' + l * 1.1 + ' ' + l*0.5 + ')'}
+              transform={'rotate(90 ' + DimensionsStore.getScatterplotLength() * 1.1 + ' ' + DimensionsStore.getScatterplotLength()*0.5 + ')'}
             >
               DISPLACEMENTS
             </text>
 
             <text
-              x={ l * 1.05 }
-              y={ l * 0.75 }
+              x={ DimensionsStore.getScatterplotLength() * 1.05 }
+              y={ DimensionsStore.getScatterplotLength() * 0.75 }
               textAnchor='middle'
               style={{fill:'white'}}
-              transform={'rotate(90 ' + l * 1.05 + ' ' + l*0.75 + ')'}
+              transform={'rotate(90 ' + DimensionsStore.getScatterplotLength() * 1.05 + ' ' + DimensionsStore.getScatterplotLength()*0.75 + ')'}
             >
               % whites
             </text>
 
             <text
-              x={ l * 1.05 }
-              y={ l * 0.25 }
+              x={ DimensionsStore.getScatterplotLength() * 1.05 }
+              y={ DimensionsStore.getScatterplotLength() * 0.25 }
               textAnchor='middle'
               style={{fill:'white'}}
-              transform={'rotate(90 ' + l * 1.05 + ' ' + l*0.25 + ')'}
+              transform={'rotate(90 ' + DimensionsStore.getScatterplotLength() * 1.05 + ' ' + DimensionsStore.getScatterplotLength()*0.25 + ')'}
             >
               % people of color
             </text>
 
             { [...Array(5).keys()].map(decile => {
-              let x = l * 1.01,
-                y = decile * l/10;
+              let x = DimensionsStore.getScatterplotLength() * 1.01,
+                y = decile * DimensionsStore.getScatterplotLength()/10;
               return (
                 <text
                   x={ x }
@@ -269,8 +258,8 @@ export default class MapChartField extends React.Component {
             }) }
 
             { [...Array(5).reverse().keys()].map(decile => {
-              let x = l * 1.01,
-                y = l - decile * l/10;
+              let x = DimensionsStore.getScatterplotLength() * 1.01,
+                y = DimensionsStore.getScatterplotLength() - decile * DimensionsStore.getScatterplotLength()/10;
               return (
                 <text
                   x={ x }
@@ -286,11 +275,11 @@ export default class MapChartField extends React.Component {
             }) }
 
             <text
-              x={ l * 1.01 }
-              y={ l/2 }
+              x={ DimensionsStore.getScatterplotLength() * 1.01 }
+              y={ DimensionsStore.getScatterplotLength()/2 }
               textAnchor='middle'
               style={{fill:'white'}}
-              transform={'rotate(90 ' + l * 1.01 + ' ' + l/2 + ')'}
+              transform={'rotate(90 ' + DimensionsStore.getScatterplotLength() * 1.01 + ' ' + DimensionsStore.getScatterplotLength()/2 + ')'}
             >
               { 'even' }
             </text>
@@ -302,9 +291,9 @@ export default class MapChartField extends React.Component {
 
         {/* masking for transition */}
         <rect
-          x={ DimensionsStore.getNationalMapWidth() / 2 - Math.sqrt(l*l/2) }
-          y={ DimensionsStore.getNationalMapHeight() / 2 - Math.sqrt(l*l/2) }
-          width={ 2 * Math.sqrt(l*l/2) }
+          x={ DimensionsStore.getNationalMapWidth() / 2 - Math.sqrt(DimensionsStore.getScatterplotLength()*DimensionsStore.getScatterplotLength()/2) }
+          y={ DimensionsStore.getNationalMapHeight() / 2 - Math.sqrt(DimensionsStore.getScatterplotLength()*DimensionsStore.getScatterplotLength()/2) }
+          width={ 2 * Math.sqrt(DimensionsStore.getScatterplotLength()*DimensionsStore.getScatterplotLength()/2) }
           height={ this.state.maskHeight }
           fill="url(#maskgradient)"
           ref='scatterplotMask'

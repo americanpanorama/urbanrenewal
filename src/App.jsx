@@ -94,7 +94,11 @@ class App extends React.Component {
 
   onCityOut() { AppActions.cityInspected(null); }
 
-  onViewSelected(event) { AppActions.viewSelected(event.target.id); }
+  onViewSelected(event) { 
+    if (event.target.id !== CitiesStore.getSelectedView()) {
+      AppActions.viewSelected(event.target.id); 
+    }
+  }
 
   onYearClicked(event) {
     let year = parseInt(event.target.id);

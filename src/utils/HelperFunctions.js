@@ -39,14 +39,18 @@ export const calculateDorlingsPosition = function() {
   years.forEach(year => {
     let nodes = CitiesStore.getDorlingsForceForYear(year);
     console.log('calculating dorlings for ' + year); 
-    
+    //console.log(nodes.reduce((a,b) => { return (a.r < b.r) ? a : b; }, {r: 10000}));
+    console.log(nodes);
+    let q = d3.geom.quadtree(nodes); 
     for (var alpha = 1; alpha > 0; alpha = alpha - 0.001) {
 
 
-      var q = d3.geom.quadtree(nodes, DimensionsStore.getNationalMapWidth(), DimensionsStore.getNationalMapHeight());
-      nodes.forEach(node => { 
-        node.y += (node.y0 - node.y) * alpha * node.r/DimensionsStore.data.dorlingsMaxRadius;
-        node.x += (node.x0 - node.x) * alpha * node.r/DimensionsStore.data.dorlingsMaxRadius;
+      
+      nodes.forEach((node,i) => { 
+        q = (i % 100 == 0) ? d3.geom.quadtree(nodes) : q;
+        //q = d3.geom.quadtree(nodes);
+        node.y += (node.y0 - node.y) * alpha * 0.5;
+        node.x += (node.x0 - node.x) * alpha * 0.5;
 
         // collide 
         var k = 0.5;
@@ -56,12 +60,13 @@ export const calculateDorlingsPosition = function() {
           ny1 = node.y - nr,
           ny2 = node.y + nr;
         q.visit(function(quad, x1, y1, x2, y2) {
-          if (quad.point && (quad.point !== node)) {
-            var x = node.x - quad.point.x,
-              y = node.y - quad.point.y,
-              l = x * x + y * y,
-              r = nr + quad.point.r;
-            if (l < r * r) {
+          if (quad.point && !(quad.point.y == node.y && quad.point.x == node.x)) {
+            var x = node.x - quad.point.x, // x distance between points
+              y = node.y - quad.point.y, // y distance between points
+              l = x * x + y * y, // cartesian distance between points
+              r = nr + quad.point.r; // the two radii added together
+            // executed if they overlap
+            if (l < r * r) { 
               l = ((l = Math.sqrt(l)) - r) / l * k;
               node.x -= x *= l;
               node.y -= y *= l;
@@ -72,13 +77,14 @@ export const calculateDorlingsPosition = function() {
           return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
         });
 
-        node.cx = node.x;
-        node.cy = node.y;
-
-        node.dorlingLngLat = GeographyStore.albersUsaPr().invert([node.x, node.y]);
+        //node.dorlingLngLat = GeographyStore.albersUsaPr().invert([node.x, node.y]);
       });
     };    
-    positions.push({ year: year, cities: nodes.map(node => { return { city_id: node.city_id, dorlingLngLat: node.dorlingLngLat}; })});
+    positions.push({ year: year, cities: nodes.map(node => { return { 
+      city_id: node.city_id, 
+      x: node.x,
+      y: node.y
+    }; })});
   });
 
   return positions; 
@@ -88,9 +94,13 @@ export const calculateDorlingsPositionUnprojected = function() {
   let projection = GeographyStore.albersUsaPr().translate([0,0]).scale(1);
   let positions = [];
   DorlingLocations.forEach(dorlingsForYear => {
+    console.log(dorlingsForYear.cities);
     positions.push({ year: dorlingsForYear.year, cities: dorlingsForYear.cities.map(cityData => {
-      let x,y;
-      [x,y] = projection(cityData.dorlingLngLat);
+      console.log(cityData.dorlingLngLat);
+      let xy = projection(cityData.dorlingLngLat);
+      let x = 1,y = 1;
+      console.log(xy);
+
       return { 
         city_id: cityData.city_id, 
         x: Math.round(x * 10000) / 10000,

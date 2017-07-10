@@ -50,95 +50,9 @@ export default class USMap extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return true;
   }
 
   render () {
-
-    {/* JSX Comment 
-    console.log(CitiesStore.getDorlingXY(494));
-
-    var nodes = CitiesStore.getDorlingsForce().reverse();
-
-    for (var alpha = 1; alpha > 0; alpha = alpha - 0.001) {
-
-
-      var q = d3.geom.quadtree(nodes, DimensionsStore.getNationalMapWidth(), DimensionsStore.getNationalMapHeight());
-      nodes.forEach(node => { 
-        node.y += (node.y0 - node.y) * alpha * node.r/DimensionsStore.data.dorlingsMaxRadius;
-        node.x += (node.x0 - node.x) * alpha * node.r/DimensionsStore.data.dorlingsMaxRadius;
-
-        // collide 
-        var k = 0.5;
-        var nr = node.r,
-          nx1 = node.x - nr,
-          nx2 = node.x + nr,
-          ny1 = node.y - nr,
-          ny2 = node.y + nr;
-        q.visit(function(quad, x1, y1, x2, y2) {
-          if (quad.point && (quad.point !== node)) {
-            var x = node.x - quad.point.x,
-              y = node.y - quad.point.y,
-              l = x * x + y * y,
-              r = nr + quad.point.r;
-            if (l < r * r) {
-              l = ((l = Math.sqrt(l)) - r) / l * k;
-              node.x -= x *= l;
-              node.y -= y *= l;
-              quad.point.x += x;
-              quad.point.y += y;
-            }
-          }
-          return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
-        });
-
-        //collide(.5);
-        node.cx = node.x;
-        node.cy = node.y;
-      });
-    };
-
-    var gravity = function(k) {
-      return function(d) {
-        d.x += (d.x0 - d.x) * k;
-        d.y += (d.y0 - d.y) * k;
-      };
-    };
-
-    var collide = function(k) {
-      var q = d3.geom.quadtree(nodes);
-      return function(node) {
-        var nr = node.r,
-          nx1 = node.x - nr,
-          nx2 = node.x + nr,
-          ny1 = node.y - nr,
-          ny2 = node.y + nr;
-        q.visit(function(quad, x1, y1, x2, y2) {
-          if (quad.point && (quad.point !== node)) {
-            var x = node.x - quad.point.x,
-              y = node.y - quad.point.y,
-              l = x * x + y * y,
-              r = nr + quad.point.r;
-            if (l < r * r) {
-              l = ((l = Math.sqrt(l)) - r) / l * k;
-              node.x -= x *= l;
-              node.y -= y *= l;
-              quad.point.x += x;
-              quad.point.y += y;
-            }
-          }
-          return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
-        });
-      };
-    };
-
-    // var force = d3.layout.force()
-    //   .charge(0)
-    //   .gravity(0)
-    //   .size([DimensionsStore.getNationalMapWidth(), DimensionsStore.getNationalMapHeight()])
-    //   .nodes(nodes)
-    //   .on("tick", tick)
-    //   .start(); */}
 
     return (
       <g 
