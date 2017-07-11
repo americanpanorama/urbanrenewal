@@ -70,7 +70,7 @@ export default class Dorlings extends React.Component {
             color: nextProps.color
           });
         });
-      d3.select(ReactDOM.findDOMNode(this)).select('text')
+      d3.select(ReactDOM.findDOMNode(this)).selectAll('text')
         .transition()
         .delay((CitiesStore.getSelectedView() == 'scatterplot') ? Math.min((DimensionsStore.getNationalMapHeight() * 0.9 - nextProps.cy) * 10, 5000) : 0)
         .duration(750)
@@ -80,7 +80,7 @@ export default class Dorlings extends React.Component {
   }
 
   render () {
-    const labelSize = (8 * this.state.r  / 15 < 12) ? 12 : (8 * this.state.r  / 15 > 18) ? 18 : 8 * this.state.r  / 15;
+    const labelSize = (8 * this.state.r  / 15 < 14) ? 14 : (8 * this.state.r  / 15 > 18) ? 18 : 8 * this.state.r  / 15;
     return (
       <g>
         <circle
@@ -90,8 +90,9 @@ export default class Dorlings extends React.Component {
           //r={ this.state.r }
           style={ {
             fill: this.state.color,
-            fillOpacity: 1,
-            strokeWidth: this.props.strokeWidth
+            fillOpacity: (!CitiesStore.getHighlightedCity() || CitiesStore.getHighlightedCity() == this.props.city_id) ? 1 : 0.5,
+            strokeWidth: this.props.strokeWidth,
+            strokeOpacity: (!CitiesStore.getHighlightedCity() || CitiesStore.getHighlightedCity() == this.props.city_id) ? 1 : 0.1,
           } }
           onClick={ this.props.onCityClicked }
           onMouseEnter={ this.props.onCityHover }
@@ -100,16 +101,31 @@ export default class Dorlings extends React.Component {
           key={ 'city' + this.props.city_id }
           className={ 'dorling ' + this.props.className }
         />
-        { (this.state.r > 15) ?
-          <text
-            x={ this.state.cx }
-            y={ this.state.cy }
-            textAnchor='middle'
-            alignmentBaseline='middle'
-            fontSize={ labelSize }
-          >
-            {this.props.name.replace(/\w\S*/g, txt =>  txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())}
-          </text> : ''
+        { (this.state.r > 15 || CitiesStore.getHighlightedCity() == this.props.city_id) ?
+          <g>
+            <text
+              x={ this.state.cx }
+              y={ this.state.cy }
+              textAnchor='middle'
+              alignmentBaseline='middle'
+              fontSize={ labelSize }
+              key={'cityLabelhalo' + this.props.city_id}
+              className='multistroke'
+              stroke={this.state.color}
+            >
+              {this.props.name.replace(/\w\S*/g, txt =>  txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())}
+            </text> 
+            <text
+              x={ this.state.cx }
+              y={ this.state.cy }
+              textAnchor='middle'
+              alignmentBaseline='middle'
+              fontSize={ labelSize }
+              key={'cityLabel' + this.props.city_id}
+            >
+              {this.props.name.replace(/\w\S*/g, txt =>  txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())}
+            </text> 
+          </g>: ''
         }
       </g>
     );

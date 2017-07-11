@@ -32,6 +32,13 @@ export const getColorForRace =  function(weight) {
   return 'rgb(' + rgb + ')';
 };
 
+export const formatNumber = function(num) {
+  if (num < 1000000 && num >= 1000) {
+    return (num/1000) + 'K';
+  }
+  return num;
+};
+
 export const calculateDorlingsPosition = function() {
   let years = [null, 1955, 1956, 1957, 1958, 1959, 1960, 1961, 1962, 1963, 1964, 1965, 1966],
     positions = [];

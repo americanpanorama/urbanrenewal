@@ -2,3 +2,15 @@
   fill: $text-color;
   text-anchor: middle;
 }
+
+.dorlings {
+	text {
+		pointer-events: none;
+
+		&.multistroke {
+			fill: transparent;
+			stroke-width: 3.5;
+			stroke-opacity: 0.7;
+		}
+	}
+}

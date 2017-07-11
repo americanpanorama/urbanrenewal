@@ -233,6 +233,7 @@ const CitiesStore = {
   },
 
   loadYearData: function(year) {
+    return;
     this.dataLoader.query([
       {
         query: "select sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, city, state, year, v2.category_id from (select value, fy.year, v.category_id, v.project_id, v.city_id from (SELECT max(year), value, city_id, project_id, category_id FROM digitalscholarshiplab.combined_dire_char_raw where value is not null group by value, city_id, project_id, category_id) v join (SELECT min(year) as year, city_id, project_id, category_id FROM digitalscholarshiplab.combined_dire_char_raw where value is not null group by city_id, project_id, category_id) fy on v.project_id = fy.project_id and v.category_id = fy.category_id) v2 join urdr_city_id_key cities on v2.city_id = cities.city_id and year = " + year + " group by cities.the_geom, city, state, cities.city_id, year, category_id", //"select * from (SELECT sum(value) as total, cities.city_id, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, city, state, year, md.category_id from urdr_category_id_key c join combined_dire_char_raw md on c.category_id = md.category_id and year = " + year + " join urdr_city_id_key cities on md.city_id = cities.city_id group by cities.the_geom, city, state, cities.city_id, year, md.category_id) year_vals where total is not null",
@@ -716,6 +717,8 @@ const CitiesStore = {
   getInspectedCity: function() { return this.data.inspectedCity; },
 
   getSelectedCity: function() { return this.data.selectedCity; },
+
+  getHighlightedCity: function() { return this.getInspectedCity() || this.getSelectedCity(); },
 
   getSlug: function() { 
     return (this.data.cities[this.getSelectedCity()] && this.data.cities[this.getSelectedCity()].slug) ? this.data.cities[this.getSelectedCity()].slug : null; 

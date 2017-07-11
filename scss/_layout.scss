@@ -46,10 +46,6 @@ header {
 
 }
 
-text {
-  fill: $text-color;
-}
-
 .funding {
   fill: $funding-color;
 }
@@ -98,7 +94,7 @@ text {
   position: absolute;
   bottom: 20px;
   right: 20px;
-  background-color: white;
+  background-color: transparent;
   padding: 10px;
 }
 

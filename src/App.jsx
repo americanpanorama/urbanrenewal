@@ -101,7 +101,7 @@ class App extends React.Component {
   }
 
   onYearClicked(event) {
-    let year = parseInt(event.target.id);
+    let year = (event.target.id && parseInt(event.target.id) !== CitiesStore.getSelectedYear()) ? parseInt(event.target.id) : null;
 
     let cat = (event.target.id.indexOf('families') !== -1) ? 'families' : (event.target.id.indexOf('funding') !== -1) ? 'funding' : this.state.cat;
 

@@ -4,49 +4,27 @@
 
 #timeline {
 
-  text {
-    fill: $text-color;
-
-    &.yearLabel {
+  .xAxis {
+    text {
+      alignment-baseline: baseline;
       text-anchor: middle;
-      alignment-baseline: middle;
+
+      &.all {
+        text-anchor: end;
+      }
     }
   }
 
-  .bars {
-    .bar {
-      stroke-width: 2;
-      stroke: transparent;
-
-      &.selected {
-        stroke: $selected-color;
-      }
+  .yAxis {
+    text {
+      alignment-baseline: middle;
+      text-anchor: start;
     }
-
-    .grid {
-      height: 0.5px;
-      fill: $background-color;
-    }
-
-    .clickableBar {
-      fill: transparent;
-    }
-
   }
 
   .baseline {
     height: 1px;
   }
-
-  .axisLabel {
-    font-size: 11px;
-    text-anchor: end;
-    alignment-baseline: middle;
-  }
-
-  
-
-
 
 
   text {
@@ -54,6 +32,10 @@
        -moz-user-select: none;
         -ms-user-select: none;
     user-select: none;
+  }
+
+  .grid {
+    fill: $background-color;
   }
 
 }

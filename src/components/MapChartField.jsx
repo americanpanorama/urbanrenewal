@@ -318,6 +318,9 @@ export default class MapChartField extends React.Component {
               <stop offset="75%" style={{stopColor:'rgb(128,128,128)', stopOpacity:1}} />
               <stop offset="100%" style={{stopColor:'rgb(128,128,128)', stopOpacity:0}} />
             </linearGradient>
+            <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="6 6" result="glow"/>
+            </filter>
             <marker id="arrow" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto" markerUnits="strokeWidth">
               <path d="M0,0 L0,6 L9,3 z" fill="#fff" />
             </marker>
@@ -334,9 +337,13 @@ export default class MapChartField extends React.Component {
                 <path
                   key={ 'statepolygon' + polygon.id }
                   d={ GeographyStore.getPath(polygon.geometry) }
-                  strokeWidth={ 1 / this.state.z }
-                  stroke={ 'silver' }
+                  strokeWidth={ (CitiesStore.getSelectedView() == 'cartogram') ? 0.1 / this.state.z : 1 / this.state.z }
+                  stroke={ (CitiesStore.getSelectedView() == 'cartogram') ? 'white' : 'silver' }
+                  fillOpacity={(CitiesStore.getSelectedView() == 'cartogram') ? 0.75 : 1}
                   className='stateMap'
+                  style={{
+                    filter: (CitiesStore.getSelectedView() == 'map') ? '' : 'url(#glow)'
+                  }}
                 />
               );
             }) }

@@ -141,7 +141,7 @@ export default class USMap extends React.Component {
 
 
         {/* dorlings */}
-        <ReactTransitionGroup component='g' className='transitionGroup'>
+        <ReactTransitionGroup component='g' className='transitionGroup dorlings'>
           { CitiesStore.getDorlingsForce().map((cityData, i) => {
             return (
               <Dorlings
