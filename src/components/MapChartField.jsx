@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { PropTypes } from 'react';
 import * as d3 from 'd3';
-import ReactTransitionGroup from 'react-addons-transition-group';
 
 import PolygonD3 from './PolygonD3.jsx';
 import GeoState from './GeoState.jsx';
@@ -18,7 +17,6 @@ export default class MapChartField extends React.Component {
       x: this.props.x,
       y: this.props.y,
       z: this.props.z,
-      dorlingZoom: this.props.z,
       scatterplotOpacity: (this.props.selectedView == 'scatterplot') ? 1 : 0,
       USMapOpacity: (this.props.selectedView == 'scatterplot') ? 0 : 1,
       maskHeight: (this.props.selectedView == 'scatterplot') ? 0 : 2*  Math.sqrt(DimensionsStore.getScatterplotLength()*DimensionsStore.getScatterplotLength()/2)
@@ -30,22 +28,19 @@ export default class MapChartField extends React.Component {
   componentWillLeave(callback) { callback(); }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.z !== nextProps.z || this.props.x !== nextProps.x || this.props.y !== nextProps.y) {
-      this.setState({
-        dorlingZoom: nextProps.z
-      });
-      d3.select(this.refs['nationalMap'])
-        .transition()
-        .duration(5000)
-        .attr("transform", "translate("+nextProps.x+","+nextProps.y+")scale(" + nextProps.z +")")
-        .each('end', () => {
-          this.setState({
-            x: nextProps.x,
-            y: nextProps.y,
-            z: nextProps.z
-          });
-        });
-    }
+    // if (this.props.z !== nextProps.z || this.props.x !== nextProps.x || this.props.y !== nextProps.y) {
+    //   d3.select(this.refs['nationalMap'])
+    //     .transition()
+    //     .duration(750)
+    //     .attr("transform", "translate("+nextProps.x+","+nextProps.y+")scale(" + nextProps.z +")")
+    //     .each('end', () => {
+    //       this.setState({
+    //         x: nextProps.x,
+    //         y: nextProps.y,
+    //         z: nextProps.z
+    //       });
+    //     });
+    // }
     if (nextProps.selectedView == 'scatterplot') {
       // d3.select(this.refs['scatterplotField'])
       //   .transition()
@@ -301,7 +296,6 @@ export default class MapChartField extends React.Component {
 
         <g 
           ref='nationalMap'
-          transform={ 'translate('+this.state.x+','+this.state.y+') scale(' + this.state.z + ')' }
         >
           <defs>
             <linearGradient id="graphgradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -348,7 +342,7 @@ export default class MapChartField extends React.Component {
               );
             }) }
 
-            {/* for outline hovers */}
+            {/* for outline hovers 
             { GeographyStore.getStatesGeojson().map(polygon => {
               return (
                 <GeoState
@@ -359,7 +353,7 @@ export default class MapChartField extends React.Component {
                   id={ polygon.id }
                 />
               );
-            })}
+            })} */}
           </g>
         </g>
       </g>

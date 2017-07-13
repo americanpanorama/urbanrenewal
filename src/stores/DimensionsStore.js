@@ -61,7 +61,7 @@ const DimensionsStore = {
 
     this.data.timelineHeight = (this.data.windowHeight - this.data.headerHeight - 2 * this.data.containerPadding) * 1/3 - this.data.containerPadding;
 
-    this.data.timelineProjectHeight = 18;
+    this.data.timelineProjectHeight = 20;
 
     this.emit(AppActionTypes.storeChanged);
   },
@@ -276,6 +276,8 @@ const DimensionsStore = {
 
   getDorlingsMaxRadius: function() { return this.data.dorlingsMaxRadius; },
 
+  dorlingHasLabel: function(city_id, visibleRadius) { return (city_id == CitiesStore.getHighlightedCity() || visibleRadius >= 20); },
+
   getCitySnippetWidth: function() { return this.getSidebarStyle().width - 10; },
 
 
@@ -339,6 +341,8 @@ const DimensionsStore = {
 
   
   getMainTimlineXOffset: function(year) {
+    return (year - 1955) * this.getMainTimelineBarFieldWidth() / (1966-1954);
+
     // years run from 1949-55 through individual years until 66
     const w49_55 = this.getMainTimelineBarWidth() * (1955-1948),
       wOtherYear = (this.getMainTimelineBarFieldWidth() - w49_55) / (1966-1955);
@@ -347,6 +351,7 @@ const DimensionsStore = {
 
 
   getMainTimelineLabelXOffset: function(year) { 
+    return (year - 1955) * this.getMainTimelineBarFieldWidth() / (1966-1954) + this.getMainTimelineBarFieldWidth() / (1966-1954) / 2;
     // years run from 1949-55 through individual years until 66
     const w49_55 = this.getMainTimelineBarWidth() * (1955-1948),
       wOtherYear = (this.getMainTimelineBarFieldWidth() - w49_55) / (1966-1955);
@@ -427,7 +432,7 @@ const DimensionsStore = {
     };
   },
 
-  getTimelineYearWidth: function() { return this.getCityTimelineStyle().width / 12; },
+  getTimelineYearWidth: function() { return this.getMainTimelineBarFieldWidth() / 12; },
 
   getTimelineYearsSpanWidth: function(year1, year2) { return this.getTimelineYearWidth() * (year2-year1); },
 

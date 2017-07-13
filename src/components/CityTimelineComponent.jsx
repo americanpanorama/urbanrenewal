@@ -14,6 +14,7 @@ export default class Timeline extends React.Component {
 
   render() {
     const projects = CitiesStore.getProjectTimelineBars(this.props.city_id),
+      maxForYear = Math.max(...projects.map(p => p.totalFamilies/(Math.min(p.endYear, 1966) - Math.max(p.startYear,1955) + 1))),
       years = [1955,1956,1957,1958,1959,1960,1961,1962,1963,1964,1965,1966];
 
     return (
@@ -33,12 +34,13 @@ export default class Timeline extends React.Component {
                     inSelectedYear={ (this.props.year >= project.startYear && this.props.year <= project.endYear) }
                     width={ DimensionsStore.getTimelineYearsSpanWidth(project.startYear, project.endYear + 1)  }
                     height={ DimensionsStore.getTimelineProjectHeight() }
-                    x={ DimensionsStore.getTimelineXOffsetForYear(project.startYear) }
-                    y={ ((project.row + 1) * DimensionsStore.getTimelineProjectHeight() + 3 )  }
+                    x={ DimensionsStore.getMainTimlineXOffset(project.startYear) }
+                    y={ ((project.row + 1) * DimensionsStore.getTimelineProjectHeight() * 1.2 )  }
                     text={ project.project.replace(/\b\w/g, l => l.toUpperCase()) }
                     key={ 'projectSpan' + i }
-                    maxForYear={ this.props.maxForYear }
+                    maxForYear={ maxForYear }
                     projectData={ project }
+                    maxForYear={ projects[0].totalFamilies/ (projects[0].endYear-projects[0].startYear+1)}
                   />
                 );
               }
@@ -50,7 +52,7 @@ export default class Timeline extends React.Component {
         { years.map(year => {
           return (
             <text
-              x={ DimensionsStore.getTimelineXOffsetForYear(year) }
+              x={ DimensionsStore.getMainTimlineXOffset(year) }
               y={ 12 }
             >
               { year }

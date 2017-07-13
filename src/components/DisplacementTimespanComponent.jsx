@@ -2,7 +2,7 @@ import * as React from 'react';
 import { PropTypes } from 'react';
 import * as d3 from 'd3';
 import ReactTransitionGroup from 'react-addons-transition-group';
-import { getColorForRace } from '../utils/HelperFunctions';
+import { getColorForRace, formatNumber } from '../utils/HelperFunctions';
 
 export default class Timespan extends React.Component {
 
@@ -41,18 +41,18 @@ export default class Timespan extends React.Component {
           fill={ getColorForRace(this.props.projectData.percentFamiliesOfColor) }
           fillOpacity={ this.props.projectData.totalFamilies / (1 + this.props.projectData.endYear - this.props.projectData.startYear) / this.props.maxForYear }
           stroke={ getColorForRace(this.props.projectData.percentFamiliesOfColor) }
-          strokeWidth='0.25'
+          strokeWidth='1'
         />
         <text
           dx={ this.props.width / 2 }
           dy={ this.props.height / 2 + 1 }
           fill={ (this.props.inSelectedYear) ? 'silver' : '#445'}
-          fontSize={ 10 }
+          fontSize={ 13 }
           textAnchor='middle'
           alignmentBaseline='middle'
           //filter="url(#textBackground)"
         >
-          { this.props.text }
+          { this.props.text + ' - ' + formatNumber(this.props.projectData.totalFamilies)  }
         </text>
       </g>
     );

@@ -29,9 +29,44 @@ export default class CityStats extends React.Component {
           id={ null }
         >close</div>
 
-        <div>
-          { Math.round(this.props.totalFamilies).toLocaleString() + ' families displaced, ' + Math.round(this.props.percentFamiliesOfColor * 100) + '% of which were families of color.'}
+        <div className='summary'>
+          <strong>{ Math.round(this.props.totalFamilies).toLocaleString() + ' '}</strong> 
+          families displaced, 
+          <strong>{' ' + Math.round(this.props.percentFamiliesOfColor * 100) + '% '}</strong>
+          of which were families of color.
         </div>
+
+        { (true) ? 
+          <table className='population-stats'>
+            <tbody>
+              <tr>
+                <th></th>
+                <th>1950</th>
+                <th>1960</th>
+              </tr>
+              <tr>
+                <td>Population</td>
+                <td className='total' key='total1950'>{ this.props.pop_1950.toLocaleString() }</td>
+                <td className='total' key='total1960'>{ this.props.pop_1960.toLocaleString()}</td>
+              </tr>
+
+              <tr>
+                <td>white</td>
+                <td>not available</td>
+                <td>{ this.props.white_1960.toLocaleString() + ' (' + Math.round(1000 * this.props.white_1960 / this.props.pop_1960) / 10  + '%)'}</td>
+              </tr>
+
+              <tr>
+                <td>of color</td>
+                <td>not available</td>
+                <td>{ this.props.nonwhite_1960.toLocaleString() + ' (' + Math.round(1000 * this.props.nonwhite_1960 / this.props.pop_1960) / 10  + '%)'}</td>
+              </tr>
+
+              
+            </tbody>
+          </table> :
+          ''
+        }
 
 
 

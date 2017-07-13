@@ -17,12 +17,13 @@ import LegendGradient from './components/LegendGradientComponent.jsx';
 import LegendDorlings from './components/LegendDorlingsComponent.jsx';
 import CityTimelineComponent from './components/CityTimelineComponent.jsx';
 import TimelineYearComponent from './components/TimelineYearComponent.jsx';
-import USMap from './components/USMapComponent.jsx';
+import MapChart from './components/MapChartComponent.jsx';
 import CityStats from './components/CityStats.jsx';
 import YearStats from './components/YearStats.jsx';
 import CitySnippet from './components/CitySnippetComponent.jsx';
 import DorlingCartogram from './components/DorlingCartogramComponent.jsx';
 import Scatterplot from './components/ScatterplotComponent.jsx';
+import {ReactSVGPanZoom} from 'react-svg-pan-zoom';
 
 
 // utils
@@ -31,15 +32,6 @@ import Scatterplot from './components/ScatterplotComponent.jsx';
 import { AppActions, AppActionTypes } from './utils/AppActionCreator';
 import AppDispatcher from './utils/AppDispatcher';
 import { calculateDorlingsPosition } from './utils/HelperFunctions';
-
-// config
-
-let cases = {
-  '1956': [994], // Cincinnati
-  '1958': [590], // Atlanta
-  '1959': [65], // Cambridge,
-  '1960': [168] // New York
-};
 
 // main app container
 class App extends React.Component {
@@ -50,6 +42,8 @@ class App extends React.Component {
     this.state = {
       legendVisible: true
     };
+
+    this.coords = {};
 
     // bind handlers
     const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut'];
@@ -70,7 +64,7 @@ class App extends React.Component {
     HighwaysStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
   }
 
-  componentDidUpdate () { this.changeHash();     console.timeEnd('update'); console.timeEnd('render'); }
+  componentDidUpdate () { this.changeHash(); }
 
   // ============================================================ //
   // Handlers
@@ -115,22 +109,20 @@ class App extends React.Component {
   toggleLegendVisibility() { this.setState({ legendVisible: !this.state.legendVisible }); }
 
   onZoomIn(event) {
-    let nextZoom = this.state.zoom*2;
-    
-    this.setState({ 
-      zoom: nextZoom,
-      x: DimensionsStore.getMainPaneWidth()  / 2 - (event.nativeEvent.offsetX - this.state.x) / this.state.zoom * (nextZoom),
-      y: DimensionsStore.getNationalMapHeight()  / 2 - (event.nativeEvent.offsetY - this.state.y) / this.state.zoom * (nextZoom)
-    });
+    console.log(event.target.id);
+    const z = GeographyStore.getZ() * 1.6,
+      centerX = (event.target.id == 'zoomInButton') ? DimensionsStore.getMainPaneWidth()  / 2 - GeographyStore.getX() : event.nativeEvent.offsetX - GeographyStore.getX(),
+      centerY = (event.target.id == 'zoomInButton') ? DimensionsStore.getNationalMapHeight()  / 2 - GeographyStore.getY() : event.nativeEvent.offsetY - GeographyStore.getY(),
+      x = DimensionsStore.getMainPaneWidth()  / 2 - centerX / GeographyStore.getZ() * z,
+      y = DimensionsStore.getNationalMapHeight()  / 2 - centerY / GeographyStore.getZ() * z;
+    AppActions.mapMoved(x,y,z);
   }
 
   zoomOut() {
-    let nextZoom = this.state.zoom / 2;
-    this.setState({
-      zoom: (this.state.zoom >= 2) ? nextZoom : 1,
-      x: DimensionsStore.getMainPaneWidth()  / 2 - (DimensionsStore.getMainPaneWidth()  / 2 - this.state.x) / this.state.zoom * (nextZoom),
-      y: DimensionsStore.getNationalMapHeight()  / 2 - (DimensionsStore.getNationalMapHeight()  / 2 - this.state.y) / this.state.zoom * (nextZoom)
-    });
+    const z = GeographyStore.getZ() / 1.6,
+      x = DimensionsStore.getMainPaneWidth()  / 2 - (DimensionsStore.getMainPaneWidth()  / 2 - GeographyStore.getX()) / GeographyStore.getZ() * z,
+      y = DimensionsStore.getNationalMapHeight()  / 2 - (DimensionsStore.getNationalMapHeight()  / 2 - GeographyStore.getY()) / GeographyStore.getZ() * z;
+    AppActions.mapMoved(x,y,z);
   }
 
   zoomToState(e) {
@@ -150,8 +142,10 @@ class App extends React.Component {
   }
 
   handleMouseDown(e) {
+
     this.dragging = true;
     //Set coords
+    this.coords = {x: e.pageX, y:e.pageY};
     //AppActions.mapMoved(e.pageX,e.pageY,GeographyStore.getZ());
   }
 
@@ -166,13 +160,11 @@ class App extends React.Component {
       this.coords.x = e.pageX;
       this.coords.y = e.pageY;
       //Adjust our x,y based upon the x/y diff from before
-      var x = this.state.x - xDiff,       
-        y = this.state.y - yDiff;
+      var x = GeographyStore.getX() - xDiff,       
+        y = GeographyStore.getY() - yDiff,
+        z = GeographyStore.getZ();
       //Re-render
-      this.setState({
-        x: x,
-        y: y
-      });  
+      AppActions.mapMoved(x,y,z); 
     }
   }
 
@@ -189,14 +181,14 @@ class App extends React.Component {
   }
 
   render () {
-    console.time('render');
+    //console.time('render');
     return (
         <div className='container full-height'>
           <div className='row full-height'>
             <div className='columns eight full-height'>
               <header style={ DimensionsStore.getHeaderStyle() }>
                 <h1>Renewing Inequality</h1>
-                <h2>1954-1972</h2>
+                <h2> Urban Renewal, Family Displacements, and Race 1955-1966</h2>
               </header>
 
               <div 
@@ -214,10 +206,8 @@ class App extends React.Component {
                     className='theMap'
                   >
                     <ReactTransitionGroup component='g'>
-                      <USMap
-                        x={ GeographyStore.getX() }
-                        y={ GeographyStore.getY() }
-                        z={ GeographyStore.getZ() }
+                      <MapChart
+                        { ...GeographyStore.getXYZ() }
                         selectedView= { CitiesStore.getSelectedView() }
                         onCityClicked={ this.onCityClicked }
                         onStateClicked={ this.zoomToState }
@@ -225,36 +215,39 @@ class App extends React.Component {
                         onCityHover={ this.onCityInspected }
                         onCityOut={ this.onCityOut }
                         resetView={ this.resetView }
-                        //onMapClicked={ this.onZoomIn }
+                        onMapClicked={ this.onZoomIn }
                         handleMouseUp={ this.handleMouseUp }
                         handleMouseDown={ this.handleMouseDown }
                         handleMouseMove={ this.handleMouseMove }
-                        //zoomOut={ this.zoomOut }
                       />
                     </ReactTransitionGroup>
-
-
-                    
-
-                  {/* JSX Comment 
-                    <g
-                      transform={ 'translate(0 ' + DimensionsStore.getNationalMapHeight() + ')' }
-                    >
-
-                      <TimelineComponent 
-                        onClick={ this.onYearClicked }
-                        state={ this.state }
-                        year={ this.state.year }
-                        yearSpan={ (CitiesStore.getSelectedCity()) ? [CitiesStore.getCityData(CitiesStore.getSelectedCity()).startYear, CitiesStore.getCityData(CitiesStore.getSelectedCity()).endYear] : [1954, 1972] }
-                        yearsData={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData : CitiesStore.getYearsTotals() }
-                        projects={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).projects : false }
-                        name={ (CitiesStore.getSelectedCity()) ? (CitiesStore.getCityData(CitiesStore.getSelectedCity()).city + ', ' + CitiesStore.getCityData(CitiesStore.getSelectedCity()).state).toUpperCase() : 'United States' }
-                        style={ DimensionsStore.getTimelineStyle() }
-                      />
-
-                    </g>*/}
                   </svg>
                 }
+
+                <div id='mapChartControls'>
+                  <img 
+                    src='static/map.png' 
+                    onClick={ this.onViewSelected }
+                    id='map'
+                  />
+
+                  <img 
+                    src='static/cartogram.png' 
+                    onClick={ this.onViewSelected }
+                    id='cartogram'
+                  />
+
+                  <img 
+                    src='static/scatterplot.png' 
+                    onClick={ this.onViewSelected }
+                    id='scatterplot'
+                  />
+
+                  <div onClick={this.resetView}>reset</div>
+                  <div onClick={this.onZoomIn} id='zoomInButton'>zoom in</div>
+                  <div onClick={this.zoomOut}>zoom out</div>
+                
+                </div>
 
                 { (this.state.legendVisible) ?
                   <div 
@@ -287,9 +280,9 @@ class App extends React.Component {
         <aside
           style={ DimensionsStore.getSidebarStyle() }
         >
-          { CitiesStore.getInspectedCity() ? 
+          { CitiesStore.getHighlightedCity() ? 
             <CityStats 
-              { ...CitiesStore.getCityData(CitiesStore.getInspectedCity()) }
+              { ...CitiesStore.getCityData(CitiesStore.getHighlightedCity()) }
               categories={ CitiesStore.getCategories() }
               year={ this.state.year }
               onCityClicked={ this.onCityClicked }
@@ -348,7 +341,7 @@ class App extends React.Component {
             style = { DimensionsStore.getTimelineAttrs() }
             className='timelineControls'
           >
-            { (CitiesStore.getSelectedCity()) ?
+            { (false && CitiesStore.getSelectedCity()) ?
               <CityTimelineComponent 
                 onClick={ this.onYearClicked }
                 state={ this.state }
@@ -364,10 +357,10 @@ class App extends React.Component {
                 onClick={ this.onYearClicked }
                 state={ this.state }
                 year={ this.state.year }
-                yearSpan={ (CitiesStore.getSelectedCity()) ? [CitiesStore.getCityData(CitiesStore.getSelectedCity()).startYear, CitiesStore.getCityData(CitiesStore.getSelectedCity()).endYear] : [1954, 1972] }
-                yearsData={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData : CitiesStore.getYearsTotals() }
-                projects={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).projects : false }
-                name={ (CitiesStore.getSelectedCity()) ? (CitiesStore.getCityData(CitiesStore.getSelectedCity()).city + ', ' + CitiesStore.getCityData(CitiesStore.getSelectedCity()).state).toUpperCase() : 'United States' }
+                yearSpan={ (false && CitiesStore.getSelectedCity()) ? [CitiesStore.getCityData(CitiesStore.getSelectedCity()).startYear, CitiesStore.getCityData(CitiesStore.getSelectedCity()).endYear] : [1954, 1972] }
+                yearsData={ (false && CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData : CitiesStore.getYearsTotals() }
+                projects={ (false && CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).projects : false }
+                name={ (false && CitiesStore.getSelectedCity()) ? (CitiesStore.getCityData(CitiesStore.getSelectedCity()).city + ', ' + CitiesStore.getCityData(CitiesStore.getSelectedCity()).state).toUpperCase() : 'United States' }
                 style={ DimensionsStore.getTimelineStyle() }
               />
             }

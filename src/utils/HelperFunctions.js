@@ -32,11 +32,12 @@ export const getColorForRace =  function(weight) {
   return 'rgb(' + rgb + ')';
 };
 
-export const formatNumber = function(num) {
+export const formatNumber = function(num, decimal) {
+  decimal = (decimal) ? decimal : 0;
   if (num < 1000000 && num >= 1000) {
-    return (num/1000) + 'K';
+    return Math.round(num /100) / 10  + 'K';
   }
-  return num;
+  return Math.round(num);
 };
 
 export const calculateDorlingsPosition = function() {

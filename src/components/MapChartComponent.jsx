@@ -1,4 +1,5 @@
 import * as React from 'react';
+import ReactDOM from 'react-dom';
 import { PropTypes } from 'react';
 import * as d3 from 'd3';
 import ReactTransitionGroup from 'react-addons-transition-group';
@@ -7,6 +8,7 @@ import PolygonD3 from './PolygonD3.jsx';
 import GeoState from './GeoState.jsx';
 import Highways from './HighwaysComponent.jsx';
 import Dorlings from './DorlingsComponent.jsx';
+import DorlingLabel from './DorlingLabelComponent.jsx';
 import MapChartField from './MapChartField.jsx';
 
 import CitiesStore from '../stores/CitiesStore.js';
@@ -34,13 +36,26 @@ export default class USMap extends React.Component {
   componentWillLeave(callback) { callback(); }
 
   componentWillReceiveProps(nextProps) {
+    if (this.props.z !== nextProps.z || this.props.x !== nextProps.x || this.props.y !== nextProps.y) {
+      d3.select(ReactDOM.findDOMNode(this))
+        .transition()
+        .duration(750)
+        .attr("transform", "translate("+nextProps.x+","+nextProps.y+")scale(" + nextProps.z +")")
+        .each('end', () => {
+          this.setState({
+            x: nextProps.x,
+            y: nextProps.y,
+            z: nextProps.z
+          });
+        });
+    }
     // if (this.props.z !== nextProps.z || this.props.x !== nextProps.x || this.props.y !== nextProps.y) {
     //   this.setState({
     //     dorlingZoom: nextProps.z
     //   });
-    //   d3.select(this.refs['nationalMap'])
+    //   d3.select(this.refs['mapChart'])
     //     .transition()
-    //     .duration(750)
+    //     .duration(5000)
     //     .attr("transform", "translate("+nextProps.x+","+nextProps.y+")scale(" + nextProps.z +")")
     //     .each('end', () => {
     //       this.setState({
@@ -50,6 +65,7 @@ export default class USMap extends React.Component {
     //       });
     //     });
     // }
+
     if (this.props.selectedView !== 'scatterplot' && nextProps.selectedView == 'scatterplot') {
       d3.select(this.refs['scatterplotField'])
         .transition()
@@ -94,15 +110,6 @@ export default class USMap extends React.Component {
   }
 
   render () {
-
-    //console.log(CitiesStore.getDorlingsForce());
-
-    const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4);
-
-    let l = Math.sqrt(2*shortside*shortside);
-
-    const transform = (false && CitiesStore.getSelectedView() == 'scatterplot') ? 'translate('+DimensionsStore.getNationalMapWidth()/2+','+DimensionsStore.getNationalMapHeight()*0.9 + ') scale(' + this.state.z + ') rotate(225)' : 'translate('+this.state.x+','+this.state.y+') scale(' + this.state.z + ')';
-
     return (
       <g 
         width={ DimensionsStore.getNationalMapWidth() }  
@@ -112,14 +119,55 @@ export default class USMap extends React.Component {
         onMouseUp={this.props.handleMouseUp }
         onMouseDown={this.props.handleMouseDown }
         onMouseMove={this.props.handleMouseMove }
+        ref='mapChart'
+        transform={"translate("+this.state.x+","+this.state.y+")scale(" + this.state.z +")"}
       >
 
-        <MapChartField 
-          selectedView={ this.props.selectedView } 
-          x={ this.props.x }
-          y={ this.props.y }
-          z={ this.props.z }
-        />
+        <ReactTransitionGroup 
+          component='g' 
+          className=''
+          
+        >
+          <MapChartField 
+            { ...GeographyStore.getXYZ() }
+            selectedView={ this.props.selectedView } 
+          />
+
+          { CitiesStore.getDorlingsForce().map((cityData, i) => {
+            return (
+              <Dorlings
+                { ...cityData }
+                { ...GeographyStore.getXYZ() }
+                r={ DimensionsStore.getDorlingRadius(cityData.value) }
+                key={'cityCircle' + cityData.city_id }
+                strokeWidth={ 0.5/GeographyStore.getZ()}
+                onCityClicked={ this.props.onCityClicked }
+                onCityHover={ this.props.onCityHover }
+                onCityOut={ this.props.onCityOut }
+              />
+            );  
+          })}
+
+          { CitiesStore.getDorlingsForce().map((cityData, i) => {
+            const visibleRadius = (CitiesStore.getSelectedView() == 'cartogram') ? DimensionsStore.getDorlingRadius(cityData.value) * GeographyStore.getZ() : DimensionsStore.getDorlingRadius(cityData.value) ;
+            if (DimensionsStore.dorlingHasLabel(cityData.city_id, visibleRadius)) {
+              return (
+                <DorlingLabel
+                  { ...cityData }
+                  { ...GeographyStore.getXYZ() }
+                  r={ DimensionsStore.getDorlingRadius(cityData.value) }
+                  key={'cityCircle' + cityData.city_id }
+                  strokeWidth={ 0.5/GeographyStore.getZ()}
+                  onCityClicked={ this.props.onCityClicked }
+                  onCityHover={ this.props.onCityHover }
+                  onCityOut={ this.props.onCityOut }
+                />
+              );
+            }  
+          })}
+        </ReactTransitionGroup>
+
+        (CitiesStore.getSelectedView() == 'cartogram') ? this.props.r : this.props.r / this.props.z
 
 
 
@@ -141,23 +189,7 @@ export default class USMap extends React.Component {
 
 
         {/* dorlings */}
-        <ReactTransitionGroup component='g' className='transitionGroup dorlings'>
-          { CitiesStore.getDorlingsForce().map((cityData, i) => {
-            return (
-              <Dorlings
-                { ...cityData }
-                r={ DimensionsStore.getDorlingRadius(cityData.value) / this.props.z }
-                key={'cityCircle' + cityData.city_id }
-                zoom={ this.props.z }
-                strokeWidth={ 0.5/this.props.z }
-                onCityClicked={ this.props.onCityClicked }
-                onCityHover={ this.props.onCityHover }
-                onCityOut={ this.props.onCityOut }
-                selected={ (CitiesStore.getSelectedCity() == cityData.city_id) }
-              />
-            );  
-          })}
-        </ReactTransitionGroup> 
+
 
         {/* selected city on top 
         <ReactTransitionGroup component='g' className='transitionGroup'>
@@ -232,54 +264,6 @@ export default class USMap extends React.Component {
         >
           -
         </text>*/}
-
-        <text 
-          x={30} 
-          y={100} 
-          fontSize={20}
-          textAnchor='middle'
-          fill='yellow'
-          
-          onClick={ this.props.resetView }
-        >
-          reset
-        </text>
-
-        <text 
-          x={30} 
-          y={20} 
-          fontSize={20}
-          textAnchor='middle'
-          fill='yellow'
-          id='map'
-          onClick={ this.props.onViewSelected }
-        >
-          map
-        </text>
-
-        <text 
-          x={30} 
-          y={50} 
-          fontSize={20}
-          textAnchor='middle'
-          fill='yellow'
-          id='cartogram'
-          onClick={ this.props.onViewSelected }
-        >
-          cartogram
-        </text>
-
-        <text 
-          x={30} 
-          y={80} 
-          fontSize={20}
-          textAnchor='middle'
-          fill='yellow'
-          id='scatterplot'
-          onClick={ this.props.onViewSelected }
-        >
-          scatterplot
-        </text>
 
         
       </g>

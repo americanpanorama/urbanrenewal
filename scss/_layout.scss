@@ -87,6 +87,10 @@ header {
       svg text {
          fill: white;
       }
+
+      .handle {
+        pointer-events: auto;
+      }
     }
 }
 

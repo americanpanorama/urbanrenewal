@@ -26,6 +26,10 @@
         text-anchor: start;
       }
     }
+
+    .handle {
+      pointer-events: auto;
+    }
   }
 
   .mask {

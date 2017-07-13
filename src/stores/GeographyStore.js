@@ -52,6 +52,14 @@ const GeographyStore = {
 
   getZ: function() { return this.data.z; },
 
+  getXYZ: function() { 
+    return { 
+      x: this.getX(),
+      y: this.getY(),
+      z: this.getZ()
+    };
+  },
+
   getLower48: function() {
     return USTopoJson;
   },

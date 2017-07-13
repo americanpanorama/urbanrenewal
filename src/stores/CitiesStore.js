@@ -72,10 +72,6 @@ const CitiesStore = {
       }
 
     ]).then((responses) => {
-
-      console.timeEnd('CitiesStoreData');
-      console.time('CitiesStoreProcessing');
-
       
       // category data
       responses[0].forEach(response => { 
@@ -469,6 +465,7 @@ const CitiesStore = {
         this.getCitiesList()
           .filter(cityData => GeographyStore.projected([cityData.lng, cityData.lat]) !== null)
           .filter(cityData => (this.data.selectedYear) ? cityData.yearsData[this.data.selectedYear] && cityData.yearsData[this.data.selectedYear]['totalFamilies'] > 0 : cityData.totalFamilies && cityData.totalFamilies > 0)
+          .filter(cityData => cityData.yearsData[this.data.selectedYear]['percentFamiliesOfColor'] >= this.getPOCBottom() && cityData.yearsData[this.data.selectedYear]['percentFamiliesOfColor'] <= this.getPOCTop())
           .map(cityData => {
             return {
               lngLat: [cityData.lng, cityData.lat],
@@ -587,7 +584,13 @@ const CitiesStore = {
   },
 
   getProjectTimelineBars: function(cityId) {
-    let projects = Object.keys(this.data.cities[cityId].projects).map(id => this.data.cities[cityId].projects[id]),
+    let projects = Object.keys(this.data.cities[cityId].projects)
+        .map(id => this.data.cities[cityId].projects[id])
+        // filter out projects without displacments
+        .filter(p => p.totalFamilies)
+        // sort by highest number of displacments in an average year descending
+        //.sort((a,b) => b.totalFamilies/(Math.min(b.endYear,1966)-b.startYear+1) - a.totalFamilies/(Math.min(a.endYear,1966)-a.startYear+1)),
+        .sort((a,b) => b.totalFamilies - a.totalFamilies),
       years = [1955,1956,1957,1958,1959,1960,1961,1962,1963,1964,1965,1966];
 
     // sort to put the longest first
@@ -596,18 +599,20 @@ const CitiesStore = {
     // calculate "grid" placement for each project
     let rows = [new Array(12)];
     projects.forEach((project, i) => {
+      const endYear = Math.min(project.endYear, 1966);
+      projects[i].endYear = endYear;
       let availableRow = false;
       rows.forEach((row, rowNum) => {
         let canFit = true;
           
         // test whether the project can fit in the space
-        for (let col = years.indexOf(project.startYear); col <= years.indexOf(project.endYear); col ++) {
+        for (let col = years.indexOf(project.startYear); col <= years.indexOf(endYear); col ++) {
           if (rows[rowNum][col]) {
             canFit = false;
           }
           // for one year spans pad it
-          if (project.startYear == project.endYear) {
-            if ((col > 0 && rows[rowNum][col-1]) || (col <= years.indexOf(project.endYear) && rows[rowNum][col+1])) {
+          if (project.startYear == endYear) {
+            if ((col > 0 && rows[rowNum][col-1]) || (col <= years.indexOf(endYear) && rows[rowNum][col+1])) {
               canFit = false;
             }
           }
@@ -621,14 +626,14 @@ const CitiesStore = {
       if (!availableRow) {
         rows.push(new Array(years.length));
       }
-      for (let col = years.indexOf(project.startYear); col <= years.indexOf(project.endYear); col ++) {
+      for (let col = years.indexOf(project.startYear); col <= years.indexOf(endYear); col ++) {
         rows[projects[i].row][col] = 'x';
         // for one year spans pad it
-        if (project.startYear == project.endYear) {
+        if (project.startYear == endYear) {
           if (col > 0) {
             rows[projects[i].row][col-1] = 'x';
           } 
-          if (col <= years.indexOf(project.endYear)) {
+          if (col <= years.indexOf(endYear)) {
             rows[projects[i].row][col+1] = 'x';
           } 
         }
