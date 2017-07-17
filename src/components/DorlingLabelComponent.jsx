@@ -11,73 +11,35 @@ export default class DorlingLabel extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
-      r: (CitiesStore.getSelectedView() == 'cartogram') ? this.props.r : this.props.r / this.props.z,
-      color: this.props.color,
       cx: this.props.cx,
       cy: this.props.cy
     };
   }
 
-  componentWillEnter(callback) {
-    callback();
-  }
+  componentWillEnter(callback) { callback(); }
 
   componentWillLeave(callback) { callback(); }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.z !== nextProps.z && CitiesStore.getSelectedView() !== 'cartogram') {
-      d3.select(ReactDOM.findDOMNode(this)).select('circle')
-        .transition()
-        .duration(0)
-        .attr('r', nextProps.r / nextProps.z)
-        .each('end', () => {
-          this.setState({
-            r: nextProps.r / nextProps.z
-          });
-        });
-    }
-    // if (this.props.zoom !== nextProps.zoom) {
-    //   d3.select(ReactDOM.findDOMNode(this))
-    //     .attr('r', nextProps.r)
-    //     .style('fill', nextProps.color);
-    //   this.setState({
-    //     r: nextProps.r,
-    //     color: nextProps.color
-    //   });
-    // }
-    if (this.props.r !== nextProps.r || this.props.color !== nextProps.color || this.props.cx !== nextProps.cx || this.props.cy !== nextProps.cy ) {
-      d3.select(ReactDOM.findDOMNode(this)).select('circle')
+    if (this.props.cx !== nextProps.cx || this.props.cy !== nextProps.cy ) {
+      d3.select(ReactDOM.findDOMNode(this))
         .transition()
         .delay((CitiesStore.getSelectedView() == 'scatterplot') ? Math.min((DimensionsStore.getNationalMapHeight() * 0.9 - nextProps.cy) * 10, 5000) : 0)
         .duration(750)
-        .attr('r', (CitiesStore.getSelectedView() !== 'cartogram') ? nextProps.r / nextProps.z : nextProps.r)
-        .attr('cx', nextProps.cx)
-        .attr('cy', nextProps.cy)
-        .style('fill', nextProps.color)
-        .each('end', () => {
-          this.setState({
-            cx: nextProps.cx,
-            cy: nextProps.cy,
-            r: (CitiesStore.getSelectedView() !== 'cartogram') ? nextProps.r / nextProps.z : nextProps.r,
-            color: nextProps.color
-          });
-        });
-      d3.select(ReactDOM.findDOMNode(this)).selectAll('text')
-        .transition()
-        .delay((CitiesStore.getSelectedView() == 'scatterplot') ? Math.min((DimensionsStore.getNationalMapHeight() * 0.9 - nextProps.cy) * 10, 5000) : 0)
-        .duration(750)
-        .attr('x', nextProps.cx)
-        .attr('y', nextProps.cy);
+        .attr('transform', 'translate(' + nextProps.cx + ' ' + nextProps.cy + ')');
     }
   }
 
   render () {
-    const labelSize = (8 * this.state.r  / 15 < 14) ? 14 : (8 * this.state.r  / 15 > 18) ? 18 : 8 * this.state.r  / 15;
+    const labelSize = (8 * this.props.r  / 15 < 14) ? 14 : (8 * this.props.r  / 15 > 18) ? 18 : 8 * this.props.r  / 15;
     return (
-      <g className='dorlingLabel'>
+      <g 
+        className='dorlingLabel'
+        transform={ 'translate(' +  this.state.cx + ' ' + this.state.cy + ')' }
+      >
         <text
-          x={ this.state.cx }
-          y={ this.state.cy }
+          x={ 0 }
+          y={ 0 }
           textAnchor='middle'
           alignmentBaseline='middle'
           fontSize={ labelSize }
@@ -89,24 +51,25 @@ export default class DorlingLabel extends React.Component {
           {this.props.name.replace(/\w\S*/g, txt =>  txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())}
         </text> 
         <text
-          x={ this.state.cx }
-          y={ this.state.cy }
+          x={ 0 }
+          y={ 0 }
           textAnchor='middle'
           alignmentBaseline='bottom'
           fontSize={ labelSize / this.props.z }
           key={'cityLabel' + this.props.city_id}
+          fill={ (this.props.color !== 'transparent') ? '#000' : 'transparent'}
         >
           {this.props.name.replace(/\w\S*/g, txt =>  txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())}
         </text> 
 
         <text
-          x={ this.state.cx }
-          y={ this.state.cy + labelSize / this.props.z}
+          x={ 0 }
+          y={ labelSize / this.props.z}
           textAnchor='middle'
           alignmentBaseline='top'
           fontSize={ labelSize / this.props.z * 0.7 }
           key={'cityNumsLabel' + this.props.city_id}
-          fill='#555'
+          fill={ (this.props.color !== 'transparent') ? '#555' : 'transparent'}
         >
           { formatNumber(this.props.value) }
         </text> 

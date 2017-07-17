@@ -78,16 +78,16 @@ export default class MapChartField extends React.Component {
     if (this.props.selectedView == 'scatterplot' && nextProps.selectedView !== 'scatterplot') {
       d3.select(this.refs['scatterplotField'])
         .transition()
-        .duration(5000)
+        .duration(750)
         .attr('opacity', 0)
         .each('end', () => {
           this.setState({
-            scatterplotOpacity: 1
+            scatterplotOpacity: 0
           });
         });
       d3.select(this.refs['baseMap'])
         .transition()
-        .duration(5000)
+        .duration(750)
         .attr('opacity', 1)
         .each('end', () => {
           this.setState({
@@ -96,7 +96,7 @@ export default class MapChartField extends React.Component {
         });
       d3.select(this.refs['scatterplotMask'])
         .transition()
-        .duration(10000)
+        .duration(750)
         .attr('height', 2*  Math.sqrt(DimensionsStore.getScatterplotLength()*DimensionsStore.getScatterplotLength()/2))
         .each('end', () => {
           this.setState({

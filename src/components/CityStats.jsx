@@ -23,11 +23,13 @@ export default class CityStats extends React.Component {
   render() {
     return (
       <div className='cityStats'>
-        <h2>{ this.props.city + ', ' + this.props.state }</h2>
         <div 
           onClick={ this.props.onCityClicked }
           id={ null }
-        >close</div>
+          className='closeicon'
+        >x</div>
+
+        <h2>{ this.props.city + ', ' + this.props.state }</h2>
 
         <div className='summary'>
           <strong>{ Math.round(this.props.totalFamilies).toLocaleString() + ' '}</strong> 

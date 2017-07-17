@@ -276,7 +276,7 @@ const DimensionsStore = {
 
   getDorlingsMaxRadius: function() { return this.data.dorlingsMaxRadius; },
 
-  dorlingHasLabel: function(city_id, visibleRadius) { return (city_id == CitiesStore.getHighlightedCity() || visibleRadius >= 20); },
+  dorlingHasLabel: function(city_id, visibleRadius) { return (city_id == CitiesStore.getHighlightedCity() || (CitiesStore.getSelectedView() == 'cartogram' && visibleRadius >= 20)); },
 
   getCitySnippetWidth: function() { return this.getSidebarStyle().width - 10; },
 
@@ -322,9 +322,7 @@ const DimensionsStore = {
   // 90% of the width
   getMainTimelineBarFieldWidth: function() { return this.getTimelineAttrs().width * 0.9; },
 
-  getMainTimelineBarHeight: function(year) { 
-    return (this.getMainTimelineLabelY() - this.data.containerPadding) * (CitiesStore.getYearTotals(year).white + CitiesStore.getYearTotals(year).nonwhite) / CitiesStore.getYearsTotalsMax(); 
-  },
+  getMainTimelineBarHeight: function(year) { return (this.getMainTimelineLabelY() - this.data.containerPadding) * (CitiesStore.getYearTotals(year).white + CitiesStore.getYearTotals(year).nonwhite) / CitiesStore.getYearsTotalsMax() || 1; },
   
   getMainTimelineBarWidth: function() { 
     const numYears = 1966-1948, 
@@ -335,7 +333,7 @@ const DimensionsStore = {
 
   getMainTimelineBarXOffset: function(year) {  return (year == 1955) ? 0 : this.getMainTimlineXOffset(year) + this.getMainTimelineBarWidth() / 6; },
 
-  getMainTimelineBarY: function(year) { return this.getMainTimelineLabelY() - this.data.containerPadding - this.getMainTimelineBarHeight(year); },
+  getMainTimelineBarY: function(year) { return this.getMainTimelineLabelY() - this.data.containerPadding - this.getMainTimelineBarHeight(year) || 0; },
 
 
 
@@ -418,7 +416,8 @@ const DimensionsStore = {
       x: 0,
       y: this.getMainTimelineBarBottom() - (value / CitiesStore.getYearsTotalsMax() * this.getMainTimelineBarBottom()),
       width: this.getMainTimelineBarFieldWidth(),
-      height: 1
+      height: 1,
+      key: 'gridline' + value
     };
   },
 
