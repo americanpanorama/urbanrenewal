@@ -6,6 +6,7 @@ import USTopoJson from '../../data/us.json';
 import * as topojson from 'topojson';
 import * as d3 from 'd3';
 import DimensionsStore from './DimensionsStore';
+import CitiesStore from './CitiesStore';
 
 const GeographyStore = {
 
@@ -14,29 +15,30 @@ const GeographyStore = {
     y: 0,
     z: 1,
     loaded: false,
-    lower48Geojson: {}
+    lower48Geojson: {},
+    lat: null,
+    lng: null,
+    zoom: 14,
+    theMap: null
   },
 
   dataLoader: CartoDBLoader,
 
-  // loadInitialData: function() {
-  //   this.dataLoader.query([
-  //     {
-  //       //query: "SELECT ST_transform(the_geom_webmercator, 2163) as the_geom_webmercator FROM states where start_n < 19600101 and end_n > 19600101 and name != 'Alaska' and name != 'Hawaii'",
-  //       query: "SELECT the_geom FROM states where start_n < 19600101 and end_n > 19600101 and name != 'Alaska' and name != 'Hawaii'",
-  //       format: 'geojson'
-  //     }
-  //   ]).then((responses) => {
-  //     responses.forEach(response => {
-  //       if (responses.length > 0) {
-  //         this.data.lower48Geojson = responses[0];
+  // SETTERS
 
-  //         this.data.loaded = true;
-  //         this.emit(AppActionTypes.storeChanged);
-  //       }
-  //     });
-  //   });
-  // },
+  setTheMap: function (theMap) {
+    this.data.theMap = theMap;
+    this.emit(AppActionTypes.storeChanged);
+  },
+
+  setViewFromBounds(city_id) {
+    console.log( CitiesStore.getCityData(city_id).center[0]);
+    this.data.lat = CitiesStore.getCityData(city_id).center[0];
+    this.data.lng = CitiesStore.getCityData(city_id).center[1];
+    console.log(this.data.theMap.getBoundsZoom(CitiesStore.getCityData(city_id).boundingBox));
+    this.data.zoom = this.data.theMap.getBoundsZoom(CitiesStore.getCityData(city_id).boundingBox);
+    this.emit(AppActionTypes.storeChanged);
+  },
 
   setXYZ: function(x,y,z) {
     this.data.x = Math.round(x * 100) / 100;
@@ -44,6 +46,56 @@ const GeographyStore = {
     this.data.z = Math.round(z * 100) / 100;
 
     this.emit(AppActionTypes.storeChanged);
+  },
+
+  // GETTERS
+
+  getBoundingBox: function() {
+    const topLeftX = (this.getX() * -1) / (DimensionsStore.getNationalMapWidth() * this.getZ()) * DimensionsStore.getNationalMapWidth(),
+      topLeftY = (this.getY() * -1) / (DimensionsStore.getNationalMapHeight() * this.getZ()) * DimensionsStore.getNationalMapHeight(),
+      bottomRightX = topLeftX + DimensionsStore.getNationalMapWidth() / this.getZ(),
+      bottomRightY = topLeftY + DimensionsStore.getNationalMapHeight() / this.getZ();
+    return [[topLeftX, topLeftY], [bottomRightX, bottomRightY]];
+
+    return [this.getProjection().invert([topLeftX, topLeftY]), this.getProjection().invert([bottomRightX, bottomRightY])];
+  },
+
+  getBoundsForState: function(id) {
+    let geojson = this.getStateGeojson(id);
+    return this.getPathFunction().bounds(geojson.geometry);
+  },
+
+  getCentroidForState: function(id) {
+    let geojson = this.getStateGeojson(id);
+    return this.getPathFunction().centroid(geojson.geometry);
+  },
+
+  getLatLngZoom: function() {
+    return {
+      lat: this.data.lat,
+      lng: this.data.lng,
+      zoom: this.data.zoom
+    };
+  },
+
+  getLower48: function() {
+    return USTopoJson;
+  },
+
+  getStatesGeojson: function() { return topojson.feature(USTopoJson, USTopoJson.objects.states).features; },
+
+  getStateGeojson: function(id) { return this.getStatesGeojson().filter(d => d.id == id)[0]; },
+
+  getPathFunction: function() { return d3.geo.path().projection(this.getProjection()); },
+
+  getPath: function(g) { return this.getPathFunction()(g); },
+
+  getTheMap: function() { return this.data.theMap; },
+
+  getProjection: function() {
+    return this.albersUsaPr()
+      .scale(DimensionsStore.getMapScale())
+      .translate([DimensionsStore.getNationalMapWidth()/2, DimensionsStore.getNationalMapHeight()/2]);
   },
 
   getX: function() { return this.data.x; },
@@ -60,49 +112,11 @@ const GeographyStore = {
     };
   },
 
-  getLower48: function() {
-    return USTopoJson;
-  },
-
-  getStatesGeojson: function() { return topojson.feature(USTopoJson, USTopoJson.objects.states).features; },
-
-  getStateGeojson: function(id) { return this.getStatesGeojson().filter(d => d.id == id)[0]; },
-
-  getPathFunction: function() { return d3.geo.path().projection(this.getProjection()); },
-
-  getPath: function(g) { return this.getPathFunction()(g); },
-
-  getProjection: function() {
-    return this.albersUsaPr()
-      .scale(DimensionsStore.getMapScale())
-      .translate([DimensionsStore.getNationalMapWidth()/2, DimensionsStore.getNationalMapHeight()/2]);
-  },
-
   projected: function(latLng) { return this.getProjection()(latLng); },
 
   projectedX: function(latLng) { return this.getProjection()(latLng)[0]; },
 
   projectedY: function(latLng) { return this.getProjection()(latLng)[1]; },
-
-  getBoundingBox: function() {
-    const topLeftX = (this.getX() * -1) / (DimensionsStore.getNationalMapWidth() * this.getZ()) * DimensionsStore.getNationalMapWidth(),
-      topLeftY = (this.getY() * -1) / (DimensionsStore.getNationalMapHeight() * this.getZ()) * DimensionsStore.getNationalMapHeight(),
-      bottomRightX = topLeftX + DimensionsStore.getNationalMapWidth() / this.getZ(),
-      bottomRightY = topLeftY + DimensionsStore.getNationalMapHeight() / this.getZ();
-    return [[topLeftX, topLeftY], [bottomRightX, bottomRightY]];
-
-    return [this.getProjection().invert([topLeftX, topLeftY]), this.getProjection().invert([bottomRightX, bottomRightY])];
-  },
-
-  getCentroidForState: function(id) {
-    let geojson = this.getStateGeojson(id);
-    return this.getPathFunction().centroid(geojson.geometry);
-  },
-
-  getBoundsForState: function(id) {
-    let geojson = this.getStateGeojson(id);
-    return this.getPathFunction().bounds(geojson.geometry);
-  },
 
   // A modified d3.geo.albersUsa to include Puerto Rico.
   albersUsaPr: function() {
@@ -268,7 +282,22 @@ GeographyStore.dispatchToken = AppDispatcher.register((action) => {
     break;
   case AppActionTypes.mapMoved:
     GeographyStore.setXYZ(action.x, action.y, action.z);
+    break;
+  case AppActionTypes.mapInitialized:
+    GeographyStore.setTheMap(action.value);
+    break;
+  case AppActionTypes.citySelected:
+    const waitingId = setInterval(() => {
+      if (GeographyStore.getTheMap()) {
+        clearInterval(waitingId);
+        GeographyStore.setViewFromBounds(action.value);
+      }
+    }, 2000);
+    
+    break;
   }
+  
+
   return true;
 });
 

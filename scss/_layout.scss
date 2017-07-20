@@ -74,18 +74,18 @@ header {
 
   .mapLegend {
       position: absolute;
-      top: 20px;
-      background-color: rgba($map-background-color, 0.9);
+      bottom: 40px;
+      right: 40px;
+      background-color: rgba(255,255,255, 0.9);
       border-left: 2px solid rgba($map-background-color, 0.9);
       border-right: 2px solid rgba($map-background-color, 0.9);
       border-bottom: 2px solid rgba($map-background-color, 0.9);
       overflow: hidden;
-      border-bottom-left-radius: 6px;
-      border-bottom-right-radius: 6px;
+      border-radius: 15px;
       pointer-events: none;
 
       svg text {
-         fill: white;
+         fill: #111;
       }
 
       .handle {

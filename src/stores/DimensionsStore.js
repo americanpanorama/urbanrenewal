@@ -34,7 +34,7 @@ const DimensionsStore = {
     this.data.windowWidth = window.innerWidth;
     this.data.tilesHeight = this.data.windowHeight - this.data.headerHeight - 2*this.data.containerPadding;
     this.data.sidebarWidth =(document.getElementsByClassName('dataViewer').length > 0) ? document.getElementsByClassName('dataViewer')[0].offsetWidth : this.data.windowWidth * 0.322 - 2*this.data.containerPadding;
-    this.data.mainPaneWidth = (document.getElementsByClassName('main-pane').length > 0) ? document.getElementsByClassName('main-pane')[0].offsetWidth : (this.data.windowWidth) * (2/3 - 0.015*11/12) - this.data.containerPadding ; // this is complicated--I deduced it from the calcuations in _skeleton.scss
+    this.data.mainPaneWidth = (document.getElementsByClassName('main-pane').length > 0) ? document.getElementsByClassName('main-pane')[0].offsetWidth : (this.data.windowWidth) * (2/3 - 0.015*8/12) - this.data.containerPadding ; // this is complicated--I deduced it from the calcuations in _skeleton.scss
     this.data.mainPaneHeight = this.data.windowHeight - this.data.headerHeight - 2*this.data.containerPadding;
 
     this.data.sidebarHeight = (this.data.windowHeight - this.data.headerHeight - 2 * this.data.containerPadding) * 2/3 ;
@@ -124,7 +124,7 @@ const DimensionsStore = {
     return {
       width: this.data.legendWidth,
       height: this.data.legendHeight,
-      right: this.data.legendRight
+      //right: this.data.legendRight
     };
   },
 
@@ -150,7 +150,7 @@ const DimensionsStore = {
     return {
       x: this.getLegendGradientPercentX(0.75), 
       y: this.data.legendGradientHeightQuints,
-      fontSize: this.data.dorlingsMaxRadius / 2.5,
+      fontSize: this.data.dorlingsMaxRadius / 3,
       textAnchor: 'middle',
       alignmentBaseline: 'baseline'
     };
@@ -178,10 +178,10 @@ const DimensionsStore = {
 
   getLegendGradientWhitesLabelAttrs: function() {
     return {
-      x: this.getLegendGradientPercentX(0.25), 
+      x: this.getLegendGradientPercentX(0), 
       y: this.data.legendGradientHeightQuints * 4,
-      fontSize: this.data.dorlingsMaxRadius / 2.5,
-      textAnchor: 'middle',
+      fontSize: this.data.dorlingsMaxRadius / 3,
+      textAnchor: 'end',
       alignmentBaseline: 'hanging'
     };
   },

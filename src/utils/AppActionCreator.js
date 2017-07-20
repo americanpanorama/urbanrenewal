@@ -12,6 +12,7 @@ export const AppActionTypes = {
   dateSelected: 'dateSelected',
   viewSelected: 'viewSelected',
   mapMoved: 'mapMoved',
+  mapInitialized: 'mapInitialized',
   windowResized: 'windowResized'
 
 };
@@ -93,10 +94,18 @@ export const AppActions = {
     });
   },
 
+  mapInitialized: (theMap) => {
+    AppDispatcher.dispatch({
+      type: AppActionTypes.mapInitialized,
+      value: theMap
+    });
+  },
+
   windowResized: () => {
     AppDispatcher.dispatch({
       type: AppActionTypes.windowResized
     });
-  }
+  },
+
 
 };

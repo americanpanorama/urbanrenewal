@@ -38,6 +38,13 @@ export default class CityStats extends React.Component {
           of which were families of color.
         </div>
 
+        <div>
+          { (this.props.hasProjectGeojson) ?
+            'Project maps are available for this city. Click bubble to view.' :
+            ''
+          }
+        </div>
+
         { (true) ? 
           <table className='population-stats'>
             <tbody>

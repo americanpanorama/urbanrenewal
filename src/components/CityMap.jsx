@@ -1,13 +1,16 @@
 import * as React from 'react';
 import { PropTypes } from 'react';
 import * as L from 'leaflet';
+import { AppActions, AppActionTypes } from '../utils/AppActionCreator';
+import { getColorForRace, formatNumber } from '../utils/HelperFunctions';
 
 import DimensionsStore from '../stores/DimensionsStore';
+import GeographyStore from '../stores/GeographyStore';
 
 // stores
 
 // components
-import { Map, TileLayer, GeoJSON } from 'react-leaflet';
+import { Map, TileLayer, GeoJSON, Marker, Tooltip, FeatureGroup, LayerGroup} from 'react-leaflet';
 
 // import cartodbConfig from '../../basemaps/cartodb/config.json';
 // import cartodbLayers from '../../basemaps/cartodb/basemaps.json';
@@ -17,6 +20,10 @@ export default class CityMap extends React.Component {
 
   constructor (props) {
     super(props);
+  }
+
+  componentDidMount() {
+    AppActions.mapInitialized(this.refs.the_map.leafletElement);
   }
 
   _isRetina(){ 
@@ -41,13 +48,18 @@ export default class CityMap extends React.Component {
   }
 
   render () {
+    console.log(this.props);
+
+    const max = Math.max(...Object.keys(this.props.cityData.projects)
+      .filter(id => this.props.cityData.projects[id].totalFamilies)
+      .map(id => this.props.cityData.projects[id].totalFamilies));
 
     return (
       <div>
         <Map 
           ref='the_map' 
-          center={ (this.props.cityData.lat && this.props.cityData.lng) ? [ this.props.cityData.lat, this.props.cityData.lng ] : [0,0] } 
-          zoom={ 12 }  
+          center={ (this.props.lat && this.props.lng) ? [ this.props.lat, this.props.lng ] : [0,0] } 
+          zoom={ this.props.zoom || 12 }  
           className='the_map'
           style={ {
             height: DimensionsStore.getNationalMapHeight()
@@ -57,7 +69,8 @@ export default class CityMap extends React.Component {
 
           {/* base map */}
           <TileLayer
-            url="https://stamen-tiles-d.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png"
+            //url="https://stamen-tiles-d.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png"
+            url='https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png'
           />
 
           { (this.props.cityData.tracts) ? 
@@ -67,8 +80,9 @@ export default class CityMap extends React.Component {
                   data={ this.props.cityData.tracts[tractId].theGeojson }
                   key={ tractId }
                   style= { {
-                    fillColor: this._pickHex([125,200,125], [100,150,200],  this.props.cityData.tracts[tractId].percentPeopleOfColor / 100),
-                    fillOpacity: (this.props.cityData.tracts[tractId].medianIncome < 10000) ? 1 - ((this.props.cityData.tracts[tractId].medianIncome - 999) / 10000): 0,
+                    fillColor: getColorForRace(this.props.cityData.tracts[tractId].percentPeopleOfColor / 100),
+                    //fillColor: 'transparent',
+                    fillOpacity: (this.props.cityData.tracts[tractId].medianIncome < 10000) ? (1 - ((this.props.cityData.tracts[tractId].medianIncome - 999) / 10000)) / 3: 0,
                     weight: 0.3
                   } }
                   className='tract'
@@ -80,19 +94,31 @@ export default class CityMap extends React.Component {
 
           { (this.props.cityData.projects) ?
             Object.keys(this.props.cityData.projects).map(projectId => {
-              //console.log(this.props.cityData.projects[projectId]);
               if (this.props.cityData.projects[projectId].theGeojson) {
                 return (
-                  <GeoJSON
-                    data={ this.props.cityData.projects[projectId].theGeojson }
-                    key={ 'geojson' + this.props.cityData.projects[projectId].id }
-                    style={ {
-                      weight: 3,
-                      color: 'black',
-                      dashArray: '5, 5',
-                      fillColor: 'purple'
-                    } }
-                  />
+                  <LayerGroup key={ 'geojson' + this.props.cityData.projects[projectId].id }>
+                    <GeoJSON
+                      data={ this.props.cityData.projects[projectId].theGeojson }
+                      key={ 'geojson' + this.props.cityData.projects[projectId].id }
+                      style={ {
+                        weight: 5,
+                        color: 'red' || getColorForRace(this.props.cityData.projects[projectId].percentFamiliesOfColor),
+                        dashArray: '10, 5',
+                        fillColor: 'transparent' || getColorForRace(this.props.cityData.projects[projectId].percentFamiliesOfColor),
+                        fillOpacity: this.props.cityData.projects[projectId].totalFamilies / max
+                      } }
+                    >
+                      <Tooltip 
+                        direction='center'
+                        offset={[0,0]} 
+                        opacity={1} 
+                        permanent={true}
+                        className='projectLabel'
+                      >
+                        <span>{this.props.cityData.projects[projectId].project + '-' + formatNumber(this.props.cityData.projects[projectId].totalFamilies) }</span>
+                      </Tooltip>
+                    </GeoJSON>
+                  </LayerGroup>
                 );
               }
             }) :

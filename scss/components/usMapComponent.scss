@@ -15,10 +15,88 @@
 	}
 }
 
+@mixin chartButtons {
+	position: relative;
+	background-color: white;
+	padding: 3px;
+	margin: 0 5px;
+	border-radius: 15px;
+	border: 3px solid transparent;
+	text-align: center;
+
+
+	&.selected {
+		border: 3px solid red;
+		background-color: pink;
+	}
+
+	img {
+		display:block;
+		pointer-events: none;
+		margin: 0 auto;
+	}
+
+	.tooltip {
+	    visibility: hidden;
+	    width: 240px;
+	    background-color: white;
+	    color: black;
+	    text-align: center;
+	    border-radius: 6px;
+	    padding: 5px;
+
+	    /* Position the tooltip */
+	    position: absolute;
+	    left: -80px;
+	    top: 100px;
+	    z-index: 1;
+	}
+
+	&:hover {
+		background-color: pink;
+
+	    .tooltip {
+	        visibility: visible;
+	    }
+	}
+
+}
+
 #mapChartControls {
 	position: absolute;
-	left: 40px;
+	left: 30px;
+	top: 30px;
+
+	div {
+		@include chartButtons;
+
+		&.zoomin {
+			border-radius: 5px 5px 0 0;
+
+		}
+
+		&.zoomout {
+			border-radius: 0 0 5px 5px;
+			border-top: 1px solid silver;
+		}
+
+		&.reset {
+			margin-top: 10px;
+			border-radius: 5px;
+		}
+	}
+}
+
+#mapChartToggle {
+	position: absolute;
+	right: 40px;
 	top: 40px;
+
+	div {
+		@include chartButtons;
+		display: inline-block;
+		width: 75px;
+	}
 }
 
 .dorlingLabel {
@@ -27,3 +105,14 @@
 		user-select: none;
 	}
 }
+
+.projectLabel {
+	border: none;
+	background-color: transparent;
+	box-shadow: none;
+	text-transform: uppercase;
+	text-shadow: 2px 2px white;
+	font-family: Oswald;
+	font-size: 1.2em;
+}
+

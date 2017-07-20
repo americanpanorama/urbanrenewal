@@ -181,7 +181,6 @@ class App extends React.Component {
   }
 
   render () {
-    //console.time('render');
     return (
         <div className='container full-height'>
           <div className='row full-height'>
@@ -199,6 +198,8 @@ class App extends React.Component {
                 { CitiesStore.getSelectedCity() ? 
                   <CityMap
                     cityData= { CitiesStore.getCityData(CitiesStore.getSelectedCity()) }
+                    { ...GeographyStore.getLatLngZoom() }
+                    maxForYear={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).maxDisplacmentsForYear }
                   />
                   :
                   <svg 
@@ -225,27 +226,52 @@ class App extends React.Component {
                 }
 
                 <div id='mapChartControls'>
-                  <img 
-                    src='static/map.png' 
+                  <div onClick={ this.onZoomIn } className='zoomin'>
+                    <img src='static/zoomin.png' />
+                  </div>
+
+                  <div onClick={ this.zoomOut }  className='zoomout'>
+                    <img src='static/zoomout.png' />
+                  </div>
+
+                  <div onClick={ this.resetView } className='reset'>
+                    <span className='tooltip'>reset view</span>
+                    <img src='static/reset.png' />
+                  </div>
+                
+                </div>
+
+                <div id='mapChartToggle'>
+                  <div
+                    className={ (CitiesStore.getSelectedView() == 'map') ? 'selected' : '' }
                     onClick={ this.onViewSelected }
                     id='map'
-                  />
+                  >
+                    <span className='tooltip'>Shows displacements in cities.</span>
+                    <img src='static/map.png' />
+                    map
+                  </div>
 
-                  <img 
-                    src='static/cartogram.png' 
+                  <div
+                    className={ (CitiesStore.getSelectedView() == 'cartogram') ? 'selected' : '' }
                     onClick={ this.onViewSelected }
                     id='cartogram'
-                  />
+                  >
+                    <span className='tooltip'>Shows all cities with no overlap keeping them as close as possible to their actual location.</span>
+                    <img src='static/cartogram.png' />
+                    cartogram
+                  </div>
 
-                  <img 
-                    src='static/scatterplot.png' 
+                  <div
+                    className={ (CitiesStore.getSelectedView() == 'scatterplot') ? 'selected' : '' }
                     onClick={ this.onViewSelected }
                     id='scatterplot'
-                  />
+                  >
+                    <span className='tooltip'>Charts percentage of displacements by race relative to the racial demographics of the overall city.</span>
+                    <img src='static/scatterplot.png' />
+                    chart
 
-                  <div onClick={this.resetView}>reset</div>
-                  <div onClick={this.onZoomIn} id='zoomInButton'>zoom in</div>
-                  <div onClick={this.zoomOut}>zoom out</div>
+                  </div>
                 
                 </div>
 
