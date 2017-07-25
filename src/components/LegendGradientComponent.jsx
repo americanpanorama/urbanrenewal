@@ -31,8 +31,8 @@ export default class LegendGradient extends React.Component {
 
 
           {/* category labels */}
-          <text { ...DimensionsStore.getLegendGradientPOCLabelAttrs() }>people of color</text>
-          <text { ...DimensionsStore.getLegendGradientWhitesLabelAttrs() }>whites</text>
+          <text { ...DimensionsStore.getLegendGradientPOCLabelAttrs() }>% families of color displaced</text>
+          <text { ...DimensionsStore.getLegendGradientWhitesLabelAttrs() }>% white families displaced</text>
 
           <g>
             {/* percent labels */}
@@ -54,10 +54,8 @@ export default class LegendGradient extends React.Component {
                 </text>
               </g> :
               <g>
-                <text { ...DimensionsStore.getLegendGradientWhites0Attrs() }>0%</text>
-                <text { ...DimensionsStore.getLegendGradientWhites100Attrs() }>100%</text>
-                <text { ...DimensionsStore.getLegendGradientPOC0Attrs() }>0%</text>
-                <text { ...DimensionsStore.getLegendGradientPOC100Attrs() }>100%</text>
+                {[1, 0.75, 0.5, 0.25, 0].map(perc => <text { ...DimensionsStore.getLegendGradientPercentAttrs(perc, 'poc') } key={'gradientLabelPoc' + perc}>{(perc * 100) + '%'}</text> )}
+                {[1, 0.75, 0.5, 0.25, 0].map(perc => <text { ...DimensionsStore.getLegendGradientPercentAttrs(perc, 'white') } key={'gradientLabelWhite' + perc}>{(perc * 100) + '%'}</text> )}
               </g>
             }
 

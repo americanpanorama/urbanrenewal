@@ -4,6 +4,16 @@
 
 #timeline {
 
+  rect {
+    &.nonwhite {
+      fill: rgba(44, 160, 44, 1);
+    }
+
+    &.white {
+      fill: rgba(163, 135, 190, 1);
+    }
+  }
+
   .xAxis {
     text {
       alignment-baseline: baseline;
@@ -36,6 +46,10 @@
 
   .grid {
     fill: $background-color;
+
+    .base {
+      fill: 'black';
+    }
   }
 
 }

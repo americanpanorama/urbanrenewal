@@ -10,7 +10,7 @@ export default class Dorlings extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
-      r: (CitiesStore.getSelectedView() == 'cartogram') ? this.props.r : this.props.r / this.props.z,
+      r: (this.props.view == 'cartogram') ? this.props.r : this.props.r / this.props.z,
       color: this.props.color,
       cx: this.props.cx,
       cy: this.props.cy
@@ -22,7 +22,8 @@ export default class Dorlings extends React.Component {
   componentWillLeave(callback) { callback(); }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.z !== nextProps.z && CitiesStore.getSelectedView() !== 'cartogram') {
+    if (this.props.city_id == '69') { console.log(this.props); }
+    if (this.props.z !== nextProps.z && this.props.view !== 'cartogram') {
       d3.select(ReactDOM.findDOMNode(this))
         .transition()
         .duration(0)
@@ -37,9 +38,9 @@ export default class Dorlings extends React.Component {
     if (this.props.r !== nextProps.r || this.props.color !== nextProps.color || this.props.cx !== nextProps.cx || this.props.cy !== nextProps.cy ) {
       d3.select(ReactDOM.findDOMNode(this))
         .transition()
-        .delay((CitiesStore.getSelectedView() == 'scatterplot') ? Math.min((DimensionsStore.getNationalMapHeight() * 0.9 - nextProps.cy) * 10, 5000) : 0)
+        .delay((nextProps.view == 'scatterplot' && this.props.view !== 'scatterplot') ? Math.min((DimensionsStore.getNationalMapHeight() * 0.9 - nextProps.cy) * 10, 2000) : 0)
         .duration(750)
-        .attr('r', (CitiesStore.getSelectedView() !== 'cartogram') ? nextProps.r / nextProps.z : nextProps.r)
+        .attr('r', (nextProps.view !== 'cartogram') ? nextProps.r / nextProps.z : nextProps.r)
         .attr('cx', nextProps.cx)
         .attr('cy', nextProps.cy)
         .style('fill', nextProps.color)
@@ -47,7 +48,7 @@ export default class Dorlings extends React.Component {
           this.setState({
             cx: nextProps.cx,
             cy: nextProps.cy,
-            r: (CitiesStore.getSelectedView() !== 'cartogram') ? nextProps.r / nextProps.z : nextProps.r,
+            r: (nextProps.view !== 'cartogram') ? nextProps.r / nextProps.z : nextProps.r,
             color: nextProps.color
           });
         });
@@ -61,8 +62,8 @@ export default class Dorlings extends React.Component {
         cx={ this.state.cx }
         cy={ this.state.cy }
         r={ this.state.r }
+        fill={ this.state.color }
         style={ {
-          fill: this.state.color,
           fillOpacity: (!CitiesStore.getHighlightedCity() || CitiesStore.getHighlightedCity() == this.props.city_id) ? 1 : 0.5,
           strokeWidth: (this.props.hasProjectGeojson) ? this.props.strokeWidth * 3 : this.props.strokeWidth,
           strokeOpacity: (!CitiesStore.getHighlightedCity() || CitiesStore.getHighlightedCity() == this.props.city_id) ? 1 : 0.1,

@@ -139,6 +139,7 @@ export default class USMap extends React.Component {
                 { ...cityData }
                 { ...GeographyStore.getXYZ() }
                 r={ DimensionsStore.getDorlingRadius(cityData.value) }
+                view={ CitiesStore.getSelectedView() }
                 key={'cityCircle' + cityData.city_id }
                 strokeWidth={ 0.5/GeographyStore.getZ()}
                 onCityClicked={ this.props.onCityClicked }
@@ -229,7 +230,7 @@ export default class USMap extends React.Component {
           <g>
             <switch>
               <foreignObject 
-                x={DimensionsStore.getNationalMapWidth() * 0.72}
+                x={DimensionsStore.getNationalMapWidth() * 0.2}
                 y={DimensionsStore.getNationalMapHeight() * 0.7}
                 width="200" 
                 height="200"

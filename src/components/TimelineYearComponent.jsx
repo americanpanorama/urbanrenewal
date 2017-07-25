@@ -34,7 +34,7 @@ export default class Timeline extends React.Component {
               onClick={ this.props.onClick }
               id={ year }
             >
-              { (year % 5 == 0) ? year : "'" + (year - 1900) }
+              { year }
             </text>
           )}
 
@@ -43,7 +43,7 @@ export default class Timeline extends React.Component {
             onClick={ this.props.onClick }
             className='all'
           >
-            All
+            All Years
           </text>
         </g>
 
@@ -57,13 +57,20 @@ export default class Timeline extends React.Component {
           { years.map(year => {
             if (this.props.yearsData[year]) {
               return (
-                <rect
-                  { ...DimensionsStore.getMainTimelineBarAttrs(year) }
-                  fill={ getColorForRace(this.props.yearsData[year].nonwhite / (this.props.yearsData[year].nonwhite + this.props.yearsData[year].white)) }
-                  className={ (year == this.props.state.year && this.props.state.cat == 'families') ? 'bar selected' : 'bar' }
-                  onClick={ this.props.onClick }
-                  id={ year }
-                />
+                <g key={'barsFor' + year}>
+                  <rect
+                    { ...DimensionsStore.getMainTimelineBarAttrs(year, 'nonwhite') }
+                    className={ (year == this.props.state.year && this.props.state.cat == 'families') ? 'nonwhite bar selected' : 'nonwhite bar' }
+                    onClick={ this.props.onClick }
+                    id={ year }
+                  />
+                 <rect
+                    { ...DimensionsStore.getMainTimelineBarAttrs(year, 'white') }
+                    className={ (year == this.props.state.year && this.props.state.cat == 'families') ? 'white bar selected' : 'white bar' }
+                    onClick={ this.props.onClick }
+                    id={ year }
+                  />
+                </g>
               );
             }
           })}
@@ -73,6 +80,25 @@ export default class Timeline extends React.Component {
         <g className='grid'>
           { DimensionsStore.getMainTimelineYAxisValues().map(d => <rect { ...DimensionsStore.getMainTimelineGridAttrs(d)} /> )}
         </g>
+
+        <rect
+          x={0}
+          y={ DimensionsStore.getMainTimelineBarBottom() }
+          width={DimensionsStore.getMainTimelineBarFieldWidth()}
+          height={1}
+          fill='black'
+        />
+
+        {/* label for year */}
+        <text { ...DimensionsStore.getMainTimelineYearLabelAttrs() }>
+          { (CitiesStore.getSelectedYear()) ? CitiesStore.getSelectedYear() : 'All Years' }
+        </text>
+
+        <rect { ...DimensionsStore.getMainTimelineLegendBoxPOCAttrs() } />
+        <text { ...DimensionsStore.getMainTimelineLegendLabelPOCAttrs() }>Displaced families of color</text>
+
+        <rect { ...DimensionsStore.getMainTimelineLegendBoxWhiteAttrs() } />
+        <text { ...DimensionsStore.getMainTimelineLegendLabelWhiteAttrs() }>Displaced white families</text>
 
       </svg>
     );

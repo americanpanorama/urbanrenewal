@@ -41,7 +41,7 @@ const DimensionsStore = {
     this.data.sidebarTitleHeight = (document.getElementsByClassName('sidebarTitle').length > 0) ? document.getElementsByClassName('sidebarTitle')[0].offsetHeight: 30;
     this.data.nationalMapHeight = this.data.mainPaneHeight - this.data.containerPadding * 2;
     this.data.nationalMapWidth = this.data.mainPaneWidth - this.data.containerPadding * 2;
-    this.data.dorlingsMaxRadius= this.data.nationalMapWidth / 22;
+    this.data.dorlingsMaxRadius= this.data.nationalMapWidth / 25;
 
     this.data.legendRight = this.data.nationalMapWidth * 0.077 + this.data.containerPadding; // lines up roughly with the western edge of Maine on full size map
     
@@ -148,10 +148,10 @@ const DimensionsStore = {
 
   getLegendGradientPOCLabelAttrs: function() {
     return {
-      x: this.getLegendGradientPercentX(0.75), 
+      x: this.getLegendGradientPercentX(1), 
       y: this.data.legendGradientHeightQuints,
       fontSize: this.data.dorlingsMaxRadius / 3,
-      textAnchor: 'middle',
+      textAnchor: 'start',
       alignmentBaseline: 'baseline'
     };
   },
@@ -183,6 +183,16 @@ const DimensionsStore = {
       fontSize: this.data.dorlingsMaxRadius / 3,
       textAnchor: 'end',
       alignmentBaseline: 'hanging'
+    };
+  },
+
+  getLegendGradientPercentAttrs: function(perc, race) {
+    return {
+      x: this.getLegendGradientPercentX((race == 'poc') ? perc : 1-perc), 
+      y: (race == 'poc') ? this.data.legendGradientHeightQuints * 2 : this.data.legendGradientHeightQuints * 3,
+      fontSize: this.data.dorlingsMaxRadius / 3,
+      textAnchor: 'middle',
+      alignmentBaseline: (race == 'poc') ? 'baseline' : 'hanging'
     };
   },
 
@@ -267,8 +277,9 @@ const DimensionsStore = {
   },
 
   getDorlingRadius: function(v) {
+    const theMax = (CitiesStore.getSelectedYear()) ? CitiesStore.getMaxDisplacementsInCityForYear() : CitiesStore.getMaxDisplacementsInCity();
     let r = d3.scale.sqrt()
-      .domain([0, (CitiesStore.getSelectedCategory() == 'funding') ? CitiesStore.getCategoryMaxForCity('urban renewal grants dispursed') : CitiesStore.getCategoryMaxForCity('totalFamilies') ])
+      .domain([0, (CitiesStore.getSelectedCategory() == 'funding') ? CitiesStore.getCategoryMaxForCity('urban renewal grants dispursed') : theMax])
       .range([0, this.data.dorlingsMaxRadius]);
 
     return r(v);
@@ -276,7 +287,7 @@ const DimensionsStore = {
 
   getDorlingsMaxRadius: function() { return this.data.dorlingsMaxRadius; },
 
-  dorlingHasLabel: function(city_id, visibleRadius) { return (city_id == CitiesStore.getHighlightedCity() || (CitiesStore.getSelectedView() == 'cartogram' && visibleRadius >= 20)); },
+  dorlingHasLabel: function(city_id, visibleRadius) { return (city_id == CitiesStore.getHighlightedCity() || (CitiesStore.getSelectedView() == 'cartogram' && visibleRadius >= 20 && !CitiesStore.getHighlightedCity())); },
 
   getCitySnippetWidth: function() { return this.getSidebarStyle().width - 10; },
 
@@ -304,49 +315,38 @@ const DimensionsStore = {
 
   // MAIN TIMELINE DIMENSIONS
 
-  getMainTimelineBarAttrs: function(year) {
+  getMainTimelineBarAttrs: function(year, race) {
     return {
-      x: this.getMainTimelineBarXOffset(year),
-      y: this.getMainTimelineBarY(year),
+      x: (race == 'white') ? this.getMainTimlineXOffset(year) : this.getMainTimlineXOffset(year) - this.getMainTimelineBarWidth(),
+      y: this.getMainTimelineBarY(year, race),
       width: this.getMainTimelineBarWidth(),
-      height: this.getMainTimelineBarHeight(year),
-      stroke: (year == CitiesStore.getSelectedYear()) ? 'black' : 'transparent',
+      height: this.getMainTimelineBarHeight(year, race),
+      stroke: (year == CitiesStore.getSelectedYear()) ? 'transparent' : 'transparent',
+      fillOpacity: (year == CitiesStore.getSelectedYear() || CitiesStore.getSelectedYear() == null) ? 1 : 0.3,
       strokeWidth: 1,
-      key: 'bar' + year
+      //key: 'bar' + year
     };
   },
 
   // 90% of the height
-  getMainTimelineBarBottom: function() { return this.getTimelineAttrs().height * 0.9; },
+  getMainTimelineBarBottom: function() { return this.getTimelineAttrs().height - this.data.containerPadding ; },
 
   // 90% of the width
   getMainTimelineBarFieldWidth: function() { return this.getTimelineAttrs().width * 0.9; },
 
-  getMainTimelineBarHeight: function(year) { return (this.getMainTimelineLabelY() - this.data.containerPadding) * (CitiesStore.getYearTotals(year).white + CitiesStore.getYearTotals(year).nonwhite) / CitiesStore.getYearsTotalsMax() || 1; },
-  
-  getMainTimelineBarWidth: function() { 
-    const numYears = 1966-1948, 
-      numGutters = 1966-1955;
+  getMainTimelineBarHeight: function(year, race) { return this.getMainTimelineMaxBarHeight() * CitiesStore.getYearTotals(year)[race]/ CitiesStore.getYearsTotalsMaxRace() || 1; },
 
-    return 2 * (this.getMainTimelineBarFieldWidth() / ((numYears * 2) + numGutters));
-  },
+  getMainTimelineMaxBarHeight: function() { return this.getTimelineAttrs().height - this.data.containerPadding * 2; },
+
+  getMainTimelineYearWidth: function() { return this.getMainTimelineBarFieldWidth() / (1966-1954); },
+  
+  getMainTimelineBarWidth: function() { return this.getMainTimelineYearWidth() / 2 - 3; },
 
   getMainTimelineBarXOffset: function(year) {  return (year == 1955) ? 0 : this.getMainTimlineXOffset(year) + this.getMainTimelineBarWidth() / 6; },
 
-  getMainTimelineBarY: function(year) { return this.getMainTimelineLabelY() - this.data.containerPadding - this.getMainTimelineBarHeight(year) || 0; },
+  getMainTimelineBarY: function(year, race) { return this.data.containerPadding + this.getMainTimelineMaxBarHeight() - this.getMainTimelineBarHeight(year, race) || 0; },
 
-
-
-  
-  getMainTimlineXOffset: function(year) {
-    return (year - 1955) * this.getMainTimelineBarFieldWidth() / (1966-1954);
-
-    // years run from 1949-55 through individual years until 66
-    const w49_55 = this.getMainTimelineBarWidth() * (1955-1948),
-      wOtherYear = (this.getMainTimelineBarFieldWidth() - w49_55) / (1966-1955);
-    return (year == 1955) ? 0 : w49_55 + (year - 1956) * wOtherYear;
-  },
-
+  getMainTimlineXOffset: function(year) { return (year - 1955 + 0.5) * this.getMainTimelineYearWidth(); },
 
   getMainTimelineLabelXOffset: function(year) { 
     return (year - 1955) * this.getMainTimelineBarFieldWidth() / (1966-1954) + this.getMainTimelineBarFieldWidth() / (1966-1954) / 2;
@@ -361,7 +361,7 @@ const DimensionsStore = {
   getMainTimelineYAxisAttrs: function(value) {
     return {
       dx: this.getMainTimelineBarFieldWidth() + 3,
-      dy: this.getMainTimelineBarBottom() - (value / CitiesStore.getYearsTotalsMax() * this.getMainTimelineBarBottom()),
+      dy: this.data.containerPadding + this.getMainTimelineMaxBarHeight() - (value / CitiesStore.getYearsTotalsMaxRace() * this.getMainTimelineMaxBarHeight()),
       fontSize: this.getMainTimelineFontSize(),
       key: 'yAxisLabel' + value
     };
@@ -372,7 +372,7 @@ const DimensionsStore = {
     for (let num = 1; num <= 1000000000; num = num*10) {
       [1, 2, 2.5, 5].forEach(multiplier => {
         let testNum = num * multiplier;
-        if (interval == -1 && value / testNum <= 4 && value / testNum >= 1) {
+        if (interval == -1 && value / testNum <= 9 && value / testNum >= 1) {
           interval = testNum;
         }
       });
@@ -381,10 +381,12 @@ const DimensionsStore = {
   },
 
   getMainTimelineYAxisValues() { 
-    const max = CitiesStore.getYearsTotalsMax(),
-      intervals = this.getMainTimelineYAxisInterval(CitiesStore.getYearsTotalsMax());
-    return [...Array(Math.floor(max/intervals)).keys()].map(i => (i+1) * intervals ); 
+    const max = CitiesStore.getYearsTotalsMaxRace(),
+      intervals = this.getMainTimelineYAxisInterval(CitiesStore.getYearsTotalsMaxRace());
+    return [...Array(Math.floor(max/intervals)).keys()].map(i => (i + 1) * intervals ); 
   },
+
+
 
   // the font size is calculated to take up just less than 10% of the full timeline area's height
   getMainTimelineFontSize: function() { return Math.min(Math.floor(this.getTimelineAttrs().height * 0.085), 16); },
@@ -414,10 +416,60 @@ const DimensionsStore = {
   getMainTimelineGridAttrs: function(value) {
     return {
       x: 0,
-      y: this.getMainTimelineBarBottom() - (value / CitiesStore.getYearsTotalsMax() * this.getMainTimelineBarBottom()),
+      y: this.data.containerPadding + this.getMainTimelineMaxBarHeight() - (value / CitiesStore.getYearsTotalsMaxRace() * this.getMainTimelineMaxBarHeight()),
       width: this.getMainTimelineBarFieldWidth(),
       height: 1,
+      className: (value == 0) ? 'base' : '',
       key: 'gridline' + value
+    };
+  },
+
+  getMainTimelineYearLabelAttrs: function() {
+    return {
+      dx: this.getMainTimlineXOffset(1955),
+      dy: this.getMainTimlineXOffset(1955),
+      fontSize: this.getMainTimlineXOffset(1955) * 2,
+      alignmentBaseline: 'hanging'
+    };
+  },
+
+  getMainTimelineLegendBoxPOCAttrs() {
+    return {
+      x: this.getMainTimlineXOffset(1955),
+      y: this.getMainTimelineMaxBarHeight() * 0.33,
+      width: this.getMainTimelineBarWidth(),
+      height: this.getMainTimelineBarWidth(),
+      fill: '#2ca02c',
+      stroke: 'black',
+      strokeWidth: 0.5
+    };
+  },
+
+  getMainTimelineLegendLabelPOCAttrs() {
+    return {
+      dx: this.getMainTimlineXOffset(1955) + this.getMainTimelineBarWidth() * 1.5 ,
+      dy: this.getMainTimelineMaxBarHeight() * 0.33 + this.getMainTimelineBarWidth() ,
+      fontSize: this.getMainTimelineBarWidth(),
+    };
+  },
+
+  getMainTimelineLegendBoxWhiteAttrs() {
+    return {
+      x: this.getMainTimlineXOffset(1955),
+      y: this.getMainTimelineMaxBarHeight() * 0.33 + this.getMainTimelineBarWidth() * 1.5 ,
+      width: this.getMainTimelineBarWidth(),
+      height: this.getMainTimelineBarWidth(),
+      fill: '#a387be',
+      stroke: 'black',
+      strokeWidth: 0.5
+    };
+  },
+
+  getMainTimelineLegendLabelWhiteAttrs() {
+    return {
+      dx: this.getMainTimlineXOffset(1955) + this.getMainTimelineBarWidth() * 1.5 ,
+      dy: this.getMainTimelineMaxBarHeight() * 0.33 + this.getMainTimelineBarWidth() * 2.5,
+      fontSize: this.getMainTimelineBarWidth(),
     };
   },
 

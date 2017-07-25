@@ -19,8 +19,8 @@ export default class LegendDorlings extends React.Component {
       legendIncrements = [maxLegendDorling, 100000000, 50000000, 10000000, 1000000];
     } else {
       maxValue = CitiesStore.getCategoryMaxForCity('totalFamilies');
-      maxLegendDorling = 15000;
-      legendIncrements = [maxLegendDorling, 7500, 2000, 100];
+      maxLegendDorling = 4000;
+      legendIncrements = [maxLegendDorling, 2500, 1000, 100];
     }
 
     let r =  d3.scale.sqrt()

@@ -97,12 +97,6 @@ class App extends React.Component {
   onYearClicked(event) {
     let year = (event.target.id && parseInt(event.target.id) !== CitiesStore.getSelectedYear()) ? parseInt(event.target.id) : null;
 
-    let cat = (event.target.id.indexOf('families') !== -1) ? 'families' : (event.target.id.indexOf('funding') !== -1) ? 'funding' : this.state.cat;
-
-    this.setState({
-      cat: cat
-    });
-
     AppActions.dateSelected(year);
   }
 
@@ -175,7 +169,6 @@ class App extends React.Component {
       year: CitiesStore.getSelectedYear(),
       view: [GeographyStore.getX(), GeographyStore.getY(), GeographyStore.getZ()].join('/'),
       city: CitiesStore.getSlug(),
-      cat: CitiesStore.getSelectedCategory(),
       viz: CitiesStore.getSelectedView()
     });
   }
@@ -202,101 +195,105 @@ class App extends React.Component {
                     maxForYear={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).maxDisplacmentsForYear }
                   />
                   :
-                  <svg 
-                    { ...DimensionsStore.getMapDimensions() }
-                    className='theMap'
-                  >
-                    <ReactTransitionGroup component='g'>
-                      <MapChart
-                        { ...GeographyStore.getXYZ() }
-                        selectedView= { CitiesStore.getSelectedView() }
-                        onCityClicked={ this.onCityClicked }
-                        onStateClicked={ this.zoomToState }
-                        onViewSelected={ this.onViewSelected }
-                        onCityHover={ this.onCityInspected }
-                        onCityOut={ this.onCityOut }
-                        resetView={ this.resetView }
-                        onMapClicked={ this.onZoomIn }
-                        handleMouseUp={ this.handleMouseUp }
-                        handleMouseDown={ this.handleMouseDown }
-                        handleMouseMove={ this.handleMouseMove }
-                      />
-                    </ReactTransitionGroup>
-                  </svg>
+                  <div>
+                    <svg 
+                      { ...DimensionsStore.getMapDimensions() }
+                      className='theMap'
+                    >
+                      <ReactTransitionGroup component='g'>
+                        <MapChart
+                          { ...GeographyStore.getXYZ() }
+                          selectedView= { CitiesStore.getSelectedView() }
+                          onCityClicked={ this.onCityClicked }
+                          onStateClicked={ this.zoomToState }
+                          onViewSelected={ this.onViewSelected }
+                          onCityHover={ this.onCityInspected }
+                          onCityOut={ this.onCityOut }
+                          resetView={ this.resetView }
+                          onMapClicked={ this.onZoomIn }
+                          handleMouseUp={ this.handleMouseUp }
+                          handleMouseDown={ this.handleMouseDown }
+                          handleMouseMove={ this.handleMouseMove }
+                        />
+                      </ReactTransitionGroup>
+
+                    </svg>
+                    <div id='mapChartControls'>
+                      <div onClick={ this.onZoomIn } className='zoomin'>
+                        <img src='static/zoomin.png' />
+                      </div>
+
+                      <div onClick={ this.zoomOut }  className='zoomout'>
+                        <img src='static/zoomout.png' />
+                      </div>
+
+                      <div onClick={ this.resetView } className='reset'>
+                        <span className='tooltip'>reset view</span>
+                        <img src='static/reset.png' />
+                      </div>
+                    
+                    </div>
+
+                    <div id='mapChartToggle'>
+                      <div
+                        className={ (CitiesStore.getSelectedView() == 'map') ? 'selected' : '' }
+                        onClick={ this.onViewSelected }
+                        id='map'
+                      >
+                        <span className='tooltip'>Shows displacements in cities.</span>
+                        <img src='static/map.png' />
+                        map
+                      </div>
+
+                      <div
+                        className={ (CitiesStore.getSelectedView() == 'cartogram') ? 'selected' : '' }
+                        onClick={ this.onViewSelected }
+                        id='cartogram'
+                      >
+                        <span className='tooltip'>Shows all cities with no overlap keeping them as close as possible to their actual location.</span>
+                        <img src='static/cartogram.png' />
+                        cartogram
+                      </div>
+
+                      <div
+                        className={ (CitiesStore.getSelectedView() == 'scatterplot') ? 'selected' : '' }
+                        onClick={ this.onViewSelected }
+                        id='scatterplot'
+                      >
+                        <span className='tooltip'>Charts percentage of displacements by race relative to the racial demographics of the overall city.</span>
+                        <img src='static/scatterplot.png' />
+                        chart
+
+                      </div>
+                    
+                    </div>
+
+                    { (this.state.legendVisible) ?
+                      <div 
+                        className='mapLegend'
+                        style={ DimensionsStore.getLegendDimensions() }
+                      >
+                        <LegendGradient
+                          state={ this.state }
+                          poc={ CitiesStore.getPOC() }
+                          onDragUpdate={ this.onDragUpdate }
+                          percent={ (CitiesStore.getSelectedCity() && CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year] && CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year].percentFamiliesOfColor) ? Math.round(CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year].percentFamiliesOfColor * 100) : false }
+                        />
+                        <LegendDorlings />
+                      </div> : ''
+                    }
+
+                    <div 
+                      className='toggleLegend'
+                      onClick={ this.toggleLegendVisibility }
+                    >
+                      { (this.state.legendVisible) ? 'hide legend' : 'show legend' }
+                    </div>
+
+                  </div>
                 }
 
-                <div id='mapChartControls'>
-                  <div onClick={ this.onZoomIn } className='zoomin'>
-                    <img src='static/zoomin.png' />
-                  </div>
 
-                  <div onClick={ this.zoomOut }  className='zoomout'>
-                    <img src='static/zoomout.png' />
-                  </div>
-
-                  <div onClick={ this.resetView } className='reset'>
-                    <span className='tooltip'>reset view</span>
-                    <img src='static/reset.png' />
-                  </div>
-                
-                </div>
-
-                <div id='mapChartToggle'>
-                  <div
-                    className={ (CitiesStore.getSelectedView() == 'map') ? 'selected' : '' }
-                    onClick={ this.onViewSelected }
-                    id='map'
-                  >
-                    <span className='tooltip'>Shows displacements in cities.</span>
-                    <img src='static/map.png' />
-                    map
-                  </div>
-
-                  <div
-                    className={ (CitiesStore.getSelectedView() == 'cartogram') ? 'selected' : '' }
-                    onClick={ this.onViewSelected }
-                    id='cartogram'
-                  >
-                    <span className='tooltip'>Shows all cities with no overlap keeping them as close as possible to their actual location.</span>
-                    <img src='static/cartogram.png' />
-                    cartogram
-                  </div>
-
-                  <div
-                    className={ (CitiesStore.getSelectedView() == 'scatterplot') ? 'selected' : '' }
-                    onClick={ this.onViewSelected }
-                    id='scatterplot'
-                  >
-                    <span className='tooltip'>Charts percentage of displacements by race relative to the racial demographics of the overall city.</span>
-                    <img src='static/scatterplot.png' />
-                    chart
-
-                  </div>
-                
-                </div>
-
-                { (this.state.legendVisible) ?
-                  <div 
-                    className='mapLegend'
-                    style={ DimensionsStore.getLegendDimensions() }
-                  >
-                    <LegendGradient
-                      state={ this.state }
-                      poc={ CitiesStore.getPOC() }
-                      onDragUpdate={ this.onDragUpdate }
-                      percent={ (CitiesStore.getSelectedCity() && CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year] && CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year].percentFamiliesOfColor) ? Math.round(CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year].percentFamiliesOfColor * 100) : false }
-                    />
-                    <LegendDorlings />
-                  </div> : ''
-                }
-
-
-                <div 
-                  className='toggleLegend'
-                  onClick={ this.toggleLegendVisibility }
-                >
-                  { (this.state.legendVisible) ? 'hide legend' : 'show legend' }
-                </div>
               </div> 
             </div>
           </div>

@@ -28,6 +28,7 @@ const CitiesStore = {
     },
     yearsTotals: {},
     dorlingXYs: {},
+    maxDisplacementsInCityForYear: 5139,
 
     // util variables to prevent reloading data that's already been loaded
     loaded: false,
@@ -119,7 +120,7 @@ const CitiesStore = {
           this.data.cities[response.city_id].yearsData[aYear]['white families'] += whites;
           this.data.cities[response.city_id].yearsData[aYear]['non-white families'] += nonwhite;
           this.data.cities[response.city_id].yearsData[aYear]['totalFamilies'] += nonwhite + whites;
-          this.data.cities[response.city_id].yearsData[aYear].percentFamiliesOfColor = (nonwhite) /  (response.nonwhite / duration + whites);
+          this.data.cities[response.city_id].yearsData[aYear].percentFamiliesOfColor = this.data.cities[response.city_id].yearsData[aYear]['non-white families'] /  this.data.cities[response.city_id].yearsData[aYear]['totalFamilies'];
 
           // project data
           this.data.cities[response.city_id].projects[response.project_id] = (this.data.cities[response.city_id].projects[response.project_id]) ? this.data.cities[response.city_id].projects[response.project_id] : {
@@ -149,7 +150,19 @@ const CitiesStore = {
 
           this.data.cities[response.city_id].maxDisplacmentsForYear = (this.data.cities[response.city_id].projects[response.project_id].yearsData[aYear].totalFamilies  > this.data.cities[response.city_id].maxDisplacmentsForYear) ? this.data.cities[response.city_id].projects[response.project_id].yearsData[aYear].totalFamilies : this.data.cities[response.city_id].maxDisplacmentsForYear;
         }
+      }); 
+
+      // calculate max displacments in any city in a particular year
+      this.data.maxDisplacementsInCityForYear = 0;
+      Object.keys(this.data.cities).forEach(id => {
+        Object.keys(this.data.cities[id].yearsData).forEach(year => {
+          if (this.data.cities[id].yearsData[year].totalFamilies > this.data.maxDisplacementsInCityForYear) {
+            this.data.maxDisplacementsInCityForYear = this.data.cities[id].yearsData[year].totalFamilies;
+          }
+        });
       });
+
+      this.data.maxDisplacementInCity = Math.max(...Object.keys(this.data.cities).map(id => this.data.cities[id].totalFamilies));
       
       // load a city if one's specified
       if (citySlug) {
@@ -161,16 +174,13 @@ const CitiesStore = {
 
       this.setSelectedYear(year);
 
-      DorlingXYs.forEach(yearData => {
-        this.data.dorlingXYs[yearData.year] = (!this.data.dorlingXYs[yearData.year]) ? {} : this.data.dorlingXYs[yearData.year];
-        yearData.cities.forEach(cityData => {
-          //this.data.dorlingXYs[yearData.year][cityData.city_id] = [ GeographyStore.projectedX(cityData.dorlingLngLat), GeographyStore.projectedY(cityData.dorlingLngLat) ];
-          this.data.dorlingXYs[yearData.year][cityData.city_id] = [ cityData.x * DimensionsStore.getMapScale() + DimensionsStore.getNationalMapWidth() / 2, cityData.y * DimensionsStore.getMapScale() + DimensionsStore.getNationalMapHeight() / 2 ];
-        });
-      });
+      this.assignDorlingXYs();
 
       this.data.loaded = true;
       this.data.yearsLoaded.push(year);
+
+      // var citiesForDorlingProcessing = Object.keys(this.data.cities).map(id=> { return {city_id: id, lat: this.data.cities[id].lat, lng: this.data.cities[id].lng, yearsData: this.data.cities[id].yearsData}; });
+      // console.log(citiesForDorlingProcessing);
 
       this.emit(AppActionTypes.storeChanged);
     });
@@ -223,6 +233,16 @@ const CitiesStore = {
       this.setSelectedCity(city_id);
       this.emit(AppActionTypes.storeChanged);
     });
+  },
+
+  assignDorlingXYs: function() {
+    DorlingXYs.forEach(yearData => {
+      this.data.dorlingXYs[yearData.year] = (!this.data.dorlingXYs[yearData.year]) ? {} : this.data.dorlingXYs[yearData.year];
+      yearData.cities.forEach(cityData => {
+        this.data.dorlingXYs[yearData.year][cityData.city_id] = [ cityData.x * DimensionsStore.getMapScale() + DimensionsStore.getNationalMapWidth() / 2, cityData.y * DimensionsStore.getMapScale() + DimensionsStore.getNationalMapHeight() / 2 ];
+      });
+    });
+    this.emit(AppActionTypes.storeChanged);
   },
 
   // SETTERS
@@ -375,7 +395,7 @@ const CitiesStore = {
               const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4),
                 l = Math.sqrt(2*shortside*shortside);
               cx = (this.getCityData(cityData.city_id).pop_1960 && this.getCityData(cityData.city_id).nonwhite_1960) ? (this.getCityData(cityData.city_id).nonwhite_1960 / this.getCityData(cityData.city_id).pop_1960) * l : -900;
-              cy = l - this.getCityData(cityData.city_id).percentFamiliesOfColor * l;
+              cy = (this.data.selectedYear) ? l - this.getCityData(cityData.city_id).yearsData[this.data.selectedYear].percentFamiliesOfColor * l : l - this.getCityData(cityData.city_id).percentFamiliesOfColor * l;
               [cx, cy] = DimensionsStore.translateScatterplotPoint([cx, cy]);
             } else if (this.data.selectedView == 'cartogram') {
               [cx, cy] = this.getDorlingXY(cityData.city_id);
@@ -390,7 +410,7 @@ const CitiesStore = {
               r: DimensionsStore.getDorlingRadius((this.data.selectedYear && false) ? cityData.yearsData[this.data.selectedYear]['totalFamilies'] : cityData.totalFamilies), 
               city_id: cityData.city_id,
               value: (this.data.selectedYear !== null) ? cityData.yearsData[this.data.selectedYear]['totalFamilies'] : cityData.totalFamilies,
-              color: (this.data.selectedYear && cityData.yearsData[this.data.selectedYear]['percentFamiliesOfColor'] >= this.getPOCBottom() && cityData.yearsData[this.data.selectedYear]['percentFamiliesOfColor'] <= this.getPOCTop()) ? getColorForRace(cityData.yearsData[this.data.selectedYear]['percentFamiliesOfColor']) : (cityData.percentFamiliesOfColor >= this.getPOCBottom() && cityData.percentFamiliesOfColor <= this.getPOCTop()) ? getColorForRace(cityData.percentFamiliesOfColor) : 'transparent',
+              color: (this.data.selectedYear && cityData.yearsData[this.data.selectedYear].percentFamiliesOfColor >= this.getPOCBottom() && cityData.yearsData[this.data.selectedYear].percentFamiliesOfColor <= this.getPOCTop()) ? getColorForRace(cityData.yearsData[this.data.selectedYear].percentFamiliesOfColor) : (cityData.percentFamiliesOfColor >= this.getPOCBottom() && cityData.percentFamiliesOfColor <= this.getPOCTop()) ? getColorForRace(cityData.percentFamiliesOfColor) : 'transparent',
               name: cityData.city,
               hasProjectGeojson: cityData.hasProjectGeojson
             };
@@ -599,7 +619,14 @@ const CitiesStore = {
 
   getYearTotals: function(year) { return this.data.yearsTotals[year]; },
 
-  getYearsTotalsMax: function() { return Math.max(...Object.keys(this.data.yearsTotals).map(year => this.data.yearsTotals[year].white + this.data.yearsTotals[year].nonwhite)); }
+  getYearsTotalsMax: function() { return Math.max(...Object.keys(this.data.yearsTotals).map(year => this.data.yearsTotals[year].white + this.data.yearsTotals[year].nonwhite)); },
+
+  getYearsTotalsMaxRace: function() { return Math.max(...Object.keys(this.data.yearsTotals).map(year => this.data.yearsTotals[year].nonwhite).concat(Object.keys(this.data.yearsTotals).map(year => this.data.yearsTotals[year].white))); },
+
+  getMaxDisplacementsInCityForYear: function() { return this.data.maxDisplacementsInCityForYear; },
+
+  getMaxDisplacementsInCity: function() { return this.data.maxDisplacementInCity; },
+
 };
 
 // Mixin EventEmitter functionality
@@ -642,10 +669,6 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
 
   case AppActionTypes.dateSelected:
     CitiesStore.setSelectedYear(action.value);
-    if (CitiesStore.yearLoaded(action.value)) {
-    } else {
-      CitiesStore.loadYearData(action.value);
-    } 
     break;
 
   case AppActionTypes.POCSelected:
@@ -654,6 +677,10 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
     } else if (action.leftOrRight == 'left') {
       CitiesStore.setPOCTop(action.value);
     }
+    break;
+
+  case AppActionTypes.windowResized:
+    CitiesStore.assignDorlingXYs();
     break;
 
   }
