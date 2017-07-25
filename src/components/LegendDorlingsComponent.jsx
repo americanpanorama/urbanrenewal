@@ -26,8 +26,7 @@ export default class LegendDorlings extends React.Component {
     let r =  d3.scale.sqrt()
       .domain([0, maxValue])
       .range([0, 50]);
-
-
+      
     return (
       <svg 
         { ...DimensionsStore.getLegendDorlingsDimensions() }  

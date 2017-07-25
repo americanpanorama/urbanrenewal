@@ -22,9 +22,12 @@ export default class CityMap extends React.Component {
     super(props);
   }
 
-  componentDidMount() {
-    AppActions.mapInitialized(this.refs.the_map.leafletElement);
+  shouldComponentUpdate(nextProps) {
+    // prevent rerendering on map move--new props but dom already updated by leaflet
+    return !(this.refs.the_map.leafletElement.getCenter().lat ==  nextProps.lat && this.refs.the_map.leafletElement.getCenter().lng ==  nextProps.lng && this.refs.the_map.leafletElement.getZoom() ==  nextProps.zoom);
   }
+
+  componentDidMount() { AppActions.mapInitialized(this.refs.the_map.leafletElement); }
 
   _isRetina(){ 
     return ((window.matchMedia && (window.matchMedia('only screen and (min-resolution: 124dpi), only screen and (min-resolution: 1.3dppx), only screen and (min-resolution: 48.8dpcm)').matches || window.matchMedia('only screen and (-webkit-min-device-pixel-ratio: 1.3), only screen and (-o-min-device-pixel-ratio: 2.6/2), only screen and (min--moz-device-pixel-ratio: 1.3), only screen and (min-device-pixel-ratio: 1.3)').matches)) || (window.devicePixelRatio && window.devicePixelRatio > 1.3));
@@ -36,35 +39,29 @@ export default class CityMap extends React.Component {
     return url;
   }
 
-  _pickHex(color1, color2, weight) {
-    var p = weight;
-    var w = p * 2 - 1;
-    var w1 = (w/1+1) / 2;
-    var w2 = 1 - w1;
-    var rgb = [Math.round(color1[0] * w1 + color2[0] * w2),
-        Math.round(color1[1] * w1 + color2[1] * w2),
-        Math.round(color1[2] * w1 + color2[2] * w2)];
-    return 'rgb(' + rgb + ')';
-  }
-
   render () {
-    console.log(this.props);
-
     const max = Math.max(...Object.keys(this.props.cityData.projects)
       .filter(id => this.props.cityData.projects[id].totalFamilies)
       .map(id => this.props.cityData.projects[id].totalFamilies));
 
     return (
-      <div>
+      <div
+        style={ {
+          paddingTop: DimensionsStore.getDimensions().containerPadding,
+          marginLeft: DimensionsStore.getDimensions().containerPadding
+        } }
+      >
         <Map 
           ref='the_map' 
           center={ (this.props.lat && this.props.lng) ? [ this.props.lat, this.props.lng ] : [0,0] } 
           zoom={ this.props.zoom || 12 }  
           className='the_map'
           style={ {
+            width: DimensionsStore.getMapDimensions().width,
             height: DimensionsStore.getNationalMapHeight()
-
           } }
+          onMoveend={ this.props.onMoveend }
+
         >
 
           {/* base map */}
@@ -126,6 +123,10 @@ export default class CityMap extends React.Component {
           }
 
         </Map>
+
+        <div className='miLink'>
+          <a href={ 'https://dsl.richmond.edu/panorama/redlining/#loc=' + [GeographyStore.getLatLngZoom().zoom, GeographyStore.getLatLngZoom().lat, GeographyStore.getLatLngZoom().lng].join('/') + "&opacity=0" }>Mapping Inequality</a>
+        </div>
 
       {/* JSX Comment 
         <div>

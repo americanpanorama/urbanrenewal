@@ -277,7 +277,7 @@ const DimensionsStore = {
   },
 
   getDorlingRadius: function(v) {
-    const theMax = (CitiesStore.getSelectedYear()) ? CitiesStore.getMaxDisplacementsInCityForYear() : CitiesStore.getMaxDisplacementsInCity();
+    let theMax = (CitiesStore.getSelectedYear()) ? CitiesStore.getMaxDisplacementsInCityForYear() : CitiesStore.getMaxDisplacementsInCity() || 1;
     let r = d3.scale.sqrt()
       .domain([0, (CitiesStore.getSelectedCategory() == 'funding') ? CitiesStore.getCategoryMaxForCity('urban renewal grants dispursed') : theMax])
       .range([0, this.data.dorlingsMaxRadius]);

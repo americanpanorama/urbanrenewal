@@ -32,11 +32,9 @@ const GeographyStore = {
   },
 
   setViewFromBounds(city_id) {
-    console.log( CitiesStore.getCityData(city_id).center[0]);
-    this.data.lat = CitiesStore.getCityData(city_id).center[0];
-    this.data.lng = CitiesStore.getCityData(city_id).center[1];
-    console.log(this.data.theMap.getBoundsZoom(CitiesStore.getCityData(city_id).boundingBox));
-    this.data.zoom = this.data.theMap.getBoundsZoom(CitiesStore.getCityData(city_id).boundingBox);
+    this.data.lat = (CitiesStore.getCityData(city_id).center) ? CitiesStore.getCityData(city_id).center[0] : 0;
+    this.data.lng = (CitiesStore.getCityData(city_id).center) ? CitiesStore.getCityData(city_id).center[1] : 0;
+    this.data.zoom = (CitiesStore.getCityData(city_id).boundingBox) ? this.data.theMap.getBoundsZoom(CitiesStore.getCityData(city_id).boundingBox) : 12;
     this.emit(AppActionTypes.storeChanged);
   },
 
@@ -76,6 +74,14 @@ const GeographyStore = {
       lng: this.data.lng,
       zoom: this.data.zoom
     };
+  },
+
+  updateLOC: function() {
+    const center = this.getTheMap().getCenter();
+    this.data.zoom = this.getTheMap().getZoom();
+    this.data.lat = center.lat;
+    this.data.lng = center.lng;
+    this.emit(AppActionTypes.storeChanged);
   },
 
   getLower48: function() {
@@ -294,6 +300,11 @@ GeographyStore.dispatchToken = AppDispatcher.register((action) => {
       }
     }, 2000);
     
+    break;
+  case AppActionTypes.cityMapMoved:
+    if (GeographyStore.getTheMap !== null) {
+      GeographyStore.updateLOC();
+    }
     break;
   }
   

@@ -54,6 +54,7 @@ export default class Timeline extends React.Component {
             <text
               x={ DimensionsStore.getMainTimlineXOffset(year) }
               y={ 12 }
+              key={'citytimeline' + year}
             >
               { year }
             </text>

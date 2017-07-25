@@ -22,7 +22,6 @@ export default class Dorlings extends React.Component {
   componentWillLeave(callback) { callback(); }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.city_id == '69') { console.log(this.props); }
     if (this.props.z !== nextProps.z && this.props.view !== 'cartogram') {
       d3.select(ReactDOM.findDOMNode(this))
         .transition()

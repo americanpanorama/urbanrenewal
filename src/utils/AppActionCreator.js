@@ -13,7 +13,8 @@ export const AppActionTypes = {
   viewSelected: 'viewSelected',
   mapMoved: 'mapMoved',
   mapInitialized: 'mapInitialized',
-  windowResized: 'windowResized'
+  windowResized: 'windowResized',
+  cityMapMoved: 'cityMapMoved',
 
 };
 
@@ -106,6 +107,14 @@ export const AppActions = {
       type: AppActionTypes.windowResized
     });
   },
+
+  cityMapMoved: () => {
+    AppDispatcher.dispatch({
+      type: AppActionTypes.cityMapMoved
+    });
+  },
+
+
 
 
 };

@@ -46,7 +46,7 @@ class App extends React.Component {
     this.coords = {};
 
     // bind handlers
-    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
 
     console.time('update');
@@ -85,6 +85,8 @@ class App extends React.Component {
   onCityClicked(event) { AppActions.citySelected(event.target.id); }
 
   onCityInspected(event) { AppActions.cityInspected(event.target.id); }
+
+  onCityMapMove(event) { AppActions.cityMapMoved(); }
 
   onCityOut() { AppActions.cityInspected(null); }
 
@@ -165,12 +167,20 @@ class App extends React.Component {
   /* manage hash */
 
   changeHash () {
-    HashManager.updateHash({ 
+    const vizState = { 
       year: CitiesStore.getSelectedYear(),
       view: [GeographyStore.getX(), GeographyStore.getY(), GeographyStore.getZ()].join('/'),
       city: CitiesStore.getSlug(),
       viz: CitiesStore.getSelectedView()
-    });
+    };
+    if (CitiesStore.getSelectedCity() && GeographyStore.getLatLngZoom().lat) {
+      vizState.loc = { 
+        zoom: GeographyStore.getLatLngZoom().zoom, 
+        center: [GeographyStore.getLatLngZoom().lat, GeographyStore.getLatLngZoom().lng] 
+      };
+    }
+
+    HashManager.updateHash(vizState);
   }
 
   render () {
@@ -193,6 +203,7 @@ class App extends React.Component {
                     cityData= { CitiesStore.getCityData(CitiesStore.getSelectedCity()) }
                     { ...GeographyStore.getLatLngZoom() }
                     maxForYear={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).maxDisplacmentsForYear }
+                    onMoveend={ this.onCityMapMove }
                   />
                   :
                   <div>
