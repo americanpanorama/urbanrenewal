@@ -23,8 +23,18 @@ export default class CityMap extends React.Component {
   }
 
   shouldComponentUpdate(nextProps) {
+    // a little hacky, but you don't want to update until the stores complete figuring out the bounding box
+    if (nextProps.lat == 0 || nextProps.lng == 0) {
+      return false;
+    }
+
+    const unmoved = (this.refs.the_map.leafletElement.getCenter().lat ==  nextProps.lat && this.refs.the_map.leafletElement.getCenter().lng ==  nextProps.lng && this.refs.the_map.leafletElement.getZoom() ==  nextProps.zoom);
+    // update if basemap is changed
+    if (unmoved && this.props.HOLCSelected !== nextProps.HOLCSelected) {
+      return true;
+    }
     // prevent rerendering on map move--new props but dom already updated by leaflet
-    return !(this.refs.the_map.leafletElement.getCenter().lat ==  nextProps.lat && this.refs.the_map.leafletElement.getCenter().lng ==  nextProps.lng && this.refs.the_map.leafletElement.getZoom() ==  nextProps.zoom);
+    return !unmoved;
   }
 
   componentDidMount() { AppActions.mapInitialized(this.refs.the_map.leafletElement); }
@@ -43,6 +53,8 @@ export default class CityMap extends React.Component {
     const max = Math.max(...Object.keys(this.props.cityData.projects)
       .filter(id => this.props.cityData.projects[id].totalFamilies)
       .map(id => this.props.cityData.projects[id].totalFamilies));
+
+    console.log(this.props.lat);
 
     return (
       <div
@@ -70,7 +82,7 @@ export default class CityMap extends React.Component {
             url='https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png'
           />
 
-          { (this.props.cityData.tracts) ? 
+          { (this.props.cityData.holc_areas.length == 0 || (!this.props.HOLCSelected && this.props.cityData.tracts)) ? 
             Object.keys(this.props.cityData.tracts).map(tractId => {
               return(
                 <GeoJSON
@@ -88,6 +100,18 @@ export default class CityMap extends React.Component {
             }) : 
             ''
           }
+
+          { this.props.HOLCSelected && this.props.cityData.holc_areas.map((area, i) => 
+            <GeoJSON
+              data={area.theGeojson}
+              key={ 'holc' + i }
+              className={'holc ' + area.grade }
+              style={{
+                //fillColor: (area.grade == 'D') ? 'red' : (area.grade == 'C') ? 'yellow' : (area.grade == 'B') ? 'blue' : 'green',
+                strokeColor: (area.grade == 'D') ? 'red' : (area.grade == 'C') ? 'yellow' : (area.grade == 'B') ? 'blue' : 'green'
+              }}
+            />
+          )}
 
           { (this.props.cityData.projects) ?
             Object.keys(this.props.cityData.projects).map(projectId => {

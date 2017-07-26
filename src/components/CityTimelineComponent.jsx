@@ -3,7 +3,7 @@ import { PropTypes } from 'react';
 import * as d3 from 'd3';
 import ReactTransitionGroup from 'react-addons-transition-group';
 import Displacements from './DisplacementTimespanComponent.jsx';
-import { HelperFunctions } from '../utils/HelperFunctions';
+import { getColorForRace, formatNumber } from '../utils/HelperFunctions';
 
 import DimensionsStore from '../stores/DimensionsStore';
 import CitiesStore from '../stores/CitiesStore';
@@ -13,6 +13,7 @@ export default class Timeline extends React.Component {
   constructor (props) { super(props); }
 
   render() {
+    console.log(this.props);
     const projects = CitiesStore.getProjectTimelineBars(this.props.city_id),
       maxForYear = Math.max(...projects.map(p => p.totalFamilies/(Math.min(p.endYear, 1966) - Math.max(p.startYear,1955) + 1))),
       years = [1955,1956,1957,1958,1959,1960,1961,1962,1963,1964,1965,1966];
@@ -20,9 +21,49 @@ export default class Timeline extends React.Component {
     return (
       <svg 
         { ...DimensionsStore.getCityTimelineStyle() }
-        height={ projects.length * 25 + 25 }
+        height={ projects.length * 25 + 25 + 100 }
         id='timeline'
       >
+
+        { years.map(year => {
+          if (this.props.yearsData && this.props.yearsData[year] && this.props.yearsData[year].totalFamilies) {
+            return (
+              <circle
+                cx={DimensionsStore.getMainTimlineXOffset(year)}
+                cy={30}
+                r={ DimensionsStore.getDorlingRadius(this.props.yearsData[year].totalFamilies * 5) }
+                fill={ getColorForRace(this.props.yearsData[year].percentFamiliesOfColor) }
+              />
+            );
+          }
+        })}
+
+        { years.map(year => {
+          return (
+            <g>
+              
+
+              { (this.props.yearsData && this.props.yearsData[year] && this.props.yearsData[year].totalFamilies) ? 
+                <text
+                  x={ DimensionsStore.getMainTimlineXOffset(year) }
+                  y={ 30 }
+                  key={'citytimelinedisplacments' + year}
+                  textAnchor='middle'
+                  alignmentBaseline='middle'
+                > 
+                  { formatNumber(this.props.yearsData[year].totalFamilies) }
+                </text> : ''
+              }
+              <text
+                x={ DimensionsStore.getMainTimlineXOffset(year) }
+                y={ 12 }
+                key={'citytimeline' + year}
+              >
+                { year }
+              </text>
+            </g>
+          );
+        })}
 
         { (this.props.projects) ? 
           <g>
@@ -35,7 +76,7 @@ export default class Timeline extends React.Component {
                     width={ DimensionsStore.getTimelineYearsSpanWidth(project.startYear, project.endYear + 1)  }
                     height={ DimensionsStore.getTimelineProjectHeight() }
                     x={ DimensionsStore.getMainTimlineXOffset(project.startYear) }
-                    y={ ((project.row + 1) * DimensionsStore.getTimelineProjectHeight() * 1.2 )  }
+                    y={ 70 + ((project.row + 1) * DimensionsStore.getTimelineProjectHeight() * 1.2 )  }
                     text={ project.project.replace(/\b\w/g, l => l.toUpperCase()) }
                     key={ 'projectSpan' + i }
                     maxForYear={ maxForYear }
@@ -48,18 +89,6 @@ export default class Timeline extends React.Component {
           </g>:
           '' 
         }
-
-        { years.map(year => {
-          return (
-            <text
-              x={ DimensionsStore.getMainTimlineXOffset(year) }
-              y={ 12 }
-              key={'citytimeline' + year}
-            >
-              { year }
-            </text>
-          );
-        })}
       </svg>
     );
   }

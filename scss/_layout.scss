@@ -83,6 +83,7 @@ header {
       overflow: hidden;
       border-radius: 15px;
       pointer-events: none;
+      z-index: 10000;
 
       svg text {
          fill: #111;

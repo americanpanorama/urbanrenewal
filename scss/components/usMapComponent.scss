@@ -91,6 +91,7 @@
 	position: absolute;
 	right: 40px;
 	top: 40px;
+	z-index: 10000;
 
 	div {
 		@include chartButtons;
@@ -120,5 +121,22 @@
 	display: absolute;
 	left: 30px;
 	bottom: 60px;
+}
+
+.holc {
+	
+	stroke-width: 0;
+	&.A { 
+		fill: #418e41;
+	}
+	&.B { 
+		fill: #4a4ae4;
+	}
+	&.C { 
+		fill: #ffdf00;
+	}
+	&.D { 
+		fill: #eb3f3f;
+	}
 }
 

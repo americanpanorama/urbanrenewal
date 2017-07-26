@@ -31,6 +31,13 @@ const GeographyStore = {
     this.emit(AppActionTypes.storeChanged);
   },
 
+  setView(lat,lng,zoom) {
+    this.data.lat = lat;
+    this.data.lng = lng;
+    this.data.zoom = zoom;
+    this.emit(AppActionTypes.storeChanged);
+  },
+
   setViewFromBounds(city_id) {
     this.data.lat = (CitiesStore.getCityData(city_id).center) ? CitiesStore.getCityData(city_id).center[0] : 0;
     this.data.lng = (CitiesStore.getCityData(city_id).center) ? CitiesStore.getCityData(city_id).center[1] : 0;
@@ -285,6 +292,20 @@ GeographyStore.dispatchToken = AppDispatcher.register((action) => {
       y = (action.hashState.view) ? parseFloat(action.hashState.view.split('/')[1]) : 0,
       z = (action.hashState.view) ? parseFloat(action.hashState.view.split('/')[2]) : 1;
     GeographyStore.setXYZ(x,y,z);
+    if (action.hashState.loc) {
+      GeographyStore.setView(action.hashState.loc.center[0],action.hashState.loc.center[1],action.hashState.loc.zoom);
+    }
+    // if there's a city but no loc, wait for the projects to load to calculate the bounding box 
+    else if (action.hashState.city) {
+      const waitingId = setInterval(() => {
+        if (CitiesStore.initialDataLoaded() && CitiesStore.data.citiesLoaded.length == 1 && GeographyStore.getTheMap()) {
+          clearInterval(waitingId);
+          GeographyStore.setViewFromBounds(CitiesStore.data.citiesLoaded[0]);
+        } 
+      }, 500);
+
+    }
+    
     break;
   case AppActionTypes.mapMoved:
     GeographyStore.setXYZ(action.x, action.y, action.z);
@@ -298,7 +319,7 @@ GeographyStore.dispatchToken = AppDispatcher.register((action) => {
         clearInterval(waitingId);
         GeographyStore.setViewFromBounds(action.value);
       }
-    }, 2000);
+    }, 500);
     
     break;
   case AppActionTypes.cityMapMoved:

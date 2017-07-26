@@ -31,7 +31,7 @@ import {ReactSVGPanZoom} from 'react-svg-pan-zoom';
 // Having `flux` as a dependency, and two different files, is overkill.
 import { AppActions, AppActionTypes } from './utils/AppActionCreator';
 import AppDispatcher from './utils/AppDispatcher';
-import { calculateDorlingsPosition } from './utils/HelperFunctions';
+import { calculateDorlingsPosition, getColorForRace } from './utils/HelperFunctions';
 
 // main app container
 class App extends React.Component {
@@ -46,7 +46,7 @@ class App extends React.Component {
     this.coords = {};
 
     // bind handlers
-    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
 
     console.time('update');
@@ -90,6 +90,8 @@ class App extends React.Component {
 
   onCityOut() { AppActions.cityInspected(null); }
 
+  onHOLCToggle() { AppActions.HOLCToggle(!CitiesStore.getHOLCSelected()); }
+
   onViewSelected(event) { 
     if (event.target.id !== CitiesStore.getSelectedView()) {
       AppActions.viewSelected(event.target.id); 
@@ -101,6 +103,7 @@ class App extends React.Component {
 
     AppActions.dateSelected(year);
   }
+
 
   toggleLegendVisibility() { this.setState({ legendVisible: !this.state.legendVisible }); }
 
@@ -179,6 +182,9 @@ class App extends React.Component {
         center: [GeographyStore.getLatLngZoom().lat, GeographyStore.getLatLngZoom().lng] 
       };
     }
+    if (CitiesStore.getHOLCSelected()) {
+      vizState.holc = true;
+    }
 
     HashManager.updateHash(vizState);
   }
@@ -199,12 +205,104 @@ class App extends React.Component {
               >
 
                 { CitiesStore.getSelectedCity() ? 
-                  <CityMap
-                    cityData= { CitiesStore.getCityData(CitiesStore.getSelectedCity()) }
-                    { ...GeographyStore.getLatLngZoom() }
-                    maxForYear={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).maxDisplacmentsForYear }
-                    onMoveend={ this.onCityMapMove }
-                  />
+                  <div>
+                    <CityMap
+                      cityData= { CitiesStore.getCityData(CitiesStore.getSelectedCity()) }
+                      { ...GeographyStore.getLatLngZoom() }
+                      maxForYear={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).maxDisplacmentsForYear }
+                      onMoveend={ this.onCityMapMove }
+                      HOLCSelected={ CitiesStore.getHOLCSelected() }
+                    />
+                    <div 
+                      className='mapLegend'
+                      style={ DimensionsStore.getLegendDimensions() }
+                    >
+                      <svg
+                        width={120}
+                        height={95}
+                        style={{ margin: '10px 0 0 20px' }}
+                      >
+
+                        { [0,1,2,3,4].map(income => {
+                          return (
+                            [1,0.75,0.5,0.25,0].map((perc, i) => {
+                              return (
+                                <rect
+                                  x={10 + income * 15}
+                                  y={10 + i * 15}
+                                  width={15}
+                                  height={15}
+                                  fill={ getColorForRace(perc) }
+                                  fillOpacity={ (1 - (income * 2500 / 10000)) / 3 }
+                                  stroke='black'
+                                  strokeWidth={0.5}
+                                />
+                              );
+                            })
+                          );
+                        })}
+                        <text
+                          x={0}
+                          y={57.5}
+                          textAnchor='middle'
+                          alignmentBaseline='baseline'
+                          transform='rotate(270 0,47.5)'
+                          fill='black'
+                        >
+                          people of color
+                        </text>
+                        <text
+                          x={85}
+                          y={10}
+                          alignmentBaseline='hanging'
+                          fill='black'
+                        >
+                          100%
+                        </text>
+                        <text
+                          x={85}
+                          y={85}
+                          alignmentBaseline='baseline'
+                          fill='black'
+                        >
+                          0%
+                        </text>
+                        <text
+                          x={47.5}
+                          y={-5}
+                          textAnchor='middle'
+                          alignmentBaseline='hanging'
+                          fill='black'
+                        >
+                          income
+                        </text>
+                      </svg>
+                    </div>
+                    
+                    { (CitiesStore.getCityData(CitiesStore.getSelectedCity()).holc_areas.length > 0) ?
+                      <div id='mapChartToggle'>
+                        <div
+                          className={ (CitiesStore.getHOLCSelected()) ? '' : 'selected' }
+                          onClick={ this.onHOLCToggle }
+                        >
+                          <span className='tooltip'>View the racial demographics and median incomes from the 1960s census.</span>
+                          <img src='static/map.png' />
+                          race and income
+                        </div>
+
+                        <div
+                          className={ (CitiesStore.getHOLCSelected()) ? 'selected' : '' }
+                          onClick={ this.onHOLCToggle }
+                        >
+                          <span className='tooltip'>View the grades assigned by the Home Owners' Loan Corporation assessing 'neighborhood security' in the 1930s.</span>
+                          <img src='static/cartogram.png' />
+                          HOLC grades
+                        </div>
+                      
+                      </div> : ''
+                    }
+
+                  </div>
                   :
                   <div>
                     <svg 

@@ -15,6 +15,7 @@ export const AppActionTypes = {
   mapInitialized: 'mapInitialized',
   windowResized: 'windowResized',
   cityMapMoved: 'cityMapMoved',
+  HOLCToggle: 'HOLCToggle',
 
 };
 
@@ -111,6 +112,13 @@ export const AppActions = {
   cityMapMoved: () => {
     AppDispatcher.dispatch({
       type: AppActionTypes.cityMapMoved
+    });
+  },
+
+  HOLCToggle: (bool) => {
+    AppDispatcher.dispatch({
+      type: AppActionTypes.HOLCToggle,
+      value: bool
     });
   },
 

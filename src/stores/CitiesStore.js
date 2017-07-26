@@ -16,6 +16,7 @@ const CitiesStore = {
     selectedYear: null,
     selectedCategory: 'families',
     selectedCity: null,
+    HOLCSelected: false,
     inspectedCity: null,
     selectedView: 'cartogram',
     poc: [0, 1],
@@ -40,7 +41,7 @@ const CitiesStore = {
 
   // LOADERS
 
-  loadInitialData: function(year, citySlug, viz, selectedCategory) {
+  loadInitialData: function(year, viz, selectedCategory) {
     this.setSelectedView(viz);
 
     // initiate year keys on yearsTotal
@@ -84,6 +85,7 @@ const CitiesStore = {
             startYear: response.start_year,
             state: response.state,
             tracts: {},
+            holc_areas: [],
             center: (response.centerlat !== null) ? [response.centerlat,response.centerlng] : null,
             boundingBox: (response.bbymin !== null) ? [[response.bbymin,response.bbxmin],[response.bbymax,response.bbxmax]] : null,
             yearsData: {},
@@ -164,10 +166,6 @@ const CitiesStore = {
 
       this.data.maxDisplacementInCity = Math.max(...Object.keys(this.data.cities).map(id => this.data.cities[id].totalFamilies));
       
-      // load a city if one's specified
-      if (citySlug) {
-        this.loadCityData(this.getCityIdFromSlug(citySlug));
-      }
       if (selectedCategory) {
         this.setSelectedCategory(selectedCategory);
       }
@@ -189,7 +187,11 @@ const CitiesStore = {
   loadCityData: function(city_id) {
     this.dataLoader.query([
       {
-        query: ("SELECT ct.cartodb_id, ST_AsGeoJSON(ct.the_geom, 4) as the_geojson, ct.gisjoin, 100 * negro / (negro + white) as percent, case when i_under_999 > (i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 999 when (i_under_999 + i__1000___1998) > (i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 1999 when (i_under_999 + i__1000___1998 + i__2000___2998) > (i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 2999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998) > (i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 3999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998) > (i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 4999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998) > (i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 5999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998) > (i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 6999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998) > (i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 7999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998) > (i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 8999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998) > (i__10000___14998 + i__15000___24998 + i__25000_plus) then 9999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998) > (i__15000___24998 + i__25000_plus) then 14999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998) > i__25000_plus then 24999 else 25000 end as median FROM us_tracts_1960 ct join urdr_city_id_key cities on cities.nhgiscty = ct.nhgiscty and cities.city_id = " + city_id + " join census_data_1960 d on ct.gisjoin = d.gisjoin and (negro + white) > 0  order by percent desc, median").replace(/\+/g, '%2B'),
+        query: ("SELECT ct.cartodb_id, ST_AsGeoJSON(ct.the_geom, 4) as the_geojson, ct.gisjoin, 100 * (negro + other_races) / (negro + other_races + white) as percent, case when i_under_999 > (i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 999 when (i_under_999 + i__1000___1998) > (i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 1999 when (i_under_999 + i__1000___1998 + i__2000___2998) > (i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 2999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998) > (i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 3999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998) > (i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 4999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998) > (i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 5999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998) > (i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 6999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998) > (i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 7999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998) > (i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 8999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998) > (i__10000___14998 + i__15000___24998 + i__25000_plus) then 9999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998) > (i__15000___24998 + i__25000_plus) then 14999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998) > i__25000_plus then 24999 else 25000 end as median FROM us_tracts_1960 ct join urdr_city_id_key cities on cities.nhgiscty = ct.nhgiscty and cities.city_id = " + city_id + " join census_data_1960 d on ct.gisjoin = d.gisjoin and (negro + white + other_races) > 0  order by percent desc, median").replace(/\+/g, '%2B'),
+        format: 'JSON'
+      },
+      {
+        query: "select ST_asgeojson(the_geom, 4) as the_geojson, holc_grade from holc_polygons where ad_id in (select ad_id from holc_polygons join (select city_id, st_envelope(st_collect(the_geom)) as the_geom from urdr_id_key where city_id = " + city_id + " and the_geom is not null group by city_id) projects on st_intersects(projects.the_geom, holc_polygons.the_geom) group by ad_id)",
         format: 'JSON'
       }
     ]).then(responses => {
@@ -199,6 +201,13 @@ const CitiesStore = {
           percentPeopleOfColor: response.percent,
           medianIncome: response.median
         };
+      });
+
+      responses[1].forEach(response => {
+        this.data.cities[city_id].holc_areas.push({
+          theGeojson: JSON.parse(response.the_geojson),
+          grade: response.holc_grade
+        });
       });
 
       // use the project totals to calculate city totals
@@ -229,6 +238,7 @@ const CitiesStore = {
         });
       } );
 
+
       this.data.citiesLoaded.push(city_id);
       this.setSelectedCity(city_id);
       this.emit(AppActionTypes.storeChanged);
@@ -246,6 +256,11 @@ const CitiesStore = {
   },
 
   // SETTERS
+
+  setHOLCSelected: function(value) {
+    this.data.HOLCSelected = value;
+    this.emit(AppActionTypes.storeChanged);
+  },
 
   setInspectedCity: function(city_id) {
     this.data.inspectedCity = city_id;
@@ -285,6 +300,8 @@ const CitiesStore = {
   // CHECKERS
   
   cityLoaded: function(city_id) { return (this.data.citiesLoaded.indexOf(city_id) !== -1); },
+
+  initialDataLoaded: function() { return this.data.loaded; },
 
   yearLoaded: function(year) { return (this.data.yearsLoaded.indexOf(year) !== -1); },
 
@@ -468,6 +485,8 @@ const CitiesStore = {
 
   getHighlightedCity: function() { return this.getInspectedCity() || this.getSelectedCity(); },
 
+  getHOLCSelected: function() { return this.data.HOLCSelected; },
+
   getInspectedCity: function() { return this.data.inspectedCity; },
 
   getPOC: function() { return this.data.poc; },
@@ -640,7 +659,21 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
     const year = (action.hashState.year) ? action.hashState.year : null,
       category = (action.hashState.cat) ? action.hashState.cat : 'families',
       viz = (action.hashState.viz) ? action.hashState.viz : 'cartogram' ;
-    CitiesStore.loadInitialData(year, action.hashState.city, viz, category);
+    CitiesStore.loadInitialData(year, viz, category);
+
+    if (action.hashState.holc) {
+      CitiesStore.setHOLCSelected(true);
+    }
+
+    if (action.hashState.city) {
+      // wait for the overall data to load before you can look up and load the city
+      let waitingId = setInterval(() => {
+        if (CitiesStore.initialDataLoaded()) {
+          clearInterval(waitingId);
+          CitiesStore.loadCityData(CitiesStore.getCityIdFromSlug(action.hashState.city));
+        }
+      }, 50);
+    }
     break;
 
   case AppActionTypes.categorySelected:
@@ -653,6 +686,7 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
     } else {
       CitiesStore.loadCityData(action.value);
     }
+    CitiesStore.setInspectedCity(null);
     break;
 
   case AppActionTypes.cityInspected:
@@ -683,7 +717,13 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
     CitiesStore.assignDorlingXYs();
     break;
 
+  case AppActionTypes.HOLCToggle:
+    CitiesStore.setHOLCSelected(action.value);
+    break;
   }
+
+
+
   return true;
 });
 
