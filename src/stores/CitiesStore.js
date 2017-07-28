@@ -19,6 +19,7 @@ const CitiesStore = {
     HOLCSelected: false,
     inspectedCity: null,
     selectedView: 'cartogram',
+    inspectedProject: null,
     poc: [0, 1],
 
     // the city data propers
@@ -44,17 +45,19 @@ const CitiesStore = {
   loadInitialData: function(year, viz, selectedCategory) {
     this.setSelectedView(viz);
 
-    // initiate year keys on yearsTotal
-    [...Array(1966-1954).keys()].map(num => num+1955).forEach(year => this.data.yearsTotals[year] = { white: 0, nonwhite: 0});
-
     this.dataLoader.query([
       {
         // category metadata
         query: "SELECT max(value) as max, md.category_id, assessed_category, unit_of_measurement from urdr_category_id_key c join combined_dire_char_raw md on c.category_id = md.category_id group by md.category_id, assessed_category, unit_of_measurement union (select total as max, 1000 as category_id, 'totalFamilies' as assessed_category, 'familiies' as unit_of_measurement from (SELECT sum(value) as total, city_id, year from urdr_category_id_key c join combined_dire_char_raw md on c.category_id = md.category_id and (c.category_id = 71 or c.category_id = 72) and value is not null group by city_id, year order by sum(value) desc limit 1) tf)",
         format: 'JSON'
       },
+      {
+        // cities data
+        query: "with polygon_bounds as (select city_id, round(st_xmin(st_envelope(st_collect(urdr_id_key.the_geom)))::numeric, 3) as bbxmin, round(st_ymin(st_envelope(st_collect(urdr_id_key.the_geom)))::numeric, 3) as bbymin, round(st_xmax(st_envelope(st_collect(urdr_id_key.the_geom)))::numeric, 3) as bbxmax, round(st_ymax(st_envelope(st_collect(urdr_id_key.the_geom)))::numeric, 3) as bbymax, round(st_x(st_centroid(st_envelope(st_collect(urdr_id_key.the_geom))))::numeric, 3) as centerlng, round(st_y(st_centroid(st_envelope(st_collect(urdr_id_key.the_geom))))::numeric, 3) as centerlat FROM urdr_id_key group by city_id) select cities.city_id, cities.city, cities.state, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, pop_1940, pop_1950, pop_1960, pop_1970, white_1960, white_1970, nonwhite_1960, nonwhite_1970, polygon_bounds.bbxmin, polygon_bounds.bbymin, polygon_bounds.bbxmax, polygon_bounds.bbymax, polygon_bounds.centerlng, polygon_bounds.centerlat from urdr_city_id_key cities left join ur_city_census_data on cities.city_id = ur_city_census_data.city_id left join polygon_bounds on polygon_bounds.city_id = cities.city_id",
+        format: 'JSON'
+      },
       // data for projects: duration, displacments, etc.
-      { query: "with polygon_bounds as (select city_id, round(st_xmin(st_envelope(st_collect(urdr_id_key.the_geom)))::numeric, 3) as bbxmin, round(st_ymin(st_envelope(st_collect(urdr_id_key.the_geom)))::numeric, 3) as bbymin, round(st_xmax(st_envelope(st_collect(urdr_id_key.the_geom)))::numeric, 3) as bbxmax, round(st_ymax(st_envelope(st_collect(urdr_id_key.the_geom)))::numeric, 3) as bbymax, round(st_x(st_centroid(st_envelope(st_collect(urdr_id_key.the_geom))))::numeric, 3) as centerlng, round(st_y(st_centroid(st_envelope(st_collect(urdr_id_key.the_geom))))::numeric, 3) as centerlat FROM urdr_id_key group by city_id) SELECT d.project_id, d.start_year, d.end_year, d.whites, d.nonwhite, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, cities.city, cities.state, p.project, st_asgeojson(p.the_geom) as project_geojson, pop_1940, pop_1950, pop_1960, pop_1970, white_1960, white_1970, nonwhite_1960, nonwhite_1970, polygon_bounds.* FROM digitalscholarshiplab.urdr_displacements d join urdr_city_id_key cities on cities.city_id = d.city_id join urdr_id_key p on p.project_id = d.project_id join ur_city_census_data on cities.city_id = ur_city_census_data.city_id join polygon_bounds on polygon_bounds.city_id = cities.city_id",
+      { query: "select projects.city_id, projects.project_id, projects.project, st_asgeojson(projects.the_geom) as the_geojson, duration.start_year, duration.end_year, whites.value as whites, nonwhites.value as nonwhite from urdr_id_key projects join (SELECT project_id, min(year) as start_year, max(year) as end_year FROM combined_dire_char_raw group by project_id, city_id) duration on projects.project_id = duration.project_id join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 71 order by project_id, year desc) whites on whites.project_id = projects.project_id join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 72 order by project_id, year desc) nonwhites on nonwhites.project_id = projects.project_id",
         format: 'JSON'
       }
     ]).then((responses) => {
@@ -68,89 +71,83 @@ const CitiesStore = {
         };
       });
 
-      responses[1].forEach(response => {
-        let duration = 1 + response.end_year - response.start_year;
-        for (let aYear = response.start_year; aYear <= response.end_year; aYear += 1) {
-          let whites = response.whites / duration,
-            nonwhite = response.nonwhite / duration;
+      responses[1].forEach(r => {
+        // calculate some additional/aggregate and initialization values 
+        r.slug = r.city.replace(/ /g,'') + r.state.toUpperCase();
+        r.center = (r.centerlat !== null) ? [r.centerlat,r.centerlng] : null;
+        r.hasProjectGeojson = (r.centerlat !== null);
+        r.boundingBox = (r.bbymin !== null) ? [[r.bbymin,r.bbxmin],[r.bbymax,r.bbxmax]] : null;
+        r.projects = {};
+        r.yearsData = {};
+        r.tracts = {};
+        r.holc_areas = [];
+        r.maxDisplacmentsForYear = 0;
+        r.whites = 0;
+        r.nonwhite = 0;
+        r.totalFamilies = 0;
+        r.percentFamiliesOfColor = 0;
 
-          this.data.cities[response.city_id] = (this.data.cities[response.city_id]) ? this.data.cities[response.city_id] : { 
-            city: response.city,
-            city_id: response.city_id,
-            endYear: response.end_year,
-            lat: response.lat,
-            lng: response.lng,
-            projects: {},
-            slug: response.city.replace(/ /g,'') + response.state.toUpperCase(),
-            startYear: response.start_year,
-            state: response.state,
-            tracts: {},
-            holc_areas: [],
-            center: (response.centerlat !== null) ? [response.centerlat,response.centerlng] : null,
-            boundingBox: (response.bbymin !== null) ? [[response.bbymin,response.bbxmin],[response.bbymax,response.bbxmax]] : null,
-            yearsData: {},
-            maxDisplacmentsForYear: 0,
-            'white families': 0,
-            'non-white families': 0,
-            totalFamilies: 0,
-            percentFamiliesOfColor: 0,
-            pop_1940: parseInt(response.pop_1940),
-            pop_1950: parseInt(response.pop_1950),
-            pop_1960: parseInt(response.pop_1960),
-            pop_1970: parseInt(response.pop_1970),
-            white_1960: parseInt(response.white_1960),
-            nonwhite_1960: parseInt(response.nonwhite_1960),
-            nonwhite_1970: parseInt(response.nonwhite_1970),
-            hasProjectGeojson: false,
-          };
+        // delete a few values you no longer need
+        delete r.centerlat;
+        delete r.centerlng;
+        delete r.bbymin;
+        delete r.bbxmin;
+        delete r.bbymax;
+        delete r.bbxmax;
+
+        this.data.cities[r.city_id] = r;
+
+
+      });
+
+      responses[2].forEach(r => {
+        // calculate some additional/aggregate and initialization values 
+        r.the_geojson = JSON.parse(r.the_geojson);
+        r.totalFamilies = r.nonwhite + r.whites;
+        r.percentFamiliesOfColor = r.nonwhite / r.totalFamilies;
+        r.yearsData = {};
+
+        // add the project
+        this.data.cities[r.city_id].projects[r.project_id] = r;
+
+        // aggregate city-level data
+        this.data.cities[r.city_id].whites += r.whites;
+        this.data.cities[r.city_id].nonwhite += r.nonwhite;
+        this.data.cities[r.city_id].totalFamilies += r.totalFamilies;
+        this.data.cities[r.city_id].percentFamiliesOfColor = this.data.cities[r.city_id].nonwhite / this.data.cities[r.city_id].totalFamilies;
+
+        // calculate and add years data
+        for (let aYear = r.start_year; aYear <= r.end_year; aYear += 1) {
+          const duration = 1 + Math.min(r.end_year, 1966) - Math.max(r.start_year, 1955),
+            whites = r.whites / duration,
+            nonwhite = r.nonwhite / duration;
 
           // total up year data
-          this.data.yearsTotals[aYear].white += whites;
+          this.data.yearsTotals[aYear] = this.data.yearsTotals[aYear] || {whites: 0, nonwhite: 0};
+          this.data.yearsTotals[aYear].whites += whites;
           this.data.yearsTotals[aYear].nonwhite += nonwhite;
 
-
           // aggregate total and year data for city
-          if (!this.data.cities[response.city_id].yearsData[aYear]) {
-            this.data.cities[response.city_id].yearsData[aYear] = {
-              'white families': 0,
-              'non-white families': 0,
+          if (!this.data.cities[r.city_id].yearsData[aYear]) {
+            this.data.cities[r.city_id].yearsData[aYear] = {
+              whites: 0,
+              nonwhite: 0,
               totalFamilies: 0
             };
           }
-          this.data.cities[response.city_id].percentFamiliesOfColor = nonwhite /  (nonwhite + whites);
-          this.data.cities[response.city_id].hasProjectGeojson = (response.project_geojson) ? true : this.data.cities[response.city_id].hasProjectGeojson;
-          this.data.cities[response.city_id].yearsData[aYear]['white families'] += whites;
-          this.data.cities[response.city_id].yearsData[aYear]['non-white families'] += nonwhite;
-          this.data.cities[response.city_id].yearsData[aYear]['totalFamilies'] += nonwhite + whites;
-          this.data.cities[response.city_id].yearsData[aYear].percentFamiliesOfColor = this.data.cities[response.city_id].yearsData[aYear]['non-white families'] /  this.data.cities[response.city_id].yearsData[aYear]['totalFamilies'];
+          this.data.cities[r.city_id].yearsData[aYear].whites += whites;
+          this.data.cities[r.city_id].yearsData[aYear].nonwhite += nonwhite;
+          this.data.cities[r.city_id].yearsData[aYear].totalFamilies += nonwhite + whites;
+          this.data.cities[r.city_id].yearsData[aYear].percentFamiliesOfColor = this.data.cities[r.city_id].yearsData[aYear].nonwhite /  this.data.cities[r.city_id].yearsData[aYear].totalFamilies;
 
-          // project data
-          this.data.cities[response.city_id].projects[response.project_id] = (this.data.cities[response.city_id].projects[response.project_id]) ? this.data.cities[response.city_id].projects[response.project_id] : {
-            id: response.project_id,
-            endYear: response.end_year,
-            startYear: response.start_year,
-            theGeojson: JSON.parse(response.project_geojson),
-            project: response.project,
-            yearsData: {},
-            'white families': response.whites,
-            'non-white families': response.nonwhite,
-            totalFamilies: response.nonwhite + response.whites,
-            percentFamiliesOfColor: (response.nonwhite) /  (response.nonwhite + response.whites)
-          };
-          this.data.cities[response.city_id].projects[response.project_id].yearsData[aYear] = (this.data.cities[response.city_id].projects[response.project_id].yearsData[aYear]) ? this.data.cities[response.city_id].projects[response.project_id].yearsData[aYear] : {};
-          this.data.cities[response.city_id].projects[response.project_id].yearsData[aYear]['white families'] = response.whites / duration;
-          this.data.cities[response.city_id].projects[response.project_id].yearsData[aYear]['non-white families'] = response.nonwhite / duration;
-          this.data.cities[response.city_id].projects[response.project_id].yearsData[aYear].totalFamilies = response.nonwhite / duration + response.whites / duration;
-          this.data.cities[response.city_id].projects[response.project_id].yearsData[aYear].percentFamiliesOfColor = (response.nonwhite / duration) /  (response.nonwhite / duration + response.whites / duration);
-
-          this.data.cities[response.city_id]['white families'] += response.whites / duration;
-          this.data.cities[response.city_id]['non-white families'] += response.nonwhite / duration;
-          this.data.cities[response.city_id].totalFamilies += response.nonwhite / duration + response.whites / duration;
-          this.data.cities[response.city_id].percentFamiliesOfColor = this.data.cities[response.city_id]['non-white families'] / this.data.cities[response.city_id].totalFamilies;
+          this.data.cities[r.city_id].projects[r.project_id].yearsData[aYear] = (this.data.cities[r.city_id].projects[r.project_id].yearsData[aYear]) ? this.data.cities[r.city_id].projects[r.project_id].yearsData[aYear] : {};
+          this.data.cities[r.city_id].projects[r.project_id].yearsData[aYear].whites = r.whites / duration;
+          this.data.cities[r.city_id].projects[r.project_id].yearsData[aYear].nonwhite = r.nonwhite / duration;
+          this.data.cities[r.city_id].projects[r.project_id].yearsData[aYear].totalFamilies = r.nonwhite / duration + r.whites / duration;
+          this.data.cities[r.city_id].projects[r.project_id].yearsData[aYear].percentFamiliesOfColor = (r.nonwhite / duration) /  (r.nonwhite / duration + r.whites / duration);
 
 
-
-          this.data.cities[response.city_id].maxDisplacmentsForYear = (this.data.cities[response.city_id].projects[response.project_id].yearsData[aYear].totalFamilies  > this.data.cities[response.city_id].maxDisplacmentsForYear) ? this.data.cities[response.city_id].projects[response.project_id].yearsData[aYear].totalFamilies : this.data.cities[response.city_id].maxDisplacmentsForYear;
+          this.data.cities[r.city_id].maxDisplacmentsForYear = (this.data.cities[r.city_id].projects[r.project_id].yearsData[aYear].totalFamilies  > this.data.cities[r.city_id].maxDisplacmentsForYear) ? this.data.cities[r.city_id].projects[r.project_id].yearsData[aYear].totalFamilies : this.data.cities[r.city_id].maxDisplacmentsForYear;
         }
       }); 
 
@@ -197,7 +194,7 @@ const CitiesStore = {
     ]).then(responses => {
       responses[0].forEach(response => {
         this.data.cities[city_id].tracts[response.gisjoin] = {
-          theGeojson: JSON.parse(response.the_geojson),
+          the_geojson: JSON.parse(response.the_geojson),
           percentPeopleOfColor: response.percent,
           medianIncome: response.median
         };
@@ -205,7 +202,7 @@ const CitiesStore = {
 
       responses[1].forEach(response => {
         this.data.cities[city_id].holc_areas.push({
-          theGeojson: JSON.parse(response.the_geojson),
+          the_geojson: JSON.parse(response.the_geojson),
           grade: response.holc_grade
         });
       });
@@ -214,8 +211,8 @@ const CitiesStore = {
       this.data.cities[city_id].yearsData = {};
       Object.keys(this.data.cities[city_id].projects).forEach(project_id => {
         Object.keys(this.data.cities[city_id].projects[project_id].yearsData).forEach(year => {
-          this.data.cities[city_id].startYear = (!this.data.cities[city_id].startYear || year < this.data.cities[city_id].startYear) ? year : this.data.cities[city_id].startYear;
-          this.data.cities[city_id].endYear = (!this.data.cities[city_id].endYear || year > this.data.cities[city_id].endYear) ? year : this.data.cities[city_id].endYear;
+          this.data.cities[city_id].start_year = (!this.data.cities[city_id].start_year || year < this.data.cities[city_id].start_year) ? year : this.data.cities[city_id].start_year;
+          this.data.cities[city_id].end_year = (!this.data.cities[city_id].end_year || year > this.data.cities[city_id].end_year) ? year : this.data.cities[city_id].end_year;
           this.data.cities[city_id].yearsData[year] = (this.data.cities[city_id].yearsData[year]) ? this.data.cities[city_id].yearsData[year] : {};
           Object.keys(this.data.cities[city_id].projects[project_id].yearsData[year]).forEach(category => {
             this.data.cities[city_id].yearsData[year][category] = (this.data.cities[city_id].yearsData[year][category]) ? this.data.cities[city_id].yearsData[year][category] + this.data.cities[city_id].projects[project_id].yearsData[year][category] : this.data.cities[city_id].projects[project_id].yearsData[year][category];
@@ -228,11 +225,11 @@ const CitiesStore = {
         let CityIdsToParse = (city_id) ? [city_id] : Object.keys(this.data.cities);
         CityIdsToParse.forEach(city_id => {
           if (this.data.cities[city_id].yearsData[year]) {
-            let white = (this.data.cities[city_id].yearsData[year]['white families']) ? this.data.cities[city_id].yearsData[year]['white families'] : 0,
-              nonwhite =  (this.data.cities[city_id].yearsData[year]['non-white families']) ? this.data.cities[city_id].yearsData[year]['non-white families'] : 0;
+            let white = (this.data.cities[city_id].yearsData[year].whites) ? this.data.cities[city_id].yearsData[year].whites : 0,
+              nonwhite =  (this.data.cities[city_id].yearsData[year].nonwhite) ? this.data.cities[city_id].yearsData[year].nonwhite : 0;
             if (white + nonwhite > 0) {
-              this.data.cities[city_id].yearsData[year]['totalFamilies'] = white + nonwhite;
-              this.data.cities[city_id].yearsData[year]['percentFamiliesOfColor'] = nonwhite / this.data.cities[city_id].yearsData[year]['totalFamilies'];
+              this.data.cities[city_id].yearsData[year].totalFamilies = white + nonwhite;
+              this.data.cities[city_id].yearsData[year]['percentFamiliesOfColor'] = nonwhite / this.data.cities[city_id].yearsData[year].totalFamilies;
             }
           }
         });
@@ -264,6 +261,11 @@ const CitiesStore = {
 
   setInspectedCity: function(city_id) {
     this.data.inspectedCity = city_id;
+    this.emit(AppActionTypes.storeChanged);
+  },
+
+  setInspectedProject: function(project_id) {
+    this.data.inspectedProject = project_id;
     this.emit(AppActionTypes.storeChanged);
   },
 
@@ -489,6 +491,8 @@ const CitiesStore = {
 
   getInspectedCity: function() { return this.data.inspectedCity; },
 
+  getInspectedProject: function() { return this.data.inspectedProject; },
+
   getPOC: function() { return this.data.poc; },
 
   getPOCBottom: function() { return this.data.poc[0]; },
@@ -499,9 +503,9 @@ const CitiesStore = {
     let projects = Object.keys(this.data.cities[cityId].projects)
         .map(id => this.data.cities[cityId].projects[id])
         // filter out projects without displacments
-        .filter(p => p.totalFamilies)
+        //.filter(p => p.totalFamilies)
         // sort by highest number of displacments in an average year descending
-        //.sort((a,b) => b.totalFamilies/(Math.min(b.endYear,1966)-b.startYear+1) - a.totalFamilies/(Math.min(a.endYear,1966)-a.startYear+1)),
+        //.sort((a,b) => b.totalFamilies/(Math.min(b.end_year,1966)-b.start_year+1) - a.totalFamilies/(Math.min(a.end_year,1966)-a.start_year+1)),
         .sort((a,b) => b.totalFamilies - a.totalFamilies),
       years = [1955,1956,1957,1958,1959,1960,1961,1962,1963,1964,1965,1966];
 
@@ -511,20 +515,20 @@ const CitiesStore = {
     // calculate "grid" placement for each project
     let rows = [new Array(12)];
     projects.forEach((project, i) => {
-      const endYear = Math.min(project.endYear, 1966);
-      projects[i].endYear = endYear;
+      const end_year = Math.min(project.end_year, 1966);
+      projects[i].end_year = end_year;
       let availableRow = false;
       rows.forEach((row, rowNum) => {
         let canFit = true;
           
         // test whether the project can fit in the space
-        for (let col = years.indexOf(project.startYear); col <= years.indexOf(endYear); col ++) {
+        for (let col = years.indexOf(project.start_year); col <= years.indexOf(end_year); col ++) {
           if (rows[rowNum][col]) {
             canFit = false;
           }
           // for one year spans pad it
-          if (project.startYear == endYear) {
-            if ((col > 0 && rows[rowNum][col-1]) || (col <= years.indexOf(endYear) && rows[rowNum][col+1])) {
+          if (project.start_year == end_year) {
+            if ((col > 0 && rows[rowNum][col-1]) || (col <= years.indexOf(end_year) && rows[rowNum][col+1])) {
               canFit = false;
             }
           }
@@ -538,14 +542,14 @@ const CitiesStore = {
       if (!availableRow) {
         rows.push(new Array(years.length));
       }
-      for (let col = years.indexOf(project.startYear); col <= years.indexOf(endYear); col ++) {
+      for (let col = years.indexOf(project.start_year); col <= years.indexOf(end_year); col ++) {
         rows[projects[i].row][col] = 'x';
         // for one year spans pad it
-        if (project.startYear == endYear) {
+        if (project.start_year == end_year) {
           if (col > 0) {
             rows[projects[i].row][col-1] = 'x';
           } 
-          if (col <= years.indexOf(endYear)) {
+          if (col <= years.indexOf(end_year)) {
             rows[projects[i].row][col+1] = 'x';
           } 
         }
@@ -638,9 +642,9 @@ const CitiesStore = {
 
   getYearTotals: function(year) { return this.data.yearsTotals[year]; },
 
-  getYearsTotalsMax: function() { return Math.max(...Object.keys(this.data.yearsTotals).map(year => this.data.yearsTotals[year].white + this.data.yearsTotals[year].nonwhite)); },
+  getYearsTotalsMax: function() { return Math.max(...Object.keys(this.data.yearsTotals).map(year => this.data.yearsTotals[year].whites + this.data.yearsTotals[year].nonwhite)); },
 
-  getYearsTotalsMaxRace: function() { return Math.max(...Object.keys(this.data.yearsTotals).map(year => this.data.yearsTotals[year].nonwhite).concat(Object.keys(this.data.yearsTotals).map(year => this.data.yearsTotals[year].white))); },
+  getYearsTotalsMaxRace: function() { return (this.data.loaded) ? Math.max(...Object.keys(this.data.yearsTotals).map(year => this.data.yearsTotals[year].nonwhite).concat(Object.keys(this.data.yearsTotals).map(year => this.data.yearsTotals[year].whites))) : 4000; },
 
   getMaxDisplacementsInCityForYear: function() { return this.data.maxDisplacementsInCityForYear; },
 
@@ -695,6 +699,10 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
     } else {
       CitiesStore.setInspectedCity(action.value);
     }
+    break;
+
+  case AppActionTypes.projectInspected:
+    CitiesStore.setInspectedProject(action.value);
     break;
 
   case AppActionTypes.viewSelected:

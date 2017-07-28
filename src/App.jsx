@@ -46,7 +46,7 @@ class App extends React.Component {
     this.coords = {};
 
     // bind handlers
-    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle', 'onProjectInspected', 'onProjectOut'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
 
     console.time('update');
@@ -92,6 +92,10 @@ class App extends React.Component {
 
   onHOLCToggle() { AppActions.HOLCToggle(!CitiesStore.getHOLCSelected()); }
 
+  onProjectInspected(event) { AppActions.projectInspected(event.target.id); }
+
+  onProjectOut() { AppActions.projectInspected(null); }
+
   onViewSelected(event) { 
     if (event.target.id !== CitiesStore.getSelectedView()) {
       AppActions.viewSelected(event.target.id); 
@@ -108,7 +112,7 @@ class App extends React.Component {
   toggleLegendVisibility() { this.setState({ legendVisible: !this.state.legendVisible }); }
 
   onZoomIn(event) {
-    console.log(event.target.id);
+    event.preventDefault();
     const z = GeographyStore.getZ() * 1.6,
       centerX = (event.target.id == 'zoomInButton') ? DimensionsStore.getMainPaneWidth()  / 2 - GeographyStore.getX() : event.nativeEvent.offsetX - GeographyStore.getX(),
       centerY = (event.target.id == 'zoomInButton') ? DimensionsStore.getNationalMapHeight()  / 2 - GeographyStore.getY() : event.nativeEvent.offsetY - GeographyStore.getY(),
@@ -174,16 +178,14 @@ class App extends React.Component {
       year: CitiesStore.getSelectedYear(),
       view: [GeographyStore.getX(), GeographyStore.getY(), GeographyStore.getZ()].join('/'),
       city: CitiesStore.getSlug(),
-      viz: CitiesStore.getSelectedView()
+      viz: CitiesStore.getSelectedView(),
+      holc: CitiesStore.getHOLCSelected() || null
     };
     if (CitiesStore.getSelectedCity() && GeographyStore.getLatLngZoom().lat) {
       vizState.loc = { 
         zoom: GeographyStore.getLatLngZoom().zoom, 
         center: [GeographyStore.getLatLngZoom().lat, GeographyStore.getLatLngZoom().lng] 
       };
-    }
-    if (CitiesStore.getHOLCSelected()) {
-      vizState.holc = true;
     }
 
     HashManager.updateHash(vizState);
@@ -212,15 +214,15 @@ class App extends React.Component {
                       maxForYear={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).maxDisplacmentsForYear }
                       onMoveend={ this.onCityMapMove }
                       HOLCSelected={ CitiesStore.getHOLCSelected() }
+                      inspectedProject={ CitiesStore.getInspectedProject() }
                     />
                     <div 
-                      className='mapLegend'
-                      style={ DimensionsStore.getLegendDimensions() }
+                      className='mapLegend demographics'
                     >
                       <svg
-                        width={120}
-                        height={95}
-                        style={{ margin: '10px 0 0 20px' }}
+                        width={135}
+                        height={130}
+                        style={{ margin: '10px 0 0 5px' }}
                       >
 
                         { [0,1,2,3,4].map(income => {
@@ -228,13 +230,13 @@ class App extends React.Component {
                             [1,0.75,0.5,0.25,0].map((perc, i) => {
                               return (
                                 <rect
-                                  x={10 + income * 15}
-                                  y={10 + i * 15}
+                                  x={25 + income * 15}
+                                  y={20 + i * 15}
                                   width={15}
                                   height={15}
                                   fill={ getColorForRace(perc) }
-                                  fillOpacity={ (1 - (income * 2500 / 10000)) / 3 }
-                                  stroke='black'
+                                  fillOpacity={ (0.75 - 0.7 * (income * 2500 / 10000)) }
+                                  stroke={ getColorForRace(perc) }
                                   strokeWidth={0.5}
                                 />
                               );
@@ -243,38 +245,70 @@ class App extends React.Component {
                         })}
                         <text
                           x={0}
-                          y={57.5}
+                          y={62.5}
                           textAnchor='middle'
-                          alignmentBaseline='baseline'
-                          transform='rotate(270 0,47.5)'
+                          alignmentBaseline='hanging'
+                          transform='rotate(270 0,57.5)'
                           fill='black'
                         >
                           people of color
                         </text>
                         <text
-                          x={85}
-                          y={10}
+                          x={103}
+                          y={20}
                           alignmentBaseline='hanging'
                           fill='black'
+                          fontSize='0.9em'
                         >
                           100%
                         </text>
                         <text
-                          x={85}
-                          y={85}
+                          x={103}
+                          y={95}
                           alignmentBaseline='baseline'
                           fill='black'
+                          fontSize='0.9em'
                         >
                           0%
                         </text>
                         <text
-                          x={47.5}
-                          y={-5}
+                          x={25 + (75/2)}
+                          y={0}
                           textAnchor='middle'
                           alignmentBaseline='hanging'
                           fill='black'
                         >
-                          income
+                          ← lower income
+                        </text>
+                        <text
+                          x={25 + 15/2}
+                          y={20 + 77}
+                          textAnchor='middle'
+                          alignmentBaseline='hanging'
+                          fill='black'
+                          fontSize='0.9em'
+                        >
+                          $1K
+                        </text>
+                        <text
+                          x={25 + 75 - 15/2}
+                          y={20 + 77}
+                          textAnchor='middle'
+                          alignmentBaseline='hanging'
+                          fill='black'
+                          fontSize='0.9em'
+                        >
+                          $5K+
+                        </text>
+                        <text
+                          x={25 + 75/2}
+                          y={20 + 77 + 12 }
+                          textAnchor='middle'
+                          alignmentBaseline='hanging'
+                          fill='#444'
+                          fontSize='0.8em'
+                        >
+                          median family incomes
                         </text>
                       </svg>
                     </div>
@@ -328,12 +362,23 @@ class App extends React.Component {
 
                     </svg>
                     <div id='mapChartControls'>
-                      <div onClick={ this.onZoomIn } className='zoomin'>
-                        <img src='static/zoomin.png' />
+                      <div
+                        className="zoom-in" 
+                        title="Zoom in" 
+                        role="button" 
+                        aria-label="Zoom in"
+                        onClick={ this.onZoomIn } 
+                      >
+                        +
                       </div>
-
-                      <div onClick={ this.zoomOut }  className='zoomout'>
-                        <img src='static/zoomout.png' />
+                      <div
+                        className="zoom-out" 
+                        title="Zoom out" 
+                        role="button" 
+                        aria-label="Zoom out"
+                        onClick={ this.zoomOut }
+                      >
+                        -
                       </div>
 
                       <div onClick={ this.resetView } className='reset'>
@@ -419,6 +464,9 @@ class App extends React.Component {
               year={ this.state.year }
               onCityClicked={ this.onCityClicked }
               onCategoryClicked={ this.onCategoryClicked }
+              onProjectInspected={ this.onProjectInspected }
+              onProjectOut={ this.onProjectOut }
+              onYearClick={ this.onYearClicked }
             /> : 
             <div className='stateList'>
               {/* CitiesStore.getVisibleCitiesByState().map(state => {

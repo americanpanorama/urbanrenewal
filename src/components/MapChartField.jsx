@@ -304,9 +304,9 @@ export default class MapChartField extends React.Component {
               <stop offset="100%" style={{stopColor:'rgb(44,160,44)', stopOpacity:1}} />
             </linearGradient>
             <linearGradient id="graphgradient2" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style={{stopColor:'rgb(44,160,44)', stopOpacity:1}} />
+              <stop offset="0%" style={{stopColor:'rgb(163, 135, 190)', stopOpacity:1}} />
               <stop offset="50%" style={{stopColor:'rgb(128,128,128)', stopOpacity:1}} />
-              <stop offset="100%" style={{stopColor:'rgb(163, 135, 190)', stopOpacity:1}} />
+              <stop offset="100%" style={{stopColor:'rgb(44,160,44)', stopOpacity:1}} />
             </linearGradient>
             <linearGradient id="maskgradient" x1="0%" y1="0%" x2="0%" y2="100%">
               <stop offset="75%" style={{stopColor:'rgb(128,128,128)', stopOpacity:1}} />

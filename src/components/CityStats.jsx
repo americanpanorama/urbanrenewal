@@ -4,21 +4,8 @@ import CitiesStore from '../stores/CitiesStore.js';
 import DimensionsStore from '../stores/DimensionsStore.js';
 import CityTimelineComponent from './CityTimelineComponent.jsx';
 
-
 export default class CityStats extends React.Component {
   constructor (props) { super(props); }
-
-  formatValue(value, category) {
-    let formatted = '';
-    switch(category) {
-    case 'dollars':
-      formatted = '$';
-      break;
-    }
-    formatted += value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-    return formatted;
-  }
 
   render() {
     return (
@@ -52,23 +39,27 @@ export default class CityStats extends React.Component {
                 <th></th>
                 <th>1950</th>
                 <th>1960</th>
+                <th>1970</th>
               </tr>
               <tr>
                 <td>Population</td>
                 <td className='total' key='total1950'>{ this.props.pop_1950.toLocaleString() }</td>
                 <td className='total' key='total1960'>{ this.props.pop_1960.toLocaleString()}</td>
+                <td className='total' key='total1970'>{ this.props.pop_1970.toLocaleString()}</td>
               </tr>
 
               <tr>
                 <td>white</td>
                 <td>not available</td>
-                <td>{ this.props.white_1960.toLocaleString() + ' (' + Math.round(1000 * this.props.white_1960 / this.props.pop_1960) / 10  + '%)'}</td>
+                <td>{ Math.round(1000 * this.props.white_1960 / this.props.pop_1960) / 10  + '%'}</td>
+                <td>{ Math.round(1000 * this.props.white_1970 / this.props.pop_1970) / 10  + '%'}</td>
               </tr>
 
               <tr>
                 <td>of color</td>
                 <td>not available</td>
-                <td>{ this.props.nonwhite_1960.toLocaleString() + ' (' + Math.round(1000 * this.props.nonwhite_1960 / this.props.pop_1960) / 10  + '%)'}</td>
+                <td>{ Math.round(1000 * this.props.nonwhite_1960 / this.props.pop_1960) / 10  + '%'}</td>
+                <td>{ Math.round(1000 * this.props.nonwhite_1970 / this.props.pop_1970) / 10  + '%'}</td>
               </tr>
 
               

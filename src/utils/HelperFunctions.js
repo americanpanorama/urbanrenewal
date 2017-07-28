@@ -6,16 +6,19 @@ import GeographyStore from '../stores/GeographyStore.js';
 import DorlingLocations from '../../data/dorlingLngLats.json';
 
 export const getColorForRace =  function(weight) {
+  if (isNaN(weight)) {
+    return 'grey';
+  }
   if (weight >= 0.5) {
-    var color1 = [44, 160, 44],
-      color2 = [255,231,97],
+    var color1 = [163, 135, 190],
+      color2 = [220,220,220], //
       scale = d3.scale.linear()
         .domain([0.5, 1])
         .range([0, 1]),
       weight = scale(weight);
   } else {
-    var color1 = [255,231,97],
-      color2 = [163, 135, 190],
+    var color1 = [220,220,220],
+      color2 = [44, 160, 44],
       scale = d3.scale.linear()
         .domain([0, 0.5])
         .range([0, 1]),

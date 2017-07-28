@@ -11,37 +11,20 @@ export default class Timespan extends React.Component {
       <g
         transform={'translate(' + this.props.x + ', ' + this.props.y + ')'}
       >
-        <defs>
-          <filter x="0" y="0" width="1" height="1" id="textBackground">
-            <feFlood floodColor="#232d37"/>
-            <feComposite in="SourceGraphic"/>
-          </filter>
-        </defs>
-
-        {/* <rect
-          x={ 0 }
-          y={ 0 }
-          width={ 0.5 }
-          height={ this.props.height }
-          fill='silver'
-        />
-        <rect
-          x={ this.props.width - 1 }
-          y={ 0 }
-          width={ 0.5 }
-          height={ this.props.height }
-          fill='silver'
-        /> */}
-
         <rect
           x={ 0 }
           y={ 0 }
+          rx={ this.props.height / 2 }
+          ry={ this.props.height / 2 }
           width={ this.props.width }
           height={ this.props.height }
           fill={ getColorForRace(this.props.projectData.percentFamiliesOfColor) }
-          fillOpacity={ this.props.projectData.totalFamilies / (1 + this.props.projectData.endYear - this.props.projectData.startYear) / this.props.maxForYear }
+          fillOpacity={ this.props.projectData.totalFamilies / (1 + this.props.projectData.end_year - this.props.projectData.start_year) / this.props.maxForYear }
           stroke={ getColorForRace(this.props.projectData.percentFamiliesOfColor) }
           strokeWidth='1'
+          onMouseEnter={ this.props.onProjectInspected }
+          onMouseLeave={ this.props.onProjectOut }
+          id={ this.props.projectData.project_id }
         />
         <text
           dx={ this.props.width / 2 }
@@ -50,7 +33,9 @@ export default class Timespan extends React.Component {
           fontSize={ 13 }
           textAnchor='middle'
           alignmentBaseline='middle'
-          //filter="url(#textBackground)"
+          onMouseEnter={ this.props.onProjectInspected }
+          onMouseLeave={ this.props.onProjectOut }
+          id={ this.props.projectData.project_id }
         >
           { this.props.text + ' - ' + formatNumber(this.props.projectData.totalFamilies)  }
         </text>

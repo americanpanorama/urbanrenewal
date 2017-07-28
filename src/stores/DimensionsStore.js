@@ -276,8 +276,8 @@ const DimensionsStore = {
     };
   },
 
-  getDorlingRadius: function(v) {
-    let theMax = (CitiesStore.getSelectedYear()) ? CitiesStore.getMaxDisplacementsInCityForYear() : CitiesStore.getMaxDisplacementsInCity() || 1;
+  getDorlingRadius: function(v, options = {}) {
+    let theMax = (CitiesStore.getSelectedYear() || options.useYear) ? CitiesStore.getMaxDisplacementsInCityForYear() : CitiesStore.getMaxDisplacementsInCity() || 1;
     let r = d3.scale.sqrt()
       .domain([0, (CitiesStore.getSelectedCategory() == 'funding') ? CitiesStore.getCategoryMaxForCity('urban renewal grants dispursed') : theMax])
       .range([0, this.data.dorlingsMaxRadius]);
@@ -317,7 +317,7 @@ const DimensionsStore = {
 
   getMainTimelineBarAttrs: function(year, race) {
     return {
-      x: (race == 'white') ? this.getMainTimlineXOffset(year) : this.getMainTimlineXOffset(year) - this.getMainTimelineBarWidth(),
+      x: (race == 'whites') ? this.getMainTimlineXOffset(year) : this.getMainTimlineXOffset(year) - this.getMainTimelineBarWidth(),
       y: this.getMainTimelineBarY(year, race),
       width: this.getMainTimelineBarWidth(),
       height: this.getMainTimelineBarHeight(year, race),
@@ -381,8 +381,8 @@ const DimensionsStore = {
   },
 
   getMainTimelineYAxisValues() { 
-    const max = CitiesStore.getYearsTotalsMaxRace(),
-      intervals = this.getMainTimelineYAxisInterval(CitiesStore.getYearsTotalsMaxRace());
+    const max = CitiesStore.getYearsTotalsMaxRace() || 4000,
+      intervals = this.getMainTimelineYAxisInterval(max);
     return [...Array(Math.floor(max/intervals)).keys()].map(i => (i + 1) * intervals ); 
   },
 
@@ -439,7 +439,7 @@ const DimensionsStore = {
       y: this.getMainTimelineMaxBarHeight() * 0.33,
       width: this.getMainTimelineBarWidth(),
       height: this.getMainTimelineBarWidth(),
-      fill: '#2ca02c',
+      fill: '#a387be',
       stroke: 'black',
       strokeWidth: 0.5
     };
@@ -459,7 +459,7 @@ const DimensionsStore = {
       y: this.getMainTimelineMaxBarHeight() * 0.33 + this.getMainTimelineBarWidth() * 1.5 ,
       width: this.getMainTimelineBarWidth(),
       height: this.getMainTimelineBarWidth(),
-      fill: '#a387be',
+      fill: '#2ca02c',
       stroke: 'black',
       strokeWidth: 0.5
     };
@@ -479,9 +479,12 @@ const DimensionsStore = {
 
   getCityTimelineStyle: function() {
     return {
-      width: this.data.sidebarWidth - 2 * this.data.containerPadding
+      width: this.data.sidebarWidth - this.data.containerPadding,
+      transform: 'translate(' + this.data.containerPadding/3 + ')'
     };
   },
+
+  getTimelineXOffset: function(year) { return (year - 1955) * this.getMainTimelineYearWidth(); },
 
   getTimelineYearWidth: function() { return this.getMainTimelineBarFieldWidth() / 12; },
 
@@ -490,6 +493,44 @@ const DimensionsStore = {
   getTimelineProjectHeight: function() { return this.data.timelineProjectHeight; },
 
   getTimelineXOffsetForYear: function(year) { return (year - 1955) * this.getTimelineYearWidth(); },
+
+  getTimelineXDorlingAttrs: function(year, families, fill) {
+    return {
+      cx: this.getMainTimelineLabelXOffset(year), 
+      cy: this.getDorlingRadius(CitiesStore.getMaxDisplacementsInCityForYear(), {useYear: true}),
+      r: this.getDorlingRadius(families, {useYear: true}),
+      fill: fill,
+      fillOpacity: (year == CitiesStore.getSelectedYear() || CitiesStore.getSelectedYear() == null) ? 1 : 0.4,
+      stroke: 'transparent',
+      key: 'xdorling' + year
+    };
+  },
+
+  getTimelineXDorlingLabelAttrs: function(year, families) {
+    return {
+      x: this.getMainTimelineLabelXOffset(year), 
+      y: this.getDorlingRadius(CitiesStore.getMaxDisplacementsInCityForYear(), {useYear: true}),
+      fill: (year == CitiesStore.getSelectedYear() || CitiesStore.getSelectedYear() == null) ? 'black' : 'grey',
+      textAnchor: 'middle',
+      alignmentBaseline: 'middle',
+      pointerEvents: 'none',
+      fontSize: (8 * this.getDorlingRadius(families, {useYear: true}) / 15 < 12) ? 12 : (8 * this.getDorlingRadius(families, {useYear: true}) / 15 > 18) ? 18 : 8 * this.getDorlingRadius(families, {useYear: true})  / 15,
+      key: 'xdorlinglabel' + year
+    };
+  },
+
+  getTimelineXAxisAttrs: function(year) {
+    return {
+      dx: this.getMainTimelineLabelXOffset(year), 
+      dy: 0,
+      alignmentBaseline: 'hanging',
+      textAnchor: 'middle',
+      fill: (year == CitiesStore.getSelectedYear() || CitiesStore.getSelectedYear() == null) ? 'black' : 'grey',
+      stroke: 'transparent',
+      fontSize: this.getMainTimelineFontSize(),
+      key: 'xAxiscitytimeline' + year
+    };
+  },
 
  
       // xOffsetForYearMiddle = (year) => xOffsetForYear(year) + yearMiddleOffset,

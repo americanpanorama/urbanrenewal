@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { PropTypes } from 'react';
 import * as L from 'leaflet';
+
 import { AppActions, AppActionTypes } from '../utils/AppActionCreator';
 import { getColorForRace, formatNumber } from '../utils/HelperFunctions';
 
@@ -11,6 +12,7 @@ import GeographyStore from '../stores/GeographyStore';
 
 // components
 import { Map, TileLayer, GeoJSON, Marker, Tooltip, FeatureGroup, LayerGroup} from 'react-leaflet';
+import UrbanRenewalPolygon from './UrbanRenewalPolygon.jsx';
 
 // import cartodbConfig from '../../basemaps/cartodb/config.json';
 // import cartodbLayers from '../../basemaps/cartodb/basemaps.json';
@@ -33,6 +35,10 @@ export default class CityMap extends React.Component {
     if (unmoved && this.props.HOLCSelected !== nextProps.HOLCSelected) {
       return true;
     }
+    // update if project inspected 
+    if (this.props.inspectedProject !== nextProps.inspectedProject) {
+      return true;
+    }
     // prevent rerendering on map move--new props but dom already updated by leaflet
     return !unmoved;
   }
@@ -53,8 +59,6 @@ export default class CityMap extends React.Component {
     const max = Math.max(...Object.keys(this.props.cityData.projects)
       .filter(id => this.props.cityData.projects[id].totalFamilies)
       .map(id => this.props.cityData.projects[id].totalFamilies));
-
-    console.log(this.props.lat);
 
     return (
       <div
@@ -84,15 +88,18 @@ export default class CityMap extends React.Component {
 
           { (this.props.cityData.holc_areas.length == 0 || (!this.props.HOLCSelected && this.props.cityData.tracts)) ? 
             Object.keys(this.props.cityData.tracts).map(tractId => {
+              console.log(this.props.cityData.tracts[tractId].medianIncome );
               return(
                 <GeoJSON
-                  data={ this.props.cityData.tracts[tractId].theGeojson }
-                  key={ tractId }
+                  data={ this.props.cityData.tracts[tractId].the_geojson }
+                  key={ 'tract' + tractId }
                   style= { {
                     fillColor: getColorForRace(this.props.cityData.tracts[tractId].percentPeopleOfColor / 100),
                     //fillColor: 'transparent',
-                    fillOpacity: (this.props.cityData.tracts[tractId].medianIncome < 10000) ? (1 - ((this.props.cityData.tracts[tractId].medianIncome - 999) / 10000)) / 3: 0,
-                    weight: 0.3
+                    //fillOpacity: (this.props.cityData.tracts[tractId].medianIncome < 10000) ? (1 - ((this.props.cityData.tracts[tractId].medianIncome - 999) / 10000)) / 3: 0,
+                    fillOpacity: (this.props.cityData.tracts[tractId].medianIncome < 5000) ? 0.7 - (1 - ((this.props.cityData.tracts[tractId].medianIncome - 999) / 5000)): 0.05,
+                    weight: 0.5, //(this.props.cityData.tracts[tractId].medianIncome < 5000) ? 10 - 10 * (1 - ((this.props.cityData.tracts[tractId].medianIncome - 999) / 5000)): 0,
+                    color: getColorForRace(this.props.cityData.tracts[tractId].percentPeopleOfColor / 100),
                   } }
                   className='tract'
                 />
@@ -103,7 +110,7 @@ export default class CityMap extends React.Component {
 
           { this.props.HOLCSelected && this.props.cityData.holc_areas.map((area, i) => 
             <GeoJSON
-              data={area.theGeojson}
+              data={area.the_geojson}
               key={ 'holc' + i }
               className={'holc ' + area.grade }
               style={{
@@ -115,30 +122,32 @@ export default class CityMap extends React.Component {
 
           { (this.props.cityData.projects) ?
             Object.keys(this.props.cityData.projects).map(projectId => {
-              if (this.props.cityData.projects[projectId].theGeojson) {
+              if (this.props.cityData.projects[projectId].the_geojson) {
                 return (
-                  <LayerGroup key={ 'geojson' + this.props.cityData.projects[projectId].id }>
-                    <GeoJSON
-                      data={ this.props.cityData.projects[projectId].theGeojson }
-                      key={ 'geojson' + this.props.cityData.projects[projectId].id }
+                  <LayerGroup key={ 'geojson' + projectId }>
+                    <UrbanRenewalPolygon
+                      data={ this.props.cityData.projects[projectId].the_geojson }
                       style={ {
                         weight: 5,
-                        color: 'red' || getColorForRace(this.props.cityData.projects[projectId].percentFamiliesOfColor),
+                        color: (this.props.inspectedProject == projectId || this.props.inspectedProject == null) ?  'red' : 'grey',
                         dashArray: '10, 5',
-                        fillColor: 'transparent' || getColorForRace(this.props.cityData.projects[projectId].percentFamiliesOfColor),
-                        fillOpacity: this.props.cityData.projects[projectId].totalFamilies / max
+                        fillColor: getColorForRace(this.props.cityData.projects[projectId].percentFamiliesOfColor),
+                        fillOpacity: (this.props.inspectedProject == projectId) ? 0.8 : 0
                       } }
                     >
-                      <Tooltip 
-                        direction='center'
-                        offset={[0,0]} 
-                        opacity={1} 
-                        permanent={true}
-                        className='projectLabel'
-                      >
-                        <span>{this.props.cityData.projects[projectId].project + '-' + formatNumber(this.props.cityData.projects[projectId].totalFamilies) }</span>
-                      </Tooltip>
-                    </GeoJSON>
+                      { (this.props.inspectedProject == projectId || this.props.inspectedProject == null) ?
+                        <Tooltip 
+                          direction='center'
+                          offset={[0,0]} 
+                          opacity={1} 
+                          permanent={true}
+                          className='projectLabel'
+                        >
+                          <span>{this.props.cityData.projects[projectId].project.replace(/\b\w/g, l => l.toUpperCase()) + ((this.props.cityData.projects[projectId].totalFamilies > 0) ? '-' + formatNumber(this.props.cityData.projects[projectId].totalFamilies) : '') }</span>
+                        </Tooltip> : ''
+                      }
+
+                    </UrbanRenewalPolygon>
                   </LayerGroup>
                 );
               }

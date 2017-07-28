@@ -65,7 +65,7 @@ export default class Timeline extends React.Component {
                     id={ year }
                   />
                  <rect
-                    { ...DimensionsStore.getMainTimelineBarAttrs(year, 'white') }
+                    { ...DimensionsStore.getMainTimelineBarAttrs(year, 'whites') }
                     className={ (year == this.props.state.year && this.props.state.cat == 'families') ? 'white bar selected' : 'white bar' }
                     onClick={ this.props.onClick }
                     id={ year }
