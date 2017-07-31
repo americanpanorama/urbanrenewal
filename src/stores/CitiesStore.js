@@ -86,6 +86,7 @@ const CitiesStore = {
         r.nonwhite = 0;
         r.totalFamilies = 0;
         r.percentFamiliesOfColor = 0;
+        r.projectsWithDisplacements = 0;
 
         // delete a few values you no longer need
         delete r.centerlat;
@@ -115,6 +116,9 @@ const CitiesStore = {
         this.data.cities[r.city_id].nonwhite += r.nonwhite;
         this.data.cities[r.city_id].totalFamilies += r.totalFamilies;
         this.data.cities[r.city_id].percentFamiliesOfColor = this.data.cities[r.city_id].nonwhite / this.data.cities[r.city_id].totalFamilies;
+        if (r.totalFamilies > 0) {
+          this.data.cities[r.city_id].projectsWithDisplacements += 1;
+        }
 
         // calculate and add years data
         for (let aYear = r.start_year; aYear <= r.end_year; aYear += 1) {
@@ -649,6 +653,10 @@ const CitiesStore = {
   getMaxDisplacementsInCityForYear: function() { return this.data.maxDisplacementsInCityForYear; },
 
   getMaxDisplacementsInCity: function() { return this.data.maxDisplacementInCity; },
+
+  hasDemographicData: function(city_id) { return this.data.cities[city_id].tracts && Object.keys(this.data.cities[city_id].tracts).length > 0; },
+
+  hasHOLCData: function(city_id) { return this.data.cities[city_id].holc_areas.length > 0; },
 
 };
 

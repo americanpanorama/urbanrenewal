@@ -3,6 +3,7 @@ import { PropTypes } from 'react';
 import CitiesStore from '../stores/CitiesStore.js';
 import DimensionsStore from '../stores/DimensionsStore.js';
 import CityTimelineComponent from './CityTimelineComponent.jsx';
+import converter from 'number-to-words';
 
 export default class CityStats extends React.Component {
   constructor (props) { super(props); }
@@ -19,10 +20,7 @@ export default class CityStats extends React.Component {
         <h2>{ this.props.city + ', ' + this.props.state }</h2>
 
         <div className='summary'>
-          <strong>{ Math.round(this.props.totalFamilies).toLocaleString() + ' '}</strong> 
-          families displaced, 
-          <strong>{' ' + Math.round(this.props.percentFamiliesOfColor * 100) + '% '}</strong>
-          of which were families of color.
+          An estimated <strong>{ Math.round(this.props.totalFamilies).toLocaleString() + ' '}</strong> families were displaced through { converter.toWords(this.props.projectsWithDisplacements) } urban renewal projects, <strong>{' ' + Math.round(this.props.percentFamiliesOfColor * 100) + '% '}</strong> of which were families of color.
         </div>
 
         <div>

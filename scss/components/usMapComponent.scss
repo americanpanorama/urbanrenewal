@@ -168,3 +168,16 @@
 	}
 }
 
+.resetView {
+  position: absolute;
+  top: 105px;
+  left: 32px;
+  z-index: 100001;
+  height: 32px;
+  width: 32px; 
+  pointer-events: auto;
+  background: white;
+  padding: 2px 0 0 0;
+  border: 2px solid rgb(204,204,204);
+}
+

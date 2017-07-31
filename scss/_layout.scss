@@ -88,6 +88,35 @@ header {
         height: 140px;
       }
 
+      &.holc {
+        padding: 20px;
+        width: 145px;
+
+        .colorkey {
+          width: 14px;
+          height: 14px;
+          display: inline-block;
+          margin-right: 14px;
+
+          &.A { 
+            background-color: #418e41;
+          }
+          &.B { 
+            background-color: #4a4ae4;
+          }
+          &.C { 
+            background-color: #ffdf00;
+          }
+          &.D { 
+            background-color: #eb3f3f;
+          }
+        }
+
+        .link {
+          pointer-events: auto;
+        }
+      }
+
       svg text {
          fill: #111;
       }

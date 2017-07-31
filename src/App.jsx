@@ -137,7 +137,11 @@ class App extends React.Component {
     AppActions.mapMoved(x,y,z);
   }
 
-  resetView() { AppActions.mapMoved(0,0,1); }
+  resetView() { 
+    AppActions.citySelected(null);
+    AppActions.mapMoved(0,0,1); 
+  }
+
 
   handleMouseUp() {
     this.dragging = false;
@@ -206,6 +210,14 @@ class App extends React.Component {
                 { ...DimensionsStore.getMainPanelDimensions() }
               >
 
+                {/* button for national view*/}
+                <button
+                  className='resetView'
+                  onClick={ this.resetView }
+                >
+                  <img src='static/us-outline.svg' />
+                </button>
+
                 { CitiesStore.getSelectedCity() ? 
                   <div>
                     <CityMap
@@ -216,104 +228,121 @@ class App extends React.Component {
                       HOLCSelected={ CitiesStore.getHOLCSelected() }
                       inspectedProject={ CitiesStore.getInspectedProject() }
                     />
-                    <div 
-                      className='mapLegend demographics'
-                    >
-                      <svg
-                        width={135}
-                        height={130}
-                        style={{ margin: '10px 0 0 5px' }}
-                      >
 
-                        { [0,1,2,3,4].map(income => {
-                          return (
-                            [1,0.75,0.5,0.25,0].map((perc, i) => {
-                              return (
-                                <rect
-                                  x={25 + income * 15}
-                                  y={20 + i * 15}
-                                  width={15}
-                                  height={15}
-                                  fill={ getColorForRace(perc) }
-                                  fillOpacity={ (0.75 - 0.7 * (income * 2500 / 10000)) }
-                                  stroke={ getColorForRace(perc) }
-                                  strokeWidth={0.5}
-                                />
-                              );
-                            })
-                          );
-                        })}
-                        <text
-                          x={0}
-                          y={62.5}
-                          textAnchor='middle'
-                          alignmentBaseline='hanging'
-                          transform='rotate(270 0,57.5)'
-                          fill='black'
+                    { (!CitiesStore.getHOLCSelected() && CitiesStore.hasDemographicData(CitiesStore.getSelectedCity())) ? 
+                      <div 
+                        className='mapLegend demographics'
+                      >
+                        <svg
+                          width={135}
+                          height={130}
+                          style={{ margin: '10px 0 0 5px' }}
                         >
-                          people of color
-                        </text>
-                        <text
-                          x={103}
-                          y={20}
-                          alignmentBaseline='hanging'
-                          fill='black'
-                          fontSize='0.9em'
-                        >
-                          100%
-                        </text>
-                        <text
-                          x={103}
-                          y={95}
-                          alignmentBaseline='baseline'
-                          fill='black'
-                          fontSize='0.9em'
-                        >
-                          0%
-                        </text>
-                        <text
-                          x={25 + (75/2)}
-                          y={0}
-                          textAnchor='middle'
-                          alignmentBaseline='hanging'
-                          fill='black'
-                        >
-                          ← lower income
-                        </text>
-                        <text
-                          x={25 + 15/2}
-                          y={20 + 77}
-                          textAnchor='middle'
-                          alignmentBaseline='hanging'
-                          fill='black'
-                          fontSize='0.9em'
-                        >
-                          $1K
-                        </text>
-                        <text
-                          x={25 + 75 - 15/2}
-                          y={20 + 77}
-                          textAnchor='middle'
-                          alignmentBaseline='hanging'
-                          fill='black'
-                          fontSize='0.9em'
-                        >
-                          $5K+
-                        </text>
-                        <text
-                          x={25 + 75/2}
-                          y={20 + 77 + 12 }
-                          textAnchor='middle'
-                          alignmentBaseline='hanging'
-                          fill='#444'
-                          fontSize='0.8em'
-                        >
-                          median family incomes
-                        </text>
-                      </svg>
-                    </div>
+
+                          { [0,1,2,3,4].map(income => {
+                            return (
+                              [1,0.75,0.5,0.25,0].map((perc, i) => {
+                                return (
+                                  <rect
+                                    x={25 + income * 15}
+                                    y={20 + i * 15}
+                                    width={15}
+                                    height={15}
+                                    fill={ getColorForRace(perc) }
+                                    fillOpacity={ (0.75 - 0.7 * (income * 2500 / 10000)) }
+                                    stroke={ getColorForRace(perc) }
+                                    strokeWidth={0.5}
+                                  />
+                                );
+                              })
+                            );
+                          })}
+                          <text
+                            x={0}
+                            y={62.5}
+                            textAnchor='middle'
+                            alignmentBaseline='hanging'
+                            transform='rotate(270 0,57.5)'
+                            fill='black'
+                          >
+                            people of color
+                          </text>
+                          <text
+                            x={103}
+                            y={20}
+                            alignmentBaseline='hanging'
+                            fill='black'
+                            fontSize='0.9em'
+                          >
+                            100%
+                          </text>
+                          <text
+                            x={103}
+                            y={95}
+                            alignmentBaseline='baseline'
+                            fill='black'
+                            fontSize='0.9em'
+                          >
+                            0%
+                          </text>
+                          <text
+                            x={25 + (75/2)}
+                            y={0}
+                            textAnchor='middle'
+                            alignmentBaseline='hanging'
+                            fill='black'
+                          >
+                            ← lower income
+                          </text>
+                          <text
+                            x={25 + 15/2}
+                            y={20 + 77}
+                            textAnchor='middle'
+                            alignmentBaseline='hanging'
+                            fill='black'
+                            fontSize='0.9em'
+                          >
+                            $1K
+                          </text>
+                          <text
+                            x={25 + 75 - 15/2}
+                            y={20 + 77}
+                            textAnchor='middle'
+                            alignmentBaseline='hanging'
+                            fill='black'
+                            fontSize='0.9em'
+                          >
+                            $5K+
+                          </text>
+                          <text
+                            x={25 + 75/2}
+                            y={20 + 77 + 12 }
+                            textAnchor='middle'
+                            alignmentBaseline='hanging'
+                            fill='#444'
+                            fontSize='0.8em'
+                          >
+                            median family incomes
+                          </text>
+                        </svg>
+                      </div> : ''
+                    }
+
+                    { (CitiesStore.getHOLCSelected() && CitiesStore.hasHOLCData(CitiesStore.getSelectedCity())) ? 
+                       <div 
+                        className='mapLegend holc'
+                      >
+                        <div><span className='colorkey A'> </span>A "Best"</div>
+                        <div><span className='colorkey B'> </span>B "Still Desirable"</div>
+                        <div><span className='colorkey C'> </span>C "Definitely Declining"</div>
+                        <div><span className='colorkey D'> </span>D "Hazardous"</div>
+
+                        <div className='link'><a href={ 'https://dsl.richmond.edu/panorama/redlining/#loc=' + [GeographyStore.getLatLngZoom().zoom, GeographyStore.getLatLngZoom().lat, GeographyStore.getLatLngZoom().lng].join('/') + "&opacity=0" }>See "Mapping Inequality" to explore redlining in { CitiesStore.getCityData(CitiesStore.getSelectedCity()).city }.</a></div>
+                      </div> : ''
+                    }
+
                     
-                    { (CitiesStore.getCityData(CitiesStore.getSelectedCity()).holc_areas.length > 0) ?
+                    { (CitiesStore.hasHOLCData(CitiesStore.getSelectedCity())) ?
                       <div id='mapChartToggle'>
                         <div
                           className={ (CitiesStore.getHOLCSelected()) ? '' : 'selected' }
@@ -380,11 +409,6 @@ class App extends React.Component {
                       >
                         -
                       </div>
-
-                      <div onClick={ this.resetView } className='reset'>
-                        <span className='tooltip'>reset view</span>
-                        <img src='static/reset.png' />
-                      </div>
                     
                     </div>
 
@@ -444,6 +468,8 @@ class App extends React.Component {
                       { (this.state.legendVisible) ? 'hide legend' : 'show legend' }
                     </div>
 
+
+
                   </div>
                 }
 
@@ -451,6 +477,8 @@ class App extends React.Component {
               </div> 
             </div>
           </div>
+
+
 
 
         

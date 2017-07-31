@@ -88,7 +88,6 @@ export default class CityMap extends React.Component {
 
           { (this.props.cityData.holc_areas.length == 0 || (!this.props.HOLCSelected && this.props.cityData.tracts)) ? 
             Object.keys(this.props.cityData.tracts).map(tractId => {
-              console.log(this.props.cityData.tracts[tractId].medianIncome );
               return(
                 <GeoJSON
                   data={ this.props.cityData.tracts[tractId].the_geojson }

@@ -486,7 +486,7 @@ const DimensionsStore = {
 
   getTimelineXOffset: function(year) { return (year - 1955) * this.getMainTimelineYearWidth(); },
 
-  getTimelineYearWidth: function() { return this.getMainTimelineBarFieldWidth() / 12; },
+  getTimelineYearWidth: function() { return this.getMainTimelineBarFieldWidth() / (1966-1954); },
 
   getTimelineYearsSpanWidth: function(year1, year2) { return this.getTimelineYearWidth() * (year2-year1); },
 
@@ -531,6 +531,8 @@ const DimensionsStore = {
       key: 'xAxiscitytimeline' + year
     };
   },
+
+  getTimelineLabelXOffset: function(year) { return (year - 1955) * this.getTimelineYearWidth(); },
 
  
       // xOffsetForYearMiddle = (year) => xOffsetForYear(year) + yearMiddleOffset,
