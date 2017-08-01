@@ -20,6 +20,8 @@ const CitiesStore = {
     inspectedCity: null,
     selectedView: 'cartogram',
     inspectedProject: null,
+    inspectedProjectStats: null,
+    selecteProject: null,
     poc: [0, 1],
 
     // the city data propers
@@ -73,7 +75,9 @@ const CitiesStore = {
 
       responses[1].forEach(r => {
         // calculate some additional/aggregate and initialization values 
+        r.id = r.city_id;
         r.slug = r.city.replace(/ /g,'') + r.state.toUpperCase();
+        r.searchName = r.city.replace(/ /g,'') + ' ' + StateAbbrs[r.state.toUpperCase()];
         r.center = (r.centerlat !== null) ? [r.centerlat,r.centerlng] : null;
         r.hasProjectGeojson = (r.centerlat !== null);
         r.boundingBox = (r.bbymin !== null) ? [[r.bbymin,r.bbxmin],[r.bbymax,r.bbxmax]] : null;
@@ -194,6 +198,11 @@ const CitiesStore = {
       {
         query: "select ST_asgeojson(the_geom, 4) as the_geojson, holc_grade from holc_polygons where ad_id in (select ad_id from holc_polygons join (select city_id, st_envelope(st_collect(the_geom)) as the_geom from urdr_id_key where city_id = " + city_id + " and the_geom is not null group by city_id) projects on st_intersects(projects.the_geom, holc_polygons.the_geom) group by ad_id)",
         format: 'JSON'
+      },
+      // full category data
+      {
+        query: "SELECT distinct on(project_id, combined_dire_char_raw.category_id) combined_dire_char_raw.project_id, combined_dire_char_raw.category_id, value, year, assessed_category, unit_of_measurement FROM digitalscholarshiplab.combined_dire_char_raw join urdr_category_id_key on city_id = " + city_id + " and combined_dire_char_raw.category_id != 71 and combined_dire_char_raw.category_id != 72 and combined_dire_char_raw.category_id = urdr_category_id_key.category_id order by project_id, combined_dire_char_raw.category_id, year desc",
+        format: 'JSON'
       }
     ]).then(responses => {
       responses[0].forEach(response => {
@@ -209,6 +218,22 @@ const CitiesStore = {
           the_geojson: JSON.parse(response.the_geojson),
           grade: response.holc_grade
         });
+      });
+
+      const cat_codes = {
+        'proposed reuse of project land- public': 'reuse_public',
+        'proposed reuse of project land- industrial': 'reuse_industrial',
+        'proposed reuse of project land- commercial': 'reuse_commercial',
+        'proposed reuse of project land- residential': 'reuse_residential',
+        'dwelling units- sub-standard': 'houses_sub_standard',
+        'dwelling units- standard': 'houses_standard',
+        'urban renewal grants dispursed': 'funding_dispursed',
+        'urban renewal grants approved/reserved': 'funding_approved'
+      };
+      responses[2].forEach(r => {
+        if (this.data.cities[city_id].projects[r.project_id]) {
+          this.data.cities[city_id].projects[r.project_id][cat_codes[r.assessed_category]] = r.value; 
+        }
       });
 
       // use the project totals to calculate city totals
@@ -273,6 +298,11 @@ const CitiesStore = {
     this.emit(AppActionTypes.storeChanged);
   },
 
+  setInspectedProjectStats: function(project_id) {
+    this.data.inspectedProjectStats = project_id;
+    this.emit(AppActionTypes.storeChanged);
+  },
+
   setPOCBottom: function(value) {
     this.data.poc[0] = value;
     this.emit(AppActionTypes.storeChanged);
@@ -290,6 +320,11 @@ const CitiesStore = {
 
   setSelectedCity: function(city_id) {
     this.data.selectedCity = city_id;
+    this.emit(AppActionTypes.storeChanged);
+  },
+
+  setSelectedProject: function(project_id) {
+    this.data.selectedProject = project_id;
     this.emit(AppActionTypes.storeChanged);
   },
 
@@ -340,6 +375,8 @@ const CitiesStore = {
   getCities: function() { return (this.data && this.data.loaded) ? this.data.cities : {}; },
 
   getCitiesList: function() { return (this.data && this.data.loaded) ? Object.keys(this.data.cities).map(city_id => this.data.cities[city_id]) : []; },
+
+  getCitiesListWithDisplacements: function() { return this.getCitiesList().filter(d => d.totalFamilies > 0); },
 
   getCitiesDataForYearAndCategory: function(year, category) { 
     return (this.data && this.data.loaded) ?
@@ -491,11 +528,15 @@ const CitiesStore = {
 
   getHighlightedCity: function() { return this.getInspectedCity() || this.getSelectedCity(); },
 
+  getHighlightedProject: function() { return this.getInspectedProjectStats() || this.getSelectedProject(); },
+
   getHOLCSelected: function() { return this.data.HOLCSelected; },
 
   getInspectedCity: function() { return this.data.inspectedCity; },
 
   getInspectedProject: function() { return this.data.inspectedProject; },
+
+  getInspectedProjectStats: function() { return this.data.inspectedProjectStats; },
 
   getPOC: function() { return this.data.poc; },
 
@@ -566,6 +607,8 @@ const CitiesStore = {
   getSelectedCategory: function() { return this.data.selectedCategory; },
 
   getSelectedCity: function() { return this.data.selectedCity; },
+
+  getSelectedProject: function() { return this.data.selectedProject; },
 
   getSelectedView: function() { return this.data.selectedView; },
 
@@ -711,6 +754,14 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
 
   case AppActionTypes.projectInspected:
     CitiesStore.setInspectedProject(action.value);
+    break;
+
+  case AppActionTypes.projectInspectedStats:
+    CitiesStore.setInspectedProjectStats(action.value);
+    break;
+
+  case AppActionTypes.projectSelected:
+    CitiesStore.setSelectedProject(action.value);
     break;
 
   case AppActionTypes.viewSelected:

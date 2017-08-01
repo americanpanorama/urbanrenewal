@@ -17,6 +17,8 @@ export const AppActionTypes = {
   cityMapMoved: 'cityMapMoved',
   HOLCToggle: 'HOLCToggle',
   projectInspected: 'projectInspected',
+  projectInspectedStats: 'projectInspectedStats',
+  projectSelected: 'projectSelected',
 
 };
 
@@ -72,6 +74,20 @@ export const AppActions = {
   projectInspected: (project_id) => {
     AppDispatcher.dispatch({
       type: AppActionTypes.projectInspected,
+      value: project_id
+    });
+  },
+
+  projectInspectedStats: (project_id) => {
+    AppDispatcher.dispatch({
+      type: AppActionTypes.projectInspectedStats,
+      value: project_id
+    });
+  },
+
+  projectSelected: (project_id) => {
+    AppDispatcher.dispatch({
+      type: AppActionTypes.projectSelected,
       value: project_id
     });
   },

@@ -19,11 +19,13 @@ import CityTimelineComponent from './components/CityTimelineComponent.jsx';
 import TimelineYearComponent from './components/TimelineYearComponent.jsx';
 import MapChart from './components/MapChartComponent.jsx';
 import CityStats from './components/CityStats.jsx';
+import ProjectStats from './components/ProjectStats.jsx';
 import YearStats from './components/YearStats.jsx';
+import TypeAheadCitySnippet from './components/TypeAheadCitySnippet.jsx';
 import CitySnippet from './components/CitySnippetComponent.jsx';
 import DorlingCartogram from './components/DorlingCartogramComponent.jsx';
 import Scatterplot from './components/ScatterplotComponent.jsx';
-import {ReactSVGPanZoom} from 'react-svg-pan-zoom';
+import { Typeahead } from 'react-typeahead';
 
 
 // utils
@@ -46,7 +48,7 @@ class App extends React.Component {
     this.coords = {};
 
     // bind handlers
-    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle', 'onProjectInspected', 'onProjectOut'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle', 'onProjectInspected', 'onProjectOut', 'onSearching', 'onProjectMapHover', 'onProjectSelected', 'onProjectMapUnhover'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
 
     console.time('update');
@@ -82,7 +84,10 @@ class App extends React.Component {
 
   onCategoryClicked(event) { AppActions.categorySelected(event.target.id); }
 
-  onCityClicked(event) { AppActions.citySelected(event.target.id); }
+  onCityClicked(event) { 
+    const id = event.city_id || event.target.id;
+    AppActions.citySelected(id); 
+  }
 
   onCityInspected(event) { AppActions.cityInspected(event.target.id); }
 
@@ -94,7 +99,17 @@ class App extends React.Component {
 
   onProjectInspected(event) { AppActions.projectInspected(event.target.id); }
 
+  onProjectMapHover(event) { AppActions.projectInspectedStats(parseInt(event.target.options.id)); }
+
+  onProjectMapUnhover(event) { AppActions.projectInspectedStats(null); }
+
+  onProjectSelected(event) { console.log(event.target.options.id); AppActions.projectSelected(parseInt(event.target.options.id)); }
+
   onProjectOut() { AppActions.projectInspected(null); }
+
+  onSearching(d) { 
+    console.log(d);
+  }
 
   onViewSelected(event) { 
     if (event.target.id !== CitiesStore.getSelectedView()) {
@@ -196,7 +211,7 @@ class App extends React.Component {
   }
 
   render () {
-    return (
+    return (      
         <div className='container full-height'>
           <div className='row full-height'>
             <div className='columns eight full-height'>
@@ -204,6 +219,7 @@ class App extends React.Component {
                 <h1>Renewing Inequality</h1>
                 <h2> Urban Renewal, Family Displacements, and Race 1955-1966</h2>
               </header>
+
 
               <div 
                 className='mainPanel row template-tile' 
@@ -225,8 +241,12 @@ class App extends React.Component {
                       { ...GeographyStore.getLatLngZoom() }
                       maxForYear={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).maxDisplacmentsForYear }
                       onMoveend={ this.onCityMapMove }
+                      onProjectHover={ this.onProjectMapHover }
+                      onProjectUnhover={ this.onProjectMapUnhover }
+                      onProjectClick={ this.onProjectSelected }
                       HOLCSelected={ CitiesStore.getHOLCSelected() }
                       inspectedProject={ CitiesStore.getInspectedProject() }
+                      inspectedProjectStats={ CitiesStore.getHighlightedProject() }
                     />
 
                     { (!CitiesStore.getHOLCSelected() && CitiesStore.hasDemographicData(CitiesStore.getSelectedCity())) ? 
@@ -349,8 +369,7 @@ class App extends React.Component {
                           onClick={ this.onHOLCToggle }
                         >
                           <span className='tooltip'>View the racial demographics and median incomes from the 1960s census.</span>
-                          <img src='static/map.png' />
-                          race and income
+                          1960 Race and Income
                         </div>
 
                         <div
@@ -358,8 +377,7 @@ class App extends React.Component {
                           onClick={ this.onHOLCToggle }
                         >
                           <span className='tooltip'>View the grades assigned by the Home Owners' Loan Corporation assessing 'neighborhood security' in the 1930s.</span>
-                          <img src='static/cartogram.png' />
-                          HOLC grades
+                          1930s redlining grades
                         </div>
                       
                       </div> : ''
@@ -478,14 +496,21 @@ class App extends React.Component {
             </div>
           </div>
 
-
-
-
-        
         <aside
           style={ DimensionsStore.getSidebarStyle() }
         >
-          { CitiesStore.getHighlightedCity() ? 
+
+          { (CitiesStore.getHighlightedProject()) ? 
+            <ProjectStats 
+              { ...CitiesStore.getCityData(CitiesStore.getHighlightedCity()) }
+              project_id={ CitiesStore.getHighlightedProject() }
+              categories={ CitiesStore.getCategories() }
+              year={ this.state.year }
+            /> : ''
+          }
+
+
+          { (!CitiesStore.getHighlightedProject() && CitiesStore.getHighlightedCity()) ? 
             <CityStats 
               { ...CitiesStore.getCityData(CitiesStore.getHighlightedCity()) }
               categories={ CitiesStore.getCategories() }
@@ -573,6 +598,23 @@ class App extends React.Component {
               />
             }
           </div>
+
+        <div 
+          className='search'
+          style={ DimensionsStore.getSearchStyle() }
+        >
+          <Typeahead
+            options={ CitiesStore.getCitiesListWithDisplacements() }
+            placeholder={ 'Search by city or state' }
+            filterOption={ 'searchName' }
+            displayOption={(city, i) => city.city }
+            onOptionSelected={ this.onCityClicked }
+            customListComponent={ TypeAheadCitySnippet }
+            onKeyPress={ this.onSearching }
+            //maxVisible={ 8 }
+            
+          />
+        </div>
       </div>
     );
   }

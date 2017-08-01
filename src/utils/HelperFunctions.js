@@ -11,13 +11,13 @@ export const getColorForRace =  function(weight) {
   }
   if (weight >= 0.5) {
     var color1 = [163, 135, 190],
-      color2 = [220,220,220], //
+      color2 = [200,200,200], //
       scale = d3.scale.linear()
         .domain([0.5, 1])
         .range([0, 1]),
       weight = scale(weight);
   } else {
-    var color1 = [220,220,220],
+    var color1 = [200,200,200],
       color2 = [44, 160, 44],
       scale = d3.scale.linear()
         .domain([0, 0.5])

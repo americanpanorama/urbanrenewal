@@ -36,7 +36,7 @@ export default class CityMap extends React.Component {
       return true;
     }
     // update if project inspected 
-    if (this.props.inspectedProject !== nextProps.inspectedProject) {
+    if (this.props.inspectedProject !== nextProps.inspectedProject || this.props.inspectedProjectStats !== nextProps.inspectedProjectStats) {
       return true;
     }
     // prevent rerendering on map move--new props but dom already updated by leaflet
@@ -56,6 +56,7 @@ export default class CityMap extends React.Component {
   }
 
   render () {
+    console.log(this.props.inspectedProjectStats);
     const max = Math.max(...Object.keys(this.props.cityData.projects)
       .filter(id => this.props.cityData.projects[id].totalFamilies)
       .map(id => this.props.cityData.projects[id].totalFamilies));
@@ -123,15 +124,22 @@ export default class CityMap extends React.Component {
             Object.keys(this.props.cityData.projects).map(projectId => {
               if (this.props.cityData.projects[projectId].the_geojson) {
                 return (
-                  <LayerGroup key={ 'geojson' + projectId }>
+                  <LayerGroup 
+                    className='projectFootprint' 
+                    key={ 'geojson' + projectId } 
+                  >
                     <UrbanRenewalPolygon
                       data={ this.props.cityData.projects[projectId].the_geojson }
+                      onMouseOver={ this.props.onProjectHover }
+                      onMouseOut={ this.props.onProjectUnhover }
+                      onClick={ this.props.onProjectClick }
+                      id={ projectId }
                       style={ {
                         weight: 5,
                         color: (this.props.inspectedProject == projectId || this.props.inspectedProject == null) ?  'red' : 'grey',
                         dashArray: '10, 5',
                         fillColor: getColorForRace(this.props.cityData.projects[projectId].percentFamiliesOfColor),
-                        fillOpacity: (this.props.inspectedProject == projectId) ? 0.8 : 0
+                        fillOpacity: (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId) ? 0.8 : 0,
                       } }
                     >
                       { (this.props.inspectedProject == projectId || this.props.inspectedProject == null) ?
@@ -141,8 +149,14 @@ export default class CityMap extends React.Component {
                           opacity={1} 
                           permanent={true}
                           className='projectLabel'
+                          
                         >
-                          <span>{this.props.cityData.projects[projectId].project.replace(/\b\w/g, l => l.toUpperCase()) + ((this.props.cityData.projects[projectId].totalFamilies > 0) ? '-' + formatNumber(this.props.cityData.projects[projectId].totalFamilies) : '') }</span>
+                          <span
+                            onClick={ this.props.onProjectHover }
+                            id={ projectId }
+                          >
+                            {this.props.cityData.projects[projectId].project.replace(/\b\w/g, l => l.toUpperCase()) + ((this.props.cityData.projects[projectId].totalFamilies > 0) ? '-' + formatNumber(this.props.cityData.projects[projectId].totalFamilies) : '') }
+                          </span>
                         </Tooltip> : ''
                       }
 
@@ -155,10 +169,6 @@ export default class CityMap extends React.Component {
           }
 
         </Map>
-
-        <div className='miLink'>
-          <a href={ 'https://dsl.richmond.edu/panorama/redlining/#loc=' + [GeographyStore.getLatLngZoom().zoom, GeographyStore.getLatLngZoom().lat, GeographyStore.getLatLngZoom().lng].join('/') + "&opacity=0" }>Mapping Inequality</a>
-        </div>
 
       {/* JSX Comment 
         <div>

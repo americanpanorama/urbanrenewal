@@ -256,6 +256,23 @@ const DimensionsStore = {
     return { height: this.data.tilesHeight + 'px' };
   },
 
+  getSearchStyle: function() {
+    return {
+      top: this.data.headerHeight / 3,
+      right: this.data.containerPadding,
+      width: this.getSidebarStyle().width + this.data.containerPadding,
+      height: 20
+    };
+  },
+
+  getSearchResultsStyle: function() {
+    return {
+      width: this.getSidebarStyle().width + this.data.containerPadding,
+      height: this.getSidebarStyle().height + this.data.containerPadding,
+      marginTop: this.data.headerHeight * (2/3) - 20 
+    };
+  },
+
   getSidebarStyle: function() {
     return {
       marginTop: this.data.headerHeight,
@@ -276,8 +293,9 @@ const DimensionsStore = {
     };
   },
 
+
   getDorlingRadius: function(v, options = {}) {
-    let theMax = (CitiesStore.getSelectedYear() || options.useYear) ? CitiesStore.getMaxDisplacementsInCityForYear() : CitiesStore.getMaxDisplacementsInCity() || 1;
+    let theMax = (options.useYear || (CitiesStore.getSelectedYear() && !options.useAll)) ? CitiesStore.getMaxDisplacementsInCityForYear() : CitiesStore.getMaxDisplacementsInCity() || 1;
     let r = d3.scale.sqrt()
       .domain([0, (CitiesStore.getSelectedCategory() == 'funding') ? CitiesStore.getCategoryMaxForCity('urban renewal grants dispursed') : theMax])
       .range([0, this.data.dorlingsMaxRadius]);
@@ -533,6 +551,17 @@ const DimensionsStore = {
   },
 
   getTimelineLabelXOffset: function(year) { return (year - 1955) * this.getTimelineYearWidth(); },
+
+
+  getProjectStatsOverallDimensions: function() {
+    return {
+      width: this.data.sidebarWidth - this.data.containerPadding,
+      height: 60
+    };
+  },
+
+  getProjectStatProportionWidth: function(prop) { return (this.getProjectStatsOverallDimensions().width - 220) * prop; },
+            
 
  
       // xOffsetForYearMiddle = (year) => xOffsetForYear(year) + yearMiddleOffset,

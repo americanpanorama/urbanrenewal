@@ -1,7 +1,14 @@
-.cityStats {
+.cityStats, .projectStats {
   h2 {
     text-transform: uppercase;
   }
+
+  h3 {
+    text-transform: uppercase;
+    text-align: center;
+    font-size: 1.4em;
+  }
+
 
   .closeicon {
       margin-left: -30px;
