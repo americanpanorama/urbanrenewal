@@ -479,12 +479,12 @@ class App extends React.Component {
                       </div> : ''
                     }
 
-                    <div 
+                    {/* JSX Comment <div 
                       className='toggleLegend'
                       onClick={ this.toggleLegendVisibility }
                     >
                       { (this.state.legendVisible) ? 'hide legend' : 'show legend' }
-                    </div>
+                    </div>*/}
 
 
 

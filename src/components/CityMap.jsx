@@ -122,7 +122,9 @@ export default class CityMap extends React.Component {
 
           { (this.props.cityData.projects) ?
             Object.keys(this.props.cityData.projects).map(projectId => {
+              console.log(this.props.cityData.projects[projectId]);
               if (this.props.cityData.projects[projectId].the_geojson) {
+
                 return (
                   <LayerGroup 
                     className='projectFootprint' 

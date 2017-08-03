@@ -59,7 +59,7 @@ const CitiesStore = {
         format: 'JSON'
       },
       // data for projects: duration, displacments, etc.
-      { query: "select projects.city_id, projects.project_id, projects.project, st_asgeojson(projects.the_geom) as the_geojson, duration.start_year, duration.end_year, whites.value as whites, nonwhites.value as nonwhite from urdr_id_key projects join (SELECT project_id, min(year) as start_year, max(year) as end_year FROM combined_dire_char_raw group by project_id, city_id) duration on projects.project_id = duration.project_id join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 71 order by project_id, year desc) whites on whites.project_id = projects.project_id join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 72 order by project_id, year desc) nonwhites on nonwhites.project_id = projects.project_id",
+      { query: "select projects.city_id, projects.project_id, projects.project, st_asgeojson(projects.the_geom) as the_geojson, duration.start_year, duration.end_year, whites.value as whites, nonwhites.value as nonwhite from urdr_id_key projects left join (SELECT project_id, min(year) as start_year, max(year) as end_year FROM combined_dire_char_raw group by project_id, city_id) duration on projects.project_id = duration.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 71 order by project_id, year desc) whites on whites.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 72 order by project_id, year desc) nonwhites on nonwhites.project_id = projects.project_id",
         format: 'JSON'
       }
     ]).then((responses) => {
@@ -131,9 +131,11 @@ const CitiesStore = {
             nonwhite = r.nonwhite / duration;
 
           // total up year data
-          this.data.yearsTotals[aYear] = this.data.yearsTotals[aYear] || {whites: 0, nonwhite: 0};
-          this.data.yearsTotals[aYear].whites += whites;
-          this.data.yearsTotals[aYear].nonwhite += nonwhite;
+          if (aYear >= 1955 && aYear <= 1966) {
+            this.data.yearsTotals[aYear] = this.data.yearsTotals[aYear] || {whites: 0, nonwhite: 0};
+            this.data.yearsTotals[aYear].whites += whites;
+            this.data.yearsTotals[aYear].nonwhite += nonwhite;
+          }
 
           // aggregate total and year data for city
           if (!this.data.cities[r.city_id].yearsData[aYear]) {
@@ -454,7 +456,7 @@ const CitiesStore = {
             if (this.data.selectedView == 'scatterplot') {
               const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4),
                 l = Math.sqrt(2*shortside*shortside);
-              cx = (this.getCityData(cityData.city_id).pop_1960 && this.getCityData(cityData.city_id).nonwhite_1960) ? (this.getCityData(cityData.city_id).nonwhite_1960 / this.getCityData(cityData.city_id).pop_1960) * l : -900;
+              cx = (this.getCityData(cityData.city_id).pop_1960 && this.getCityData(cityData.city_id).nonwhite_1960) ? (this.getCityData(cityData.city_id).nonwhite_1960 / this.getCityData(cityData.city_id).pop_1960) * l : 0;
               cy = (this.data.selectedYear) ? l - this.getCityData(cityData.city_id).yearsData[this.data.selectedYear].percentFamiliesOfColor * l : l - this.getCityData(cityData.city_id).percentFamiliesOfColor * l;
               [cx, cy] = DimensionsStore.translateScatterplotPoint([cx, cy]);
             } else if (this.data.selectedView == 'cartogram') {
@@ -546,6 +548,7 @@ const CitiesStore = {
 
   getProjectTimelineBars: function(cityId) {
     let projects = Object.keys(this.data.cities[cityId].projects)
+        .filter(id => this.data.cities[cityId].projects[id].start_year <= 1966)
         .map(id => this.data.cities[cityId].projects[id])
         // filter out projects without displacments
         //.filter(p => p.totalFamilies)

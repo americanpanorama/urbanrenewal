@@ -2,6 +2,7 @@ import { EventEmitter } from 'events';
 import AppDispatcher from '../utils/AppDispatcher';
 import { AppActionTypes } from '../utils/AppActionCreator';
 import CitiesStore from './CitiesStore';
+import GeographyStore from './GeographyStore';
 import d3 from 'd3';
 
 const DimensionsStore = {
@@ -22,7 +23,7 @@ const DimensionsStore = {
 
     legendWidth: 400,
     legendHeight: 100,
-    legendVerticalGutter: 3,
+    legendVerticalGutter: 10,
     gradientTopBottomMargins: 20,
     
 
@@ -48,7 +49,7 @@ const DimensionsStore = {
     this.data.legendHeight = 2 * this.data.dorlingsMaxRadius + this.data.legendVerticalGutter * 2;
 
     this.data.legendDorlingWidth =  4 * this.data.dorlingsMaxRadius + this.data.legendVerticalGutter * 2; // I'm estimating the labels take the same width as the diameter 3 for gutters on either side
-    this.data.legendDorlingHeight = 2 * this.data.dorlingsMaxRadius + this.data.legendVerticalGutter * 2; // 3 for gutters on either side
+    this.data.legendDorlingHeight = 2 * this.data.dorlingsMaxRadius + this.data.legendVerticalGutter * 2; // 10 for gutters on either side
 
     this.data.legendGradientHeight = this.data.legendHeight - this.data.legendVerticalGutter * 2;
     
@@ -230,6 +231,21 @@ const DimensionsStore = {
 
   getLegendGradientBottomTextY: function() { return this.data.dorlingsMaxRadius * 2 / 5 * 3 + 3; },
 
+  getLegendDimensionsIntervals: function() {
+    const maxRepresentable = (CitiesStore.getSelectedView() == 'cartogram') ? this.getValueFromDorlingRadius(this.getDorlingsMaxRadius() / GeographyStore.getZ()) : this.getValueFromDorlingRadius(this.getDorlingsMaxRadius()),
+      numDigits = Math.floor(maxRepresentable).toString().length,
+      testNum = Math.round(maxRepresentable/Math.pow(10, numDigits - 2));
+
+    console.log(maxRepresentable, numDigits, testNum);
+
+    return (testNum <= 15) ? [10,5,2,0.5].map(n => n * Math.pow(10, numDigits - 2)) :
+      (testNum <= 20) ? [15,10,5,1].map(n => n * Math.pow(10, numDigits - 2)) :
+      (testNum <= 25) ? [20,10,5,1].map(n => n * Math.pow(10, numDigits - 2)) :
+      (testNum <= 50) ? [25, 15, 5, 1].map(n => n * Math.pow(10, numDigits - 2)) :
+      (testNum <= 75) ? [50, 25, 10, 1].map(n => n * Math.pow(10, numDigits - 2)) :
+      [75, 50, 25, 10].map(n => n * Math.pow(10, numDigits - 2));
+  },
+
   getLegendDorlingsDimensions: function() {
     return {
       width: this.data.legendDorlingWidth,
@@ -237,18 +253,20 @@ const DimensionsStore = {
     };  
   },
 
-  getLegendDorlingsCircleDimensions: function() {
+  getLegendDorlingsCircleDimensions: function(scale) {
+    scale = scale || 1;
     return {
-      cx: this.data.legendDorlingWidth - 3 - this.data.dorlingsMaxRadius,
-      cy: 3 + this.data.dorlingsMaxRadius
+      cx: (this.data.legendDorlingWidth - this.data.legendVerticalGutter - this.data.dorlingsMaxRadius) / scale,
+      cy: (this.data.legendVerticalGutter + this.data.dorlingsMaxRadius) / scale,
+      strokeWidth: 0.5/scale
     };
   },
 
-  getLegendDorlingsTextPositioning: function(v, max) {
+  getLegendDorlingsTextPositioning: function(v, scale) {
     return {
-      x: this.getLegendDorlingsCircleDimensions().cx - this.data.dorlingsMaxRadius - 0,
-      y: this.getLegendDorlingsCircleDimensions().cy + DimensionsStore.getDorlingRadius(max) - DimensionsStore.getDorlingRadius(v) - DimensionsStore.getDorlingRadius(v),
-      fontSize: DimensionsStore.getDorlingRadius(max) / 2.5
+      x: (this.getLegendDorlingsCircleDimensions(scale).cx - this.data.dorlingsMaxRadius/scale),
+      y: (this.getLegendDorlingsCircleDimensions(scale).cy + this.getDorlingRadius(this.getLegendDimensionsIntervals()[0]) - this.getDorlingRadius(v) - this.getDorlingRadius(v)),
+      fontSize: this.data.dorlingsMaxRadius / 3 / scale
     };
   },
 
@@ -293,6 +311,15 @@ const DimensionsStore = {
     };
   },
 
+  getValueFromDorlingRadius: function(r, options={}) {
+    let theMax = (options.useYear || (CitiesStore.getSelectedYear() && !options.useAll)) ? CitiesStore.getMaxDisplacementsInCityForYear() : CitiesStore.getMaxDisplacementsInCity() || 1;
+    let v = d3.scale.pow().exponent(2)
+      .domain([0, this.data.dorlingsMaxRadius])
+      .range([0, theMax]);
+
+    return v(r);
+  },
+
 
   getDorlingRadius: function(v, options = {}) {
     let theMax = (options.useYear || (CitiesStore.getSelectedYear() && !options.useAll)) ? CitiesStore.getMaxDisplacementsInCityForYear() : CitiesStore.getMaxDisplacementsInCity() || 1;
@@ -315,8 +342,9 @@ const DimensionsStore = {
   // SCATTERPLOT DIMENSIONS
 
   translateScatterplotPoint: function(point) {
-    const cx = this.getNationalMapWidth() / 2 - (Math.sqrt((point[0] * point[0]) / 2) -  Math.sqrt((point[1] * point[1]) / 2)),
-      cy = this.getNationalMapHeight() * 0.9 - Math.sqrt((point[0] * point[0]) / 2) -  Math.sqrt((point[1] * point[1]) / 2);
+    const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4),
+      cx = this.getNationalMapWidth() / 2 - (Math.sqrt((point[0] * point[0]) / 2) -  Math.sqrt((point[1] * point[1]) / 2)),
+      cy = this.getNationalMapHeight() / 2 + shortside - Math.sqrt((point[0] * point[0]) / 2) -  Math.sqrt((point[1] * point[1]) / 2);
 
     return [cx,cy];
   },

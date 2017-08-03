@@ -230,14 +230,14 @@ export default class USMap extends React.Component {
           <g>
             <switch>
               <foreignObject 
-                x={DimensionsStore.getNationalMapWidth() * 0.2}
+                x={DimensionsStore.getNationalMapWidth() * 0.05}
                 y={DimensionsStore.getNationalMapHeight() * 0.7}
-                width="200" 
+                width="250" 
                 height="200"
                 style={{color: 'white'}} 
                 requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"
               >
-                <p xmlns="http://www.w3.org/1999/xhtml">Cities on the yellow line had project where displacements of families by race were proportional to their overall racial demographics. Those few above displaced more white families, the majority below more families of color. For example, Cincinnati is near the bottom because while 22% of its population in 1960 were people of color, 95% of the families displaced by its projects were of color.</p>
+                <p xmlns="http://www.w3.org/1999/xhtml">Cities on the yellow line executed renewal projects where displacements of families by race were proportional to their overall racial demographics. Those few above displaced more white families proportionally, the majority below more families of color. For example, Cincinnati is near the bottom because while people of color made up 22% of its overall population in 1960, families of color accounted for 95% of those displaced by its renewal projects.</p>
               </foreignObject>
               <text x="20" y="20">No automatic linewrapping.</text>
             </switch> 

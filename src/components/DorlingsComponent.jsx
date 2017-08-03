@@ -34,10 +34,15 @@ export default class Dorlings extends React.Component {
         });
     }
 
+    const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4),
+      scatterplotMaxY = DimensionsStore.getNationalMapHeight()/2 + shortside;
+
+
     if (this.props.r !== nextProps.r || this.props.color !== nextProps.color || this.props.cx !== nextProps.cx || this.props.cy !== nextProps.cy ) {
+      //console.log(scatterplotMaxY, nextProps.cy, nextProps.cy/scatterplotMaxY);
       d3.select(ReactDOM.findDOMNode(this))
         .transition()
-        .delay((nextProps.view == 'scatterplot' && this.props.view !== 'scatterplot') ? Math.min((DimensionsStore.getNationalMapHeight() * 0.9 - nextProps.cy) * 10, 2000) : 0)
+        .delay((nextProps.view == 'scatterplot' && this.props.view !== 'scatterplot') ? (1- nextProps.cy/scatterplotMaxY) * 5000 : 0)
         .duration(750)
         .attr('r', (nextProps.view !== 'cartogram') ? nextProps.r / nextProps.z : nextProps.r)
         .attr('cx', nextProps.cx)
@@ -64,7 +69,7 @@ export default class Dorlings extends React.Component {
         fill={ this.state.color }
         style={ {
           fillOpacity: (!CitiesStore.getHighlightedCity() || CitiesStore.getHighlightedCity() == this.props.city_id) ? 1 : 0.5,
-          strokeWidth: (this.props.hasProjectGeojson) ? this.props.strokeWidth * 3 : this.props.strokeWidth,
+          strokeWidth: (this.props.hasProjectGeojson) ? this.props.strokeWidth : this.props.strokeWidth,
           strokeOpacity: (!CitiesStore.getHighlightedCity() || CitiesStore.getHighlightedCity() == this.props.city_id) ? 1 : 0.1,
           stroke: (this.state.color == 'transparent') ? 'transparent' : '#333'
         } }

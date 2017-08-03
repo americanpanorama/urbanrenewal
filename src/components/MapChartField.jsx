@@ -56,7 +56,7 @@ export default class MapChartField extends React.Component {
         .attr('opacity', 1);
       d3.select(this.refs['baseMap'])
         .transition()
-        .duration(5000)
+        .duration(5750*2/3)
         .attr('opacity', 0)
         .each('end', () => {
           this.setState({
@@ -65,7 +65,7 @@ export default class MapChartField extends React.Component {
         });
       d3.select(this.refs['scatterplotMask'])
         .transition()
-        .duration(10000)
+        .duration(5750)
         .attr('height', 0)
         .each('end', () => {
           this.setState({
@@ -113,11 +113,14 @@ export default class MapChartField extends React.Component {
   render () {
     const transform = (false && CitiesStore.getSelectedView() == 'scatterplot') ? 'translate('+DimensionsStore.getNationalMapWidth()/2+','+DimensionsStore.getNationalMapHeight()*0.9 + ') scale(' + this.state.z + ') rotate(225)' : 'translate('+this.state.x+','+this.state.y+') scale(' + this.state.z + ')';
 
+    const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4),
+      scatterplotMaxY = DimensionsStore.getNationalMapHeight()/2 + shortside;
+
     return (
         <g>
          <g 
           opacity={ this.state.scatterplotOpacity }
-          transform={ 'translate('+DimensionsStore.getNationalMapWidth()/2+','+DimensionsStore.getNationalMapHeight()*0.9 + ') scale(' + this.state.z + ') rotate(225)' }
+          transform={ 'translate('+DimensionsStore.getNationalMapWidth()/2+','+scatterplotMaxY + ') scale(' + this.state.z + ') rotate(225)' }
           ref='scatterplotField'
         >
           <rect

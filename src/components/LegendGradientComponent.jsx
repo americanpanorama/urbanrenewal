@@ -16,7 +16,7 @@ export default class LegendGradient extends React.Component {
         <defs>
           <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" style={{stopColor:'rgb(163, 135, 190)', stopOpacity:1}} />
-            <stop offset="50%" style={{stopColor:'rgb(220,220,220)', stopOpacity:1}} />
+            <stop offset="50%" style={{stopColor:'rgb(200,200,200)', stopOpacity:1}} />
             <stop offset="100%" style={{stopColor:'rgb(44,160,44)', stopOpacity:1}} />
           </linearGradient>
         </defs>
@@ -28,14 +28,12 @@ export default class LegendGradient extends React.Component {
             fill="url(#grad1)"
           />
 
-
-
           {/* category labels */}
           <text { ...DimensionsStore.getLegendGradientPOCLabelAttrs() }>% families of color displaced</text>
           <text { ...DimensionsStore.getLegendGradientWhitesLabelAttrs() }>% white families displaced</text>
 
+          {/* percent labels */}
           <g>
-            {/* percent labels */}
             { (this.props.percent) ? 
               <g 
                 className='percent'
@@ -101,52 +99,6 @@ export default class LegendGradient extends React.Component {
               </g> :
               ''  
             } 
-          
-
-           {/* (this.props.percent) ? 
-            <g>
-              <rect
-                x={ getLegendGradientInteriorDimensions().x - (this.props.percent/100 * getLegendGradientInteriorDimensions().x) }
-                y={ height / 2 + barHeight / 2 + 5 }
-                width={ 1 }
-                height={ height-15 - (height / 2 + barHeight / 2 + 5) }
-                fill='silver'
-              />
-              <rect
-                x={ getLegendGradientInteriorDimensions().x - (this.props.percent/100 * getLegendGradientInteriorDimensions().x) }
-                y={ height / 2 + barHeight / 2 + 5 }
-                width={ 1 }
-                height={ 7 }
-                fill='silver'
-                transform={"rotate(-30 " + (getLegendGradientInteriorDimensions().x - (this.props.percent/100 * getLegendGradientInteriorDimensions().x)) + " " + (height / 2 + barHeight / 2 + 5) + ")" }
-              />
-              <rect
-                x={ getLegendGradientInteriorDimensions().x - (this.props.percent/100 * getLegendGradientInteriorDimensions().x) }
-                y={ height / 2 + barHeight / 2 + 5 }
-                width={ 1 }
-                height={ 7 }
-                fill='silver'
-                transform={"rotate(30 " + (getLegendGradientInteriorDimensions().x - (this.props.percent/100 * getLegendGradientInteriorDimensions().x)) + " " + (height / 2 + barHeight / 2 + 5) + ")" }
-              />
-              <rect
-                x={ getLegendGradientInteriorDimensions().x - (this.props.percent/100 * getLegendGradientInteriorDimensions().x) }
-                y={ height - 15 }
-                width={ width }
-                height={ 1 }
-                fill='silver'
-              />
-              <text
-                dx={ getLegendGradientInteriorDimensions().x - (this.props.percent/100 * getLegendGradientInteriorDimensions().x) }
-                dy={ height-15 }
-                fill='white'
-                textAnchor='middle'
-                alignmentBaseline='middle'
-              >
-                { (this.props.percent >= 50) ? this.props.percent + '% people of color' :  (100 - this.props.percent) + '% whites' }
-              </text> 
-            </g>:
-            '' 
-          */}
           </g>
         </g>
       </svg>
