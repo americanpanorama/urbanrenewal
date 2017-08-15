@@ -23,6 +23,7 @@ const CitiesStore = {
     inspectedProjectStats: null,
     selecteProject: null,
     poc: [0, 1],
+    visibleCitiesIds: [],
 
     // the city data propers
     cities: {},
@@ -55,7 +56,7 @@ const CitiesStore = {
       },
       {
         // cities data
-        query: "with polygon_bounds as (select city_id, round(st_xmin(st_envelope(st_collect(urdr_id_key.the_geom)))::numeric, 3) as bbxmin, round(st_ymin(st_envelope(st_collect(urdr_id_key.the_geom)))::numeric, 3) as bbymin, round(st_xmax(st_envelope(st_collect(urdr_id_key.the_geom)))::numeric, 3) as bbxmax, round(st_ymax(st_envelope(st_collect(urdr_id_key.the_geom)))::numeric, 3) as bbymax, round(st_x(st_centroid(st_envelope(st_collect(urdr_id_key.the_geom))))::numeric, 3) as centerlng, round(st_y(st_centroid(st_envelope(st_collect(urdr_id_key.the_geom))))::numeric, 3) as centerlat FROM urdr_id_key group by city_id) select cities.city_id, cities.city, cities.state, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, pop_1940, pop_1950, pop_1960, pop_1970, white_1960, white_1970, nonwhite_1960, nonwhite_1970, polygon_bounds.bbxmin, polygon_bounds.bbymin, polygon_bounds.bbxmax, polygon_bounds.bbymax, polygon_bounds.centerlng, polygon_bounds.centerlat from urdr_city_id_key cities left join ur_city_census_data on cities.city_id = ur_city_census_data.city_id left join polygon_bounds on polygon_bounds.city_id = cities.city_id",
+        query: "with polygon_bounds as (select city_id, round(st_xmin(st_envelope(st_collect(urdr_id_key.the_geom)))::numeric, 3) as bbxmin, round(st_ymin(st_envelope(st_collect(urdr_id_key.the_geom)))::numeric, 3) as bbymin, round(st_xmax(st_envelope(st_collect(urdr_id_key.the_geom)))::numeric, 3) as bbxmax, round(st_ymax(st_envelope(st_collect(urdr_id_key.the_geom)))::numeric, 3) as bbymax, round(st_x(st_centroid(st_envelope(st_collect(urdr_id_key.the_geom))))::numeric, 3) as centerlng, round(st_y(st_centroid(st_envelope(st_collect(urdr_id_key.the_geom))))::numeric, 3) as centerlat FROM urdr_id_key group by city_id), tracts_bounds as (select city_id, round(st_xmin(st_envelope(st_collect(ct.the_geom)))::numeric, 3) as bbxmin, round(st_ymin(st_envelope(st_collect(ct.the_geom)))::numeric, 3) as bbymin, round(st_xmax(st_envelope(st_collect(ct.the_geom)))::numeric, 3) as bbxmax, round(st_ymax(st_envelope(st_collect(ct.the_geom)))::numeric, 3) as bbymax, round(st_x(st_centroid(st_envelope(st_collect(ct.the_geom))))::numeric, 3) as centerlng, round(st_y(st_centroid(st_envelope(st_collect(ct.the_geom))))::numeric, 3) as centerlat FROM us_tracts_1960 ct join urdr_city_id_key cities on cities.nhgiscty = ct.nhgiscty and cities.nhgisst = ct.nhgisst group by city_id) select cities.city_id, cities.city, cities.state, ST_Y(cities.the_geom) as lat, ST_X(cities.the_geom) as lng, pop_1940, pop_1950, pop_1960, pop_1970, white_1960, white_1970, nonwhite_1960, nonwhite_1970, polygon_bounds.bbxmin, polygon_bounds.bbymin, polygon_bounds.bbxmax, polygon_bounds.bbymax, polygon_bounds.centerlng, polygon_bounds.centerlat, tracts_bounds.bbxmin as tbbxmin, tracts_bounds.bbymin as tbbymin, tracts_bounds.bbxmax as tbbxmax, tracts_bounds.bbymax as tbbymax, tracts_bounds.centerlng  as tcenterlng, tracts_bounds.centerlat as tcenterlat from urdr_city_id_key cities left join ur_city_census_data on cities.city_id = ur_city_census_data.city_id left join polygon_bounds on polygon_bounds.city_id = cities.city_id left join tracts_bounds on tracts_bounds.city_id = cities.city_id",
         format: 'JSON'
       },
       // data for projects: duration, displacments, etc.
@@ -81,6 +82,8 @@ const CitiesStore = {
         r.center = (r.centerlat !== null) ? [r.centerlat,r.centerlng] : null;
         r.hasProjectGeojson = (r.centerlat !== null);
         r.boundingBox = (r.bbymin !== null) ? [[r.bbymin,r.bbxmin],[r.bbymax,r.bbxmax]] : null;
+        r.tractsBoundingBox = (r.tbbymin !== null) ? [[r.tbbymin,r.tbbxmin],[r.tbbymax,r.tbbxmax]] : null;
+        r.detectionBoundingBox = (r.boundingBox) ? r.boundingBox : r.center;
         r.projects = {};
         r.yearsData = {};
         r.tracts = {};
@@ -99,10 +102,14 @@ const CitiesStore = {
         delete r.bbxmin;
         delete r.bbymax;
         delete r.bbxmax;
+        delete r.tcenterlat;
+        delete r.tcenterlng;
+        delete r.tbbymin;
+        delete r.tbbxmin;
+        delete r.tbbymax;
+        delete r.tbbxmax;
 
         this.data.cities[r.city_id] = r;
-
-
       });
 
       responses[2].forEach(r => {
@@ -192,6 +199,10 @@ const CitiesStore = {
   },
 
   loadCityData: function(city_id) {
+    if (this.cityLoaded(city_id)) {
+      return;
+    }
+
     this.dataLoader.query([
       {
         query: ("SELECT ct.cartodb_id, ST_AsGeoJSON(ct.the_geom, 4) as the_geojson, ct.gisjoin, 100 * (negro + other_races) / (negro + other_races + white) as percent, case when i_under_999 > (i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 999 when (i_under_999 + i__1000___1998) > (i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 1999 when (i_under_999 + i__1000___1998 + i__2000___2998) > (i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 2999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998) > (i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 3999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998) > (i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 4999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998) > (i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 5999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998) > (i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 6999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998) > (i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 7999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998) > (i__9000___9998 + i__10000___14998 + i__15000___24998 + i__25000_plus) then 8999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998) > (i__10000___14998 + i__15000___24998 + i__25000_plus) then 9999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998) > (i__15000___24998 + i__25000_plus) then 14999 when (i_under_999 + i__1000___1998 + i__2000___2998 + i__3000___3998 + i__4000___4998 + i__5000___5998 + i__6000___6998 + i__7000___7998 + i__8000___8998 + i__9000___9998 + i__10000___14998 + i__15000___24998) > i__25000_plus then 24999 else 25000 end as median FROM us_tracts_1960 ct join urdr_city_id_key cities on cities.nhgiscty = ct.nhgiscty and cities.city_id = " + city_id + " join census_data_1960 d on ct.gisjoin = d.gisjoin and (negro + white + other_races) > 0  order by percent desc, median").replace(/\+/g, '%2B'),
@@ -268,9 +279,30 @@ const CitiesStore = {
 
 
       this.data.citiesLoaded.push(city_id);
-      this.setSelectedCity(city_id);
       this.emit(AppActionTypes.storeChanged);
     });
+  },
+
+  loadVisibleCities: function() {
+    let visibleCitiesIds = [];
+
+    Object.keys(this.data.cities).forEach(city_id => {
+      let cityBounds = this.data.cities[city_id].detectionBoundingBox,
+        visibleBounds = GeographyStore.getVisibleBounds();
+      if (cityBounds && visibleBounds.intersects(cityBounds)) {
+        visibleCitiesIds.push(parseInt(city_id));
+        this.loadCityData(city_id);
+      }
+    });
+
+    this.data.visibleCitiesIds = visibleCitiesIds;
+
+    console.log(this.data.visibleCitiesIds);
+
+    // reset selected city if there's only one and it's not the current selected
+    if (this.data.visibleCitiesIds.length == 1 && this.data.selectedCity !== this.data.visibleCitiesIds[0]) {
+      this.setSelectedCity(this.data.visibleCitiesIds[0]);
+    }
   },
 
   assignDorlingXYs: function() {
@@ -624,6 +656,21 @@ const CitiesStore = {
     return this.getCitiesList().filter(d => cityIds.includes(d.city_id));
   },
 
+  getVisibleCitiesDetails: function() {
+    const visibleCitiesData = this.getCitiesList().filter(d => this.data.visibleCitiesIds.includes(d.city_id));
+    let visibleCitiesSpatialData = { projects: {}, tracts: {}, holc_areas: [] };
+
+    visibleCitiesData.forEach(cd => {
+      Object.keys(cd.projects).forEach(project_id => visibleCitiesSpatialData.projects[project_id] = cd.projects[project_id]);
+      Object.keys(cd.tracts).forEach(tract_id => visibleCitiesSpatialData.tracts[tract_id] = cd.tracts[tract_id]);
+      visibleCitiesSpatialData.holc_areas = visibleCitiesSpatialData.holc_areas.concat(cd.holc_areas);
+    });
+
+    return visibleCitiesSpatialData;
+  },
+
+  getVisibleCityIds: function() { return this.data.visibleCitiesIds; },
+
   getVisibleCitiesByState: function() {
     const cities = this.getVisibleCities();
     let states = [];
@@ -729,9 +776,13 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
         if (CitiesStore.initialDataLoaded()) {
           clearInterval(waitingId);
           CitiesStore.loadCityData(CitiesStore.getCityIdFromSlug(action.hashState.city));
+          CitiesStore.setSelectedCity(CitiesStore.getCityIdFromSlug(action.hashState.city));
         }
       }, 50);
     }
+
+
+
     break;
 
   case AppActionTypes.categorySelected:
@@ -741,6 +792,7 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
   case AppActionTypes.citySelected:
     if (!action.value || CitiesStore.cityLoaded(action.value)) {
       CitiesStore.setSelectedCity(action.value);
+      CitiesStore.loadCityData(action.value);
     } else {
       CitiesStore.loadCityData(action.value);
     }
@@ -790,7 +842,15 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
   case AppActionTypes.HOLCToggle:
     CitiesStore.setHOLCSelected(action.value);
     break;
+
+  case AppActionTypes.cityMapMoved:
+  case AppActionTypes.mapInitialized:
+    CitiesStore.loadVisibleCities();
+    break;
   }
+
+  
+
 
 
 

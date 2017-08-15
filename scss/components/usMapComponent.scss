@@ -143,6 +143,12 @@
 	text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
 	font-family: Oswald;
 	font-size: 1.2em;
+	text-align: center;
+
+	.displacements {
+		font-size: 1.2em;
+		color: red;
+	}
 }
 
 .miLink {
@@ -183,5 +189,9 @@
 
 .projectFootprint {
 	pointer-events: auto;
+
+
 }
+
+
 

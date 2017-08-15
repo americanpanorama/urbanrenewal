@@ -105,6 +105,8 @@ const GeographyStore = {
 
   getTheMap: function() { return this.data.theMap; },
 
+  getVisibleBounds: function() { return this.data.theMap.getBounds(); },
+
   getProjection: function() {
     return this.albersUsaPr()
       .scale(DimensionsStore.getMapScale())

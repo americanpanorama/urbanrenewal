@@ -21,7 +21,6 @@ export default class LegendDorlings extends React.Component {
     legendIncrements = DimensionsStore.getLegendDimensionsIntervals();
     maxLegendDorling = legendIncrements[0];
 
-    console.log(maxRepresentable);
     if (CitiesStore.getSelectedCategory() == 'funding') {
       maxValue = CitiesStore.getCategoryMaxForCity('urban renewal grants dispursed');
       //maxLegendDorling = 200000000;
@@ -35,8 +34,6 @@ export default class LegendDorlings extends React.Component {
     let r =  d3.scale.sqrt()
       .domain([0, maxValue])
       .range([0, 50]);
-
-    console.log(DimensionsStore.getLegendDorlingsDimensions(), DimensionsStore.getLegendDorlingsCircleDimensions());
       
     return (
       <svg 

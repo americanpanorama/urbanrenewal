@@ -103,7 +103,7 @@ class App extends React.Component {
 
   onProjectMapUnhover(event) { AppActions.projectInspectedStats(null); }
 
-  onProjectSelected(event) { console.log(event.target.options.id); AppActions.projectSelected(parseInt(event.target.options.id)); }
+  onProjectSelected(event) { AppActions.projectSelected(parseInt(event.target.options.id)); }
 
   onProjectOut() { AppActions.projectInspected(null); }
 
@@ -237,7 +237,9 @@ class App extends React.Component {
                 { CitiesStore.getSelectedCity() ? 
                   <div>
                     <CityMap
+                      { ...CitiesStore.getVisibleCitiesDetails() }
                       cityData= { CitiesStore.getCityData(CitiesStore.getSelectedCity()) }
+                      //visibleCityIds = { CitiesStore.getVisibleCityIds() }
                       { ...GeographyStore.getLatLngZoom() }
                       maxForYear={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).maxDisplacmentsForYear }
                       onMoveend={ this.onCityMapMove }

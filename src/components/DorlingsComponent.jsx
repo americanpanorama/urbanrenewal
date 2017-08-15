@@ -73,7 +73,7 @@ export default class Dorlings extends React.Component {
           strokeOpacity: (!CitiesStore.getHighlightedCity() || CitiesStore.getHighlightedCity() == this.props.city_id) ? 1 : 0.1,
           stroke: (this.state.color == 'transparent') ? 'transparent' : '#333'
         } }
-        onClick={ (this.props.hasProjectGeojson) ? this.props.onCityClicked : false}
+        onClick={ (this.props.hasProjectGeojson) ? this.props.onCityClicked : this.props.onCityClicked}
         onMouseEnter={ this.props.onCityHover }
         onMouseLeave={ this.props.onCityOut }
         id={ this.props.city_id }

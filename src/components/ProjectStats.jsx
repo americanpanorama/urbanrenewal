@@ -7,9 +7,7 @@ export default class ProjectStats extends React.Component {
   constructor (props) { super(props); }
 
   _label(label, percent, x, tb) {
-    console.log(label, tb);
     tb = tb || 'sub';
-    console.log(label, tb);
     if (DimensionsStore.getProjectStatProportionWidth(percent) >= 100) {
       return (
         <text

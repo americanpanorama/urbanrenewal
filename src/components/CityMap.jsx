@@ -24,26 +24,32 @@ export default class CityMap extends React.Component {
     super(props);
   }
 
-  shouldComponentUpdate(nextProps) {
-    // a little hacky, but you don't want to update until the stores complete figuring out the bounding box
-    if (nextProps.lat == 0 || nextProps.lng == 0) {
-      return false;
-    }
+  // shouldComponentUpdate(nextProps) {
+  //   // a little hacky, but you don't want to update until the stores complete figuring out the bounding box
+  //   if (nextProps.lat == 0 || nextProps.lng == 0) {
+  //     return false;
+  //   }
 
-    const unmoved = (this.refs.the_map.leafletElement.getCenter().lat ==  nextProps.lat && this.refs.the_map.leafletElement.getCenter().lng ==  nextProps.lng && this.refs.the_map.leafletElement.getZoom() ==  nextProps.zoom);
-    // update if basemap is changed
-    if (unmoved && this.props.HOLCSelected !== nextProps.HOLCSelected) {
-      return true;
-    }
-    // update if project inspected 
-    if (this.props.inspectedProject !== nextProps.inspectedProject || this.props.inspectedProjectStats !== nextProps.inspectedProjectStats) {
-      return true;
-    }
-    // prevent rerendering on map move--new props but dom already updated by leaflet
-    return !unmoved;
+  //   const unmoved = (this.refs.the_map.leafletElement.getCenter().lat ==  nextProps.lat && this.refs.the_map.leafletElement.getCenter().lng ==  nextProps.lng && this.refs.the_map.leafletElement.getZoom() ==  nextProps.zoom);
+  //   // update if basemap is changed
+  //   if (unmoved && this.props.HOLCSelected !== nextProps.HOLCSelected) {
+  //     return true;
+  //   }
+  //   // update if project inspected 
+  //   if (this.props.inspectedProject !== nextProps.inspectedProject || this.props.inspectedProjectStats !== nextProps.inspectedProjectStats) {
+  //     return true;
+  //   }
+  //   // update if new projects 
+  //   if (Object.keys(this.props.projects) !== Object.keys(nextProps.projects) || Object.keys(this.props.tracts) !== Object.keys(nextProps.tracts)) {
+  //     return true;
+  //   }
+  //   // prevent rerendering on map move--new props but dom already updated by leaflet
+  //   return !unmoved;
+  // }
+
+  componentDidMount() { 
+    AppActions.mapInitialized(this.refs.the_map.leafletElement);
   }
-
-  componentDidMount() { AppActions.mapInitialized(this.refs.the_map.leafletElement); }
 
   _isRetina(){ 
     return ((window.matchMedia && (window.matchMedia('only screen and (min-resolution: 124dpi), only screen and (min-resolution: 1.3dppx), only screen and (min-resolution: 48.8dpcm)').matches || window.matchMedia('only screen and (-webkit-min-device-pixel-ratio: 1.3), only screen and (-o-min-device-pixel-ratio: 2.6/2), only screen and (min--moz-device-pixel-ratio: 1.3), only screen and (min-device-pixel-ratio: 1.3)').matches)) || (window.devicePixelRatio && window.devicePixelRatio > 1.3));
@@ -56,7 +62,6 @@ export default class CityMap extends React.Component {
   }
 
   render () {
-    console.log(this.props.inspectedProjectStats);
     const max = Math.max(...Object.keys(this.props.cityData.projects)
       .filter(id => this.props.cityData.projects[id].totalFamilies)
       .map(id => this.props.cityData.projects[id].totalFamilies));
@@ -72,12 +77,13 @@ export default class CityMap extends React.Component {
           ref='the_map' 
           center={ (this.props.lat && this.props.lng) ? [ this.props.lat, this.props.lng ] : [0,0] } 
           zoom={ this.props.zoom || 12 }  
+          minZoom={ 11 }
           className='the_map'
           style={ {
             width: DimensionsStore.getMapDimensions().width,
             height: DimensionsStore.getNationalMapHeight()
           } }
-          onMoveend={ this.props.onMoveend }
+          onViewportChanged={ this.props.onMoveend }
 
         >
 
@@ -87,19 +93,19 @@ export default class CityMap extends React.Component {
             url='https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png'
           />
 
-          { (this.props.cityData.holc_areas.length == 0 || (!this.props.HOLCSelected && this.props.cityData.tracts)) ? 
-            Object.keys(this.props.cityData.tracts).map(tractId => {
+          { (this.props.holc_areas.length == 0 || (!this.props.HOLCSelected && this.props.tracts)) ? 
+            Object.keys(this.props.tracts).map(tractId => {
               return(
                 <GeoJSON
-                  data={ this.props.cityData.tracts[tractId].the_geojson }
+                  data={ this.props.tracts[tractId].the_geojson }
                   key={ 'tract' + tractId }
                   style= { {
-                    fillColor: getColorForRace(this.props.cityData.tracts[tractId].percentPeopleOfColor / 100),
+                    fillColor: getColorForRace(this.props.tracts[tractId].percentPeopleOfColor / 100),
                     //fillColor: 'transparent',
-                    //fillOpacity: (this.props.cityData.tracts[tractId].medianIncome < 10000) ? (1 - ((this.props.cityData.tracts[tractId].medianIncome - 999) / 10000)) / 3: 0,
-                    fillOpacity: (this.props.cityData.tracts[tractId].medianIncome < 5000) ? 0.7 - (1 - ((this.props.cityData.tracts[tractId].medianIncome - 999) / 5000)): 0.05,
-                    weight: 0.5, //(this.props.cityData.tracts[tractId].medianIncome < 5000) ? 10 - 10 * (1 - ((this.props.cityData.tracts[tractId].medianIncome - 999) / 5000)): 0,
-                    color: getColorForRace(this.props.cityData.tracts[tractId].percentPeopleOfColor / 100),
+                    //fillOpacity: (this.props.tracts[tractId].medianIncome < 10000) ? (1 - ((this.props.tracts[tractId].medianIncome - 999) / 10000)) / 3: 0,
+                    fillOpacity: (this.props.tracts[tractId].medianIncome < 5000) ? 0.7 - (1 - ((this.props.tracts[tractId].medianIncome - 999) / 5000)): 0.05,
+                    weight: 0.5, //(this.props.tracts[tractId].medianIncome < 5000) ? 10 - 10 * (1 - ((this.props.tracts[tractId].medianIncome - 999) / 5000)): 0,
+                    color: getColorForRace(this.props.tracts[tractId].percentPeopleOfColor / 100),
                   } }
                   className='tract'
                 />
@@ -108,7 +114,7 @@ export default class CityMap extends React.Component {
             ''
           }
 
-          { this.props.HOLCSelected && this.props.cityData.holc_areas.map((area, i) => 
+          { this.props.HOLCSelected && this.props.holc_areas.map((area, i) => 
             <GeoJSON
               data={area.the_geojson}
               key={ 'holc' + i }
@@ -120,10 +126,9 @@ export default class CityMap extends React.Component {
             />
           )}
 
-          { (this.props.cityData.projects) ?
-            Object.keys(this.props.cityData.projects).map(projectId => {
-              console.log(this.props.cityData.projects[projectId]);
-              if (this.props.cityData.projects[projectId].the_geojson) {
+          { (this.props.projects) ?
+            Object.keys(this.props.projects).map(projectId => {
+              if (this.props.projects[projectId].the_geojson) {
 
                 return (
                   <LayerGroup 
@@ -131,7 +136,7 @@ export default class CityMap extends React.Component {
                     key={ 'geojson' + projectId } 
                   >
                     <UrbanRenewalPolygon
-                      data={ this.props.cityData.projects[projectId].the_geojson }
+                      data={ this.props.projects[projectId].the_geojson }
                       onMouseOver={ this.props.onProjectHover }
                       onMouseOut={ this.props.onProjectUnhover }
                       onClick={ this.props.onProjectClick }
@@ -140,7 +145,7 @@ export default class CityMap extends React.Component {
                         weight: 5,
                         color: (this.props.inspectedProject == projectId || this.props.inspectedProject == null) ?  'red' : 'grey',
                         dashArray: '10, 5',
-                        fillColor: getColorForRace(this.props.cityData.projects[projectId].percentFamiliesOfColor),
+                        fillColor: getColorForRace(this.props.projects[projectId].percentFamiliesOfColor),
                         fillOpacity: (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId) ? 0.8 : 0,
                       } }
                     >
@@ -157,11 +162,14 @@ export default class CityMap extends React.Component {
                             onClick={ this.props.onProjectHover }
                             id={ projectId }
                           >
-                            {this.props.cityData.projects[projectId].project.replace(/\b\w/g, l => l.toUpperCase()) + ((this.props.cityData.projects[projectId].totalFamilies > 0) ? '-' + formatNumber(this.props.cityData.projects[projectId].totalFamilies) : '') }
+                            {this.props.projects[projectId].project.replace(/\b\w/g, l => l.toUpperCase())}
+                            <br />
+                            <span className='displacements'>
+                              {(this.props.projects[projectId].totalFamilies > 0) ? formatNumber(this.props.projects[projectId].totalFamilies) : ''}
+                            </span>
                           </span>
                         </Tooltip> : ''
                       }
-
                     </UrbanRenewalPolygon>
                   </LayerGroup>
                 );
@@ -177,7 +185,7 @@ export default class CityMap extends React.Component {
           <h2>{ this.props.cityData.city }</h2>
           <div>Population (YEAR): XXXX</div>
           <div>XX% white; XX% African American</div>
-          { (this.props.cityData.projects) ?
+          { (this.props.projects) ?
             Object.keys(this.props.cityData.projects).map(projectId => {
               return (
                 <div key={ 'project' + this.props.cityData.projects[projectId].id }>

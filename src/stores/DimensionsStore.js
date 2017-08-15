@@ -236,8 +236,6 @@ const DimensionsStore = {
       numDigits = Math.floor(maxRepresentable).toString().length,
       testNum = Math.round(maxRepresentable/Math.pow(10, numDigits - 2));
 
-    console.log(maxRepresentable, numDigits, testNum);
-
     return (testNum <= 15) ? [10,5,2,0.5].map(n => n * Math.pow(10, numDigits - 2)) :
       (testNum <= 20) ? [15,10,5,1].map(n => n * Math.pow(10, numDigits - 2)) :
       (testNum <= 25) ? [20,10,5,1].map(n => n * Math.pow(10, numDigits - 2)) :
