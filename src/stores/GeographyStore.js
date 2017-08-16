@@ -312,6 +312,11 @@ GeographyStore.dispatchToken = AppDispatcher.register((action) => {
   case AppActionTypes.mapMoved:
     GeographyStore.setXYZ(action.x, action.y, action.z);
     break;
+  case AppActionTypes.viewSelected:
+    if (action.value == 'scatterplot' || action.oldView == 'scatterplot') {
+      GeographyStore.setXYZ(0,0,1);
+    }
+    break;
   case AppActionTypes.mapInitialized:
     GeographyStore.setTheMap(action.value);
     break;

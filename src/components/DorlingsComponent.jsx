@@ -61,6 +61,13 @@ export default class Dorlings extends React.Component {
 
   render () {
     const labelSize = (8 * this.state.r  / 15 < 14) ? 14 : (8 * this.state.r  / 15 > 18) ? 18 : 8 * this.state.r  / 15;
+    let stroke = '#333';
+    if (this.state.color == 'transparent') {
+      stroke = 'transparent';
+    } 
+    // else if (this.props.view == 'scatterplot' && CitiesStore.getCityData(this.props.city_id).nonwhite_1960/CitiesStore.getCityData(this.props.city_id).pop_1960 >= 0.2 && CitiesStore.getCityData(this.props.city_id).nonwhite_1960/CitiesStore.getCityData(this.props.city_id).pop_1960 <= 0.3 ) {
+    //   stroke = 'red';
+    // } 
     return (
       <circle className='dorling'
         cx={ this.state.cx }
@@ -71,7 +78,7 @@ export default class Dorlings extends React.Component {
           fillOpacity: (!CitiesStore.getHighlightedCity() || CitiesStore.getHighlightedCity() == this.props.city_id) ? 1 : 0.5,
           strokeWidth: (this.props.hasProjectGeojson) ? this.props.strokeWidth : this.props.strokeWidth,
           strokeOpacity: (!CitiesStore.getHighlightedCity() || CitiesStore.getHighlightedCity() == this.props.city_id) ? 1 : 0.1,
-          stroke: (this.state.color == 'transparent') ? 'transparent' : '#333'
+          stroke: stroke
         } }
         onClick={ (this.props.hasProjectGeojson) ? this.props.onCityClicked : this.props.onCityClicked}
         onMouseEnter={ this.props.onCityHover }

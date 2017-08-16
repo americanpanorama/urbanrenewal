@@ -113,7 +113,7 @@ class App extends React.Component {
 
   onViewSelected(event) { 
     if (event.target.id !== CitiesStore.getSelectedView()) {
-      AppActions.viewSelected(event.target.id); 
+      AppActions.viewSelected(event.target.id, CitiesStore.getSelectedView()); 
     }
   }
 
@@ -417,6 +417,7 @@ class App extends React.Component {
                         role="button" 
                         aria-label="Zoom in"
                         onClick={ this.onZoomIn } 
+                        id='zoomInButton'
                       >
                         +
                       </div>

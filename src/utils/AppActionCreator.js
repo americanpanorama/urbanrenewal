@@ -92,10 +92,11 @@ export const AppActions = {
     });
   },
 
-  viewSelected: (view) => {
+  viewSelected: (view, oldView) => {
     AppDispatcher.dispatch({
       type: AppActionTypes.viewSelected,
-      value: view
+      value: view,
+      oldView: oldView
     });
   },
 

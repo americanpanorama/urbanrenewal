@@ -354,6 +354,19 @@ const DimensionsStore = {
 
   getScatterplotLengthDecile: function(decile) { return this.getScatterplotLength() / 10 * decile; },
 
+  getScatterplotExplanationAttrs: function() {
+    const shortside = Math.min(this.data.nationalMapWidth, this.data.nationalMapHeight) * 0.4;
+    return {
+      x: this.getNationalMapWidth()/2 - shortside*0.9 ,
+      y: 130,
+      width:  shortside * 1.8,
+      height:  shortside,
+      fontSize:  16,
+      style: {color: '#222'},
+      
+    };
+  },
+
 
 
 
