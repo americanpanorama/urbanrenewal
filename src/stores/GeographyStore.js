@@ -312,6 +312,8 @@ GeographyStore.dispatchToken = AppDispatcher.register((action) => {
   case AppActionTypes.mapMoved:
     GeographyStore.setXYZ(action.x, action.y, action.z);
     break;
+
+  // this is to reset the zoom if moving to or from the scatterplot
   case AppActionTypes.viewSelected:
     if (action.value == 'scatterplot' || action.oldView == 'scatterplot') {
       GeographyStore.setXYZ(0,0,1);
@@ -321,12 +323,18 @@ GeographyStore.dispatchToken = AppDispatcher.register((action) => {
     GeographyStore.setTheMap(action.value);
     break;
   case AppActionTypes.citySelected:
-    const waitingId = setInterval(() => {
-      if (GeographyStore.getTheMap()) {
-        clearInterval(waitingId);
-        GeographyStore.setViewFromBounds(action.value);
-      }
-    }, 500);
+    if (action.value == null) {
+      GeographyStore.setView(null,null,null);
+    } else {
+      // you have to wait for the map to set the bounds
+      const waitingId = setInterval(() => {
+        if (GeographyStore.getTheMap()) {
+          clearInterval(waitingId);
+          GeographyStore.setViewFromBounds(action.value);
+        }
+      }, 500);
+    }
+
     
     break;
   case AppActionTypes.cityMapMoved:

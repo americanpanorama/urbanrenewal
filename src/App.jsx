@@ -205,6 +205,8 @@ class App extends React.Component {
         zoom: GeographyStore.getLatLngZoom().zoom, 
         center: [GeographyStore.getLatLngZoom().lat, GeographyStore.getLatLngZoom().lng] 
       };
+    } else {
+      vizState.loc = null;
     }
 
     HashManager.updateHash(vizState);

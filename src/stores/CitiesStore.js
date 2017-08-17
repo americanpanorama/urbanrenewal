@@ -199,7 +199,7 @@ const CitiesStore = {
   },
 
   loadCityData: function(city_id) {
-    if (this.cityLoaded(city_id)) {
+    if (!city_id || this.cityLoaded(city_id)) {
       return;
     }
 
@@ -284,11 +284,17 @@ const CitiesStore = {
   },
 
   loadVisibleCities: function() {
+    // stop if the map just initialized but hasn't reloaded to city cooprdinate
+    if (GeographyStore.getLatLngZoom().lat == 0) {
+      return;
+    }
+
     let visibleCitiesIds = [];
+    const visibleBounds = GeographyStore.getVisibleBounds();
+    console.log(visibleBounds);
 
     Object.keys(this.data.cities).forEach(city_id => {
-      let cityBounds = this.data.cities[city_id].detectionBoundingBox,
-        visibleBounds = GeographyStore.getVisibleBounds();
+      let cityBounds = this.data.cities[city_id].detectionBoundingBox;
       if (cityBounds && visibleBounds.intersects(cityBounds)) {
         visibleCitiesIds.push(parseInt(city_id));
         this.loadCityData(city_id);
@@ -354,6 +360,8 @@ const CitiesStore = {
 
   setSelectedCity: function(city_id) {
     this.data.selectedCity = city_id;
+    // you know it's visible, so set the data for initial rendering
+    this.data.visibleCitiesIds = [parseInt(city_id)];
     this.emit(AppActionTypes.storeChanged);
   },
 
@@ -790,11 +798,18 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
     break;
 
   case AppActionTypes.citySelected:
-    if (!action.value || CitiesStore.cityLoaded(action.value)) {
+    if (action.value == null) {
+      CitiesStore.setSelectedCity(null);
+    } else if (CitiesStore.cityLoaded(action.value)) {
       CitiesStore.setSelectedCity(action.value);
-      CitiesStore.loadCityData(action.value);
     } else {
       CitiesStore.loadCityData(action.value);
+      let waitingId = setInterval(() => {
+        if (CitiesStore.cityLoaded(action.value)) {
+          clearInterval(waitingId);
+          CitiesStore.setSelectedCity(action.value);
+        }
+      }, 100);
     }
     CitiesStore.setInspectedCity(null);
     break;
@@ -844,8 +859,10 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
     break;
 
   case AppActionTypes.cityMapMoved:
-  case AppActionTypes.mapInitialized:
     CitiesStore.loadVisibleCities();
+    break;
+  case AppActionTypes.mapInitialized:
+    //CitiesStore.loadVisibleCities();
     break;
   }
 

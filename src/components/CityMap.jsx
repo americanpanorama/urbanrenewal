@@ -22,6 +22,12 @@ export default class CityMap extends React.Component {
 
   constructor (props) {
     super(props);
+    this.state = {
+      viewport: {
+        center: (this.props.lat && this.props.lng) ? [ this.props.lat, this.props.lng ] : [0,0],
+        zoom: this.props.zoom || 12   
+      }
+    };
   }
 
   // shouldComponentUpdate(nextProps) {
@@ -49,6 +55,17 @@ export default class CityMap extends React.Component {
 
   componentDidMount() { 
     AppActions.mapInitialized(this.refs.the_map.leafletElement);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.lat !== nextProps.lat || this.props.lng !== nextProps.lng || this.props.zoom !== nextProps.zoom) {
+      this.setState({
+        viewport: {
+          center: [ nextProps.lat, nextProps.lng ],
+          zoom: nextProps.zoom   
+        }
+      });
+    }
   }
 
   _isRetina(){ 
@@ -83,6 +100,7 @@ export default class CityMap extends React.Component {
             width: DimensionsStore.getMapDimensions().width,
             height: DimensionsStore.getNationalMapHeight()
           } }
+          viewport={ this.state.viewport }
           onViewportChanged={ this.props.onMoveend }
 
         >
