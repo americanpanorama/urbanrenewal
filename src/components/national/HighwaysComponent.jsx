@@ -3,7 +3,7 @@ import { PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import d3 from 'd3';
 
-import HighwaysStore from '../stores/HighwaysStore';
+import HighwaysStore from '../../stores/HighwaysStore';
 
 export default class Highways extends React.Component {
 

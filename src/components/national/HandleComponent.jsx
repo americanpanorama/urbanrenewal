@@ -1,5 +1,5 @@
 var React = require('react');
-import DimensionsStore from  '../stores/DimensionsStore.js';
+import DimensionsStore from  '../../stores/DimensionsStore.js';
 
 var Handle = React.createClass({
 

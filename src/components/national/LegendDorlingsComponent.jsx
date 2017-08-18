@@ -1,10 +1,10 @@
 import * as React from 'react';
 import * as d3 from 'd3';
 import Handle from './HandleComponent.jsx';
-import CitiesStore from '../stores/CitiesStore.js';
-import GeographyStore from '../stores/GeographyStore.js';
-import DimensionsStore from  '../stores/DimensionsStore.js';
-import { getColorForRace } from '../utils/HelperFunctions.js';
+import CitiesStore from '../../stores/CitiesStore.js';
+import GeographyStore from '../../stores/GeographyStore.js';
+import DimensionsStore from  '../../stores/DimensionsStore.js';
+import { getColorForRace } from '../../utils/HelperFunctions.js';
 
 export default class LegendDorlings extends React.Component {
 

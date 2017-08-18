@@ -3,8 +3,8 @@ import { PropTypes } from 'react';
 import * as d3 from 'd3';
 import ReactTransitionGroup from 'react-addons-transition-group';
 import Handle from './HandleComponent.jsx';
-import CitiesStore from '../stores/CitiesStore.js';
-import DimensionsStore from  '../stores/DimensionsStore.js';
+import CitiesStore from '../../stores/CitiesStore.js';
+import DimensionsStore from  '../../stores/DimensionsStore.js';
 
 export default class LegendGradient extends React.Component {
 

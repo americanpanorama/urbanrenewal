@@ -1,0 +1,21 @@
+.scatterplotField {
+	line {
+
+		&.gridline {
+			stroke: silver;
+			stroke-width: 1;
+			stroke-opacity: 0.2;
+		}
+
+		&.proportional {
+			stroke: yellow;
+			stroke-width: 2;
+		}
+	}
+
+	text {
+		fill: white;
+		text-anchor: middle;
+		alignment-baseline: hanging;
+	}
+}

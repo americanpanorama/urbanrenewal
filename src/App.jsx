@@ -11,20 +11,27 @@ import HighwaysStore from './stores/HighwaysStore';
 import HashManager from './stores/HashManager';
 
 // components
-//import { HashManager } from '@panorama/toolkit';
-import CityMap from './components/CityMap.jsx';
-import LegendGradient from './components/LegendGradientComponent.jsx';
-import LegendDorlings from './components/LegendDorlingsComponent.jsx';
+// national
+import MapChart from './components/national/MapChartComponent.jsx';
+import Legend from  './components/national/LegendComponent.jsx';
+import VizControls from './components/national/VizControlsComponent.jsx';
+import ZoomControls from './components/national/ZoomControlsComponent.jsx';
+
+// city
+import CityMap from './components/city/CityMap.jsx';
+import CityMapControls from  './components/city/CityMapControlsComponent.jsx';
+import LegendRaceAndIncome from  './components/city/LegendRaceAndIncomeComponent.jsx';
+import LegendHOLC from  './components/city/LegendHOLCComponent.jsx';
+
+
 import CityTimelineComponent from './components/CityTimelineComponent.jsx';
 import TimelineYearComponent from './components/TimelineYearComponent.jsx';
-import MapChart from './components/MapChartComponent.jsx';
+
 import CityStats from './components/CityStats.jsx';
 import ProjectStats from './components/ProjectStats.jsx';
 import YearStats from './components/YearStats.jsx';
 import TypeAheadCitySnippet from './components/TypeAheadCitySnippet.jsx';
 import CitySnippet from './components/CitySnippetComponent.jsx';
-import DorlingCartogram from './components/DorlingCartogramComponent.jsx';
-import Scatterplot from './components/ScatterplotComponent.jsx';
 import { Typeahead } from 'react-typeahead';
 
 
@@ -36,7 +43,7 @@ import AppDispatcher from './utils/AppDispatcher';
 import { calculateDorlingsPosition, getColorForRace } from './utils/HelperFunctions';
 
 // main app container
-class App extends React.Component {
+export default class App extends React.Component {
 
   constructor (props) {
     super(props);
@@ -222,19 +229,10 @@ class App extends React.Component {
                 <h2> Urban Renewal, Family Displacements, and Race 1955-1966</h2>
               </header>
 
-
               <div 
                 className='mainPanel row template-tile' 
                 { ...DimensionsStore.getMainPanelDimensions() }
               >
-
-                {/* button for national view*/}
-                <button
-                  className='resetView'
-                  onClick={ this.resetView }
-                >
-                  <img src='static/us-outline.svg' />
-                </button>
 
                 { CitiesStore.getSelectedCity() ? 
                   <div>
@@ -253,246 +251,64 @@ class App extends React.Component {
                       inspectedProjectStats={ CitiesStore.getHighlightedProject() }
                     />
 
-                    { (!CitiesStore.getHOLCSelected() && CitiesStore.hasDemographicData(CitiesStore.getSelectedCity())) ? 
-                      <div 
-                        className='mapLegend demographics'
-                      >
-                        <svg
-                          width={135}
-                          height={130}
-                          style={{ margin: '10px 0 0 5px' }}
-                        >
+                    <button
+                      className='resetView'
+                      onClick={ this.resetView }
+                    >
+                      <img src='static/us-outline.svg' />
+                    </button>
 
-                          { [0,1,2,3,4].map(income => {
-                            return (
-                              [1,0.75,0.5,0.25,0].map((perc, i) => {
-                                return (
-                                  <rect
-                                    x={25 + income * 15}
-                                    y={20 + i * 15}
-                                    width={15}
-                                    height={15}
-                                    fill={ getColorForRace(perc) }
-                                    fillOpacity={ (0.75 - 0.7 * (income * 2500 / 10000)) }
-                                    stroke={ getColorForRace(perc) }
-                                    strokeWidth={0.5}
-                                  />
-                                );
-                              })
-                            );
-                          })}
-                          <text
-                            x={0}
-                            y={62.5}
-                            textAnchor='middle'
-                            alignmentBaseline='hanging'
-                            transform='rotate(270 0,57.5)'
-                            fill='black'
-                          >
-                            people of color
-                          </text>
-                          <text
-                            x={103}
-                            y={20}
-                            alignmentBaseline='hanging'
-                            fill='black'
-                            fontSize='0.9em'
-                          >
-                            100%
-                          </text>
-                          <text
-                            x={103}
-                            y={95}
-                            alignmentBaseline='baseline'
-                            fill='black'
-                            fontSize='0.9em'
-                          >
-                            0%
-                          </text>
-                          <text
-                            x={25 + (75/2)}
-                            y={0}
-                            textAnchor='middle'
-                            alignmentBaseline='hanging'
-                            fill='black'
-                          >
-                            ← lower income
-                          </text>
-                          <text
-                            x={25 + 15/2}
-                            y={20 + 77}
-                            textAnchor='middle'
-                            alignmentBaseline='hanging'
-                            fill='black'
-                            fontSize='0.9em'
-                          >
-                            $1K
-                          </text>
-                          <text
-                            x={25 + 75 - 15/2}
-                            y={20 + 77}
-                            textAnchor='middle'
-                            alignmentBaseline='hanging'
-                            fill='black'
-                            fontSize='0.9em'
-                          >
-                            $5K+
-                          </text>
-                          <text
-                            x={25 + 75/2}
-                            y={20 + 77 + 12 }
-                            textAnchor='middle'
-                            alignmentBaseline='hanging'
-                            fill='#444'
-                            fontSize='0.8em'
-                          >
-                            median family incomes
-                          </text>
-                        </svg>
-                      </div> : ''
+                    { (!CitiesStore.getHOLCSelected() && CitiesStore.hasDemographicData(CitiesStore.getSelectedCity())) ? 
+                      <LegendRaceAndIncome /> : ''
                     }
 
                     { (CitiesStore.getHOLCSelected() && CitiesStore.hasHOLCData(CitiesStore.getSelectedCity())) ? 
-                       <div 
-                        className='mapLegend holc'
-                      >
-                        <div><span className='colorkey A'> </span>A "Best"</div>
-                        <div><span className='colorkey B'> </span>B "Still Desirable"</div>
-                        <div><span className='colorkey C'> </span>C "Definitely Declining"</div>
-                        <div><span className='colorkey D'> </span>D "Hazardous"</div>
-
-                        <div className='link'><a href={ 'https://dsl.richmond.edu/panorama/redlining/#loc=' + [GeographyStore.getLatLngZoom().zoom, GeographyStore.getLatLngZoom().lat, GeographyStore.getLatLngZoom().lng].join('/') + "&opacity=0" }>See "Mapping Inequality" to explore redlining in { CitiesStore.getCityData(CitiesStore.getSelectedCity()).city }.</a></div>
-                      </div> : ''
+                      <LegendHOLC 
+                        miurl={ 'https://dsl.richmond.edu/panorama/redlining/#loc=' + [GeographyStore.getLatLngZoom().zoom, GeographyStore.getLatLngZoom().lat, GeographyStore.getLatLngZoom().lng].join('/') + "&opacity=0" }
+                        city={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).city }
+                      /> : ''
                     }
 
                     
                     { (CitiesStore.hasHOLCData(CitiesStore.getSelectedCity())) ?
-                      <div id='mapChartToggle'>
-                        <div
-                          className={ (CitiesStore.getHOLCSelected()) ? '' : 'selected' }
-                          onClick={ this.onHOLCToggle }
-                        >
-                          <span className='tooltip'>View the racial demographics and median incomes from the 1960s census.</span>
-                          1960 Race and Income
-                        </div>
-
-                        <div
-                          className={ (CitiesStore.getHOLCSelected()) ? 'selected' : '' }
-                          onClick={ this.onHOLCToggle }
-                        >
-                          <span className='tooltip'>View the grades assigned by the Home Owners' Loan Corporation assessing 'neighborhood security' in the 1930s.</span>
-                          1930s redlining grades
-                        </div>
-                      
-                      </div> : ''
+                      <CityMapControls 
+                       holcSelected={ CitiesStore.getHOLCSelected() }
+                       onHOLCToggle={ this.onHOLCToggle }
+                      /> : ''
                     }
 
                   </div>
                   :
                   <div>
-                    <svg 
-                      { ...DimensionsStore.getMapDimensions() }
-                      className='theMap'
-                    >
-                      <ReactTransitionGroup component='g'>
-                        <MapChart
-                          { ...GeographyStore.getXYZ() }
-                          selectedView= { CitiesStore.getSelectedView() }
-                          onCityClicked={ this.onCityClicked }
-                          onStateClicked={ this.zoomToState }
-                          onViewSelected={ this.onViewSelected }
-                          onCityHover={ this.onCityInspected }
-                          onCityOut={ this.onCityOut }
-                          resetView={ this.resetView }
-                          onMapClicked={ this.onZoomIn }
-                          handleMouseUp={ this.handleMouseUp }
-                          handleMouseDown={ this.handleMouseDown }
-                          handleMouseMove={ this.handleMouseMove }
-                        />
-                      </ReactTransitionGroup>
+                    <MapChart
+                      { ...GeographyStore.getXYZ() }
+                      selectedView= { CitiesStore.getSelectedView() }
+                      onCityClicked={ this.onCityClicked }
+                      onStateClicked={ this.zoomToState }
+                      onViewSelected={ this.onViewSelected }
+                      onCityHover={ this.onCityInspected }
+                      onCityOut={ this.onCityOut }
+                      resetView={ this.resetView }
+                      onMapClicked={ this.onZoomIn }
+                    />
 
-                    </svg>
-                    <div id='mapChartControls'>
-                      <div
-                        className="zoom-in" 
-                        title="Zoom in" 
-                        role="button" 
-                        aria-label="Zoom in"
-                        onClick={ this.onZoomIn } 
-                        id='zoomInButton'
-                      >
-                        +
-                      </div>
-                      <div
-                        className="zoom-out" 
-                        title="Zoom out" 
-                        role="button" 
-                        aria-label="Zoom out"
-                        onClick={ this.zoomOut }
-                      >
-                        -
-                      </div>
-                    
-                    </div>
+                    <ZoomControls
+                      onZoomIn={ this.onZoomIn }
+                      onZoomOut={ this.zoomOut }
+                      resetView={ this.resetView }
+                    />
 
-                    <div id='mapChartToggle'>
-                      <div
-                        className={ (CitiesStore.getSelectedView() == 'map') ? 'selected' : '' }
-                        onClick={ this.onViewSelected }
-                        id='map'
-                      >
-                        <span className='tooltip'>Shows displacements in cities.</span>
-                        <img src='static/map.png' />
-                        map
-                      </div>
-
-                      <div
-                        className={ (CitiesStore.getSelectedView() == 'cartogram') ? 'selected' : '' }
-                        onClick={ this.onViewSelected }
-                        id='cartogram'
-                      >
-                        <span className='tooltip'>Shows all cities with no overlap keeping them as close as possible to their actual location.</span>
-                        <img src='static/cartogram.png' />
-                        cartogram
-                      </div>
-
-                      <div
-                        className={ (CitiesStore.getSelectedView() == 'scatterplot') ? 'selected' : '' }
-                        onClick={ this.onViewSelected }
-                        id='scatterplot'
-                      >
-                        <span className='tooltip'>Charts percentage of displacements by race relative to the racial demographics of the overall city.</span>
-                        <img src='static/scatterplot.png' />
-                        chart
-
-                      </div>
-                    
-                    </div>
+                    <VizControls
+                      selectedView={ CitiesStore.getSelectedView() }
+                      onViewSelected={ this.onViewSelected }
+                    />
 
                     { (this.state.legendVisible) ?
-                      <div 
-                        className='mapLegend'
-                        style={ DimensionsStore.getLegendDimensions() }
-                      >
-                        <LegendGradient
-                          state={ this.state }
-                          poc={ CitiesStore.getPOC() }
-                          onDragUpdate={ this.onDragUpdate }
-                          percent={ (CitiesStore.getSelectedCity() && CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year] && CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year].percentFamiliesOfColor) ? Math.round(CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData[this.state.year].percentFamiliesOfColor * 100) : false }
-                        />
-                        <LegendDorlings />
-                      </div> : ''
+                      <Legend
+                        poc={ CitiesStore.getPOC() }
+                        onDragUpdate={ this.onDragUpdate }
+                      /> : ''
                     }
-
-                    {/* JSX Comment <div 
-                      className='toggleLegend'
-                      onClick={ this.toggleLegendVisibility }
-                    >
-                      { (this.state.legendVisible) ? 'hide legend' : 'show legend' }
-                    </div>*/}
-
-
-
                   </div>
                 }
 
@@ -525,54 +341,8 @@ class App extends React.Component {
               onProjectInspected={ this.onProjectInspected }
               onProjectOut={ this.onProjectOut }
               onYearClick={ this.onYearClicked }
-            /> : 
-            <div className='stateList'>
-              {/* CitiesStore.getVisibleCitiesByState().map(state => {
-                return (
-                  <div key={ 'state' + state.abbr }>
-                    <h2>{ state.name }</h2>
-                    { state.cities.map(city => {
-                      return (
-                        <CitySnippet
-                          { ...city }
-                          numWithDisplacements={ Object.keys(city.projects).filter(id => (city.projects[id].yearsData[CitiesStore.getSelectedYear()] && city.projects[id].yearsData[CitiesStore.getSelectedYear()].totalFamilies && city.projects[id].yearsData[CitiesStore.getSelectedYear()].totalFamilies > 0)).length}
-                          displayPop={ true }
-                          key={ 'city' + city.city_id }
-                          onCityClick={ this.onCityClicked }
-                        />
-                      );
-                    })}
-                  </div>
-                );
-              }) */} 
-            </div>
+            /> : ''
           }
-
-
-
-          {/* <YearStats
-              year={ this.state.year }
-              totals={ CitiesStore.getYearTotals(this.state.year) }
-              onCategoryClicked={ this.onCategoryClicked }
-            />*/}
-
-          {/* (cases[this.state.year]) ? 
-            cases[this.state.year].map((cityId, i)=> {
-              return (
-                <CityMap 
-                  year={ this.state.year }
-                  cityData={ CitiesStore.getCityData(cityId) }
-                  key={'case' + this.state.year + i }
-                />
-              );
-            }) :
-            ''
-          */}
-
-
-          
-
-          
         </aside>
 
           <div
@@ -623,7 +393,4 @@ class App extends React.Component {
       </div>
     );
   }
-
 }
-
-export default App;

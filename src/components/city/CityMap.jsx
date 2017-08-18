@@ -2,11 +2,11 @@ import * as React from 'react';
 import { PropTypes } from 'react';
 import * as L from 'leaflet';
 
-import { AppActions, AppActionTypes } from '../utils/AppActionCreator';
-import { getColorForRace, formatNumber } from '../utils/HelperFunctions';
+import { AppActions, AppActionTypes } from '../../utils/AppActionCreator';
+import { getColorForRace, formatNumber } from '../../utils/HelperFunctions';
 
-import DimensionsStore from '../stores/DimensionsStore';
-import GeographyStore from '../stores/GeographyStore';
+import DimensionsStore from '../../stores/DimensionsStore';
+import GeographyStore from '../../stores/GeographyStore';
 
 // stores
 

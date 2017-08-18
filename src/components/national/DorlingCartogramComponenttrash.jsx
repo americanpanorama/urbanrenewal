@@ -8,11 +8,11 @@ import GeoState from './GeoState.jsx';
 import Highways from './HighwaysComponent.jsx';
 import Dorlings from './DorlingsComponent.jsx';
 
-import CitiesStore from '../stores/CitiesStore.js';
-import GeographyStore from '../stores/GeographyStore';
-import HighwaysStore from '../stores/HighwaysStore';
-import DimensionsStore from '../stores/DimensionsStore';
-import HelperFunctions from '../utils/HelperFunctions.js';
+import CitiesStore from '../../stores/CitiesStore.js';
+import GeographyStore from '../../stores/GeographyStore';
+import HighwaysStore from '../../stores/HighwaysStore';
+import DimensionsStore from '../../stores/DimensionsStore';
+import HelperFunctions from '../../utils/HelperFunctions.js';
 
 export default class USMap extends React.Component {
 

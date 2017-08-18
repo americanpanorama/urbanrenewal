@@ -2,8 +2,8 @@ import * as React from 'react';
 import { PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import d3 from 'd3';
-import CitiesStore from '../stores/CitiesStore.js';
-import DimensionsStore from '../stores/DimensionsStore.js';
+import CitiesStore from '../../stores/CitiesStore.js';
+import DimensionsStore from '../../stores/DimensionsStore.js';
 
 export default class Dorlings extends React.Component {
 

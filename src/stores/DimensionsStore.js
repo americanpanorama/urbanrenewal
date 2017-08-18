@@ -357,11 +357,11 @@ const DimensionsStore = {
   getScatterplotExplanationAttrs: function() {
     const shortside = Math.min(this.data.nationalMapWidth, this.data.nationalMapHeight) * 0.4;
     return {
-      x: this.getNationalMapWidth()/2 - shortside*0.9 ,
-      y: 130,
+      x: 60,
+      y: 15,
       width:  shortside * 1.8,
       height:  shortside,
-      fontSize:  16,
+      fontSize:  13,
       style: {color: '#222'},
       
     };

@@ -2,9 +2,9 @@ import * as React from 'react';
 import { PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import d3 from 'd3';
-import CitiesStore from '../stores/CitiesStore.js';
-import DimensionsStore from '../stores/DimensionsStore.js';
-import { formatNumber } from '../utils/HelperFunctions';
+import CitiesStore from '../../stores/CitiesStore.js';
+import DimensionsStore from '../../stores/DimensionsStore.js';
+import { formatNumber } from '../../utils/HelperFunctions';
 
 export default class DorlingLabel extends React.Component {
 
