@@ -12,10 +12,14 @@
 @import "components/timelineComponent";
 @import "components/cityStatsComponent";
 @import "components/highwaysComponent";
-@import "components/geoStatesComponent";
+
 @import "components/dorlingsComponent";
 @import "components/usMapComponent";
 @import "components/legendGradientComponent";
 @import "components/citySnippetComponent";
 @import "components/searchComponent";
 @import "components/scatterplotFieldComponent";
+
+@import "components/national/vizControlsComponent";
+@import "components/national/chartFieldComponent";
+@import "components/national/mapFieldComponent";

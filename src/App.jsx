@@ -23,12 +23,15 @@ import CityMapControls from  './components/city/CityMapControlsComponent.jsx';
 import LegendRaceAndIncome from  './components/city/LegendRaceAndIncomeComponent.jsx';
 import LegendHOLC from  './components/city/LegendHOLCComponent.jsx';
 
+// stats
+import CityStats from './components/stats/CityStats.jsx';
+import ProjectStats from './components/stats/ProjectStats.jsx';
 
-import CityTimelineComponent from './components/CityTimelineComponent.jsx';
+
+import CityTimelineComponent from './components/stats/CityTimelineComponent.jsx';
 import TimelineYearComponent from './components/TimelineYearComponent.jsx';
 
-import CityStats from './components/CityStats.jsx';
-import ProjectStats from './components/ProjectStats.jsx';
+
 import YearStats from './components/YearStats.jsx';
 import TypeAheadCitySnippet from './components/TypeAheadCitySnippet.jsx';
 import CitySnippet from './components/CitySnippetComponent.jsx';
@@ -40,7 +43,7 @@ import { Typeahead } from 'react-typeahead';
 // Having `flux` as a dependency, and two different files, is overkill.
 import { AppActions, AppActionTypes } from './utils/AppActionCreator';
 import AppDispatcher from './utils/AppDispatcher';
-import { calculateDorlingsPosition, getColorForRace } from './utils/HelperFunctions';
+import { getColorForRace } from './utils/HelperFunctions';
 
 // main app container
 export default class App extends React.Component {
@@ -269,14 +272,12 @@ export default class App extends React.Component {
                       /> : ''
                     }
 
-                    
                     { (CitiesStore.hasHOLCData(CitiesStore.getSelectedCity())) ?
                       <CityMapControls 
                        holcSelected={ CitiesStore.getHOLCSelected() }
                        onHOLCToggle={ this.onHOLCToggle }
                       /> : ''
                     }
-
                   </div>
                   :
                   <div>
@@ -291,6 +292,14 @@ export default class App extends React.Component {
                       resetView={ this.resetView }
                       onMapClicked={ this.onZoomIn }
                     />
+
+                    { (CitiesStore.getSelectedView() == 'scatterplot') ?
+                        <p 
+                          style={ DimensionsStore.getScatterplotExplanationAttrs() }
+                          className='scatterplotExplanation'
+                        >James Baldwin famously characterized urban renewal as "Negro removal," a point made too by this chart. Cities below the yellow line, which is most cities, displaced families of color disproportionately relative to their overall population. For example, the bottom left of the graph shows cities like <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('cincinnatiOH')}>Cincinnati</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('norfolkVA')}>Norfolk</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('clevelandOH')}>Cleveland</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('saintlouisMO')}>St. Louis</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('philadelphiaPA')}>Philadelphia</span>, and <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('detroitMI')}>Detroit</span> where people of color were 20% to 30% of the overall population but made up two-thirds or more of those displaced. On the far right are usually smaller white cities with tiny populations of color. With people of color being less than 10% of those cities populations, though the majority of families displaced were white, families of color were still <em>disproportionately</em> displaced by most of these cities. For example, while 96% of the families displaced in <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('scrantonPA')}>Scranton</span> where white, more than 99% of the population was white.
+                        </p> : ''
+                    }
 
                     <ZoomControls
                       onZoomIn={ this.onZoomIn }
@@ -312,7 +321,6 @@ export default class App extends React.Component {
                   </div>
                 }
 
-
               </div> 
             </div>
           </div>
@@ -329,7 +337,6 @@ export default class App extends React.Component {
               year={ this.state.year }
             /> : ''
           }
-
 
           { (!CitiesStore.getHighlightedProject() && CitiesStore.getHighlightedCity()) ? 
             <CityStats 

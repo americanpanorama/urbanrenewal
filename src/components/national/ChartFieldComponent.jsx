@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as d3 from 'd3';
 
 import DimensionsStore from '../../stores/DimensionsStore';
+import CitiesStore from '../../stores/CitiesStore';
 
 export default class ChartField extends React.Component {
 
@@ -210,19 +211,6 @@ export default class ChartField extends React.Component {
               { 'even' }
             </text>
           </g>
-        </g>
-
-        <g>
-          <switch>
-            <foreignObject 
-              { ...DimensionsStore.getScatterplotExplanationAttrs() }
-              requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"
-            >
-              <p xmlns="http://www.w3.org/1999/xhtml"  style={{backgroundColor: 'rgba(200,200,200,0.8)', padding: '10px', borderRadius: '10px'}}>James Baldwin famously characterized urban renewal as "Negro removal." Charting the percentage of families of color displaced by federally-funded urban renewal projects against the percentage of people of color in cities reinforces Baldwin's point. Cities below the yellow line, which is most cities, displaced families of color disproportionately relative to their overall population. For example, the bottom left of the graph shows cities like <span>Cincinnati</span>, 
-                Norfolk, Cleveland, St. Louis, Philadelphia, Detroit where people of color were 20% to 30% of the overall population but made up two-thirds or more of those displaced. On the far right are usually smaller white cities with tiny populations of color. With people of color being less than 10% of those cities populations, though the majority of families displaced were white, families of color were still <em>disproportionately</em> displaced by most of these cities.</p>
-            </foreignObject>
-            <text x="20" y="20">No automatic linewrapping.</text>
-          </switch> 
         </g>
 
         {/* masking for transition */}

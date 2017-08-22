@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { PropTypes } from 'react';
+
 
 import GeographyStore from '../stores/GeographyStore';
 

@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { PropTypes } from 'react';
-import CitiesStore from '../stores/CitiesStore.js';
-import DimensionsStore from '../stores/DimensionsStore.js';
+
+import CitiesStore from '../../stores/CitiesStore.js';
+import DimensionsStore from '../../stores/DimensionsStore.js';
 
 export default class ProjectStats extends React.Component {
   constructor (props) { super(props); }

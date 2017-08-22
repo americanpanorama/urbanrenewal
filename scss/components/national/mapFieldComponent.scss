@@ -1,0 +1,16 @@
+.nationalMap {
+  path {
+    pointerEvents: none;
+
+    fill: white;
+    stroke: silver;
+    fillOpacity: 1;
+
+    &.cartogram {
+      fill: #444;
+      stroke: black;
+      fillOpacity: 1;
+      filter: url(#glow)
+    }
+  }
+}

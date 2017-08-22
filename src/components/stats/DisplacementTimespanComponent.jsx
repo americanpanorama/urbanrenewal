@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { PropTypes } from 'react';
+
 import * as d3 from 'd3';
 import ReactTransitionGroup from 'react-addons-transition-group';
-import { getColorForRace, formatNumber } from '../utils/HelperFunctions';
+import { getColorForRace, formatNumber } from '../../utils/HelperFunctions';
 
 export default class Timespan extends React.Component {
 

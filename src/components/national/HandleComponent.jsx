@@ -1,11 +1,12 @@
-var React = require('react');
+import * as React from 'react';
 import DimensionsStore from  '../../stores/DimensionsStore.js';
 
-var Handle = React.createClass({
+export default class Handle extends React.Component {
 
-  getInitialState: function() {
+  constructor(props) {
+    super(props);
     let xForPercent = DimensionsStore.getLegendGradientPercentX(this.props.percent);
-    return {
+    this.state = {
       x: (this.props.max) ? xForPercent : xForPercent - 4, // the visible handle position
       deX: (this.props.max) ? xForPercent - 2 : xForPercent - 6, // the draggable element x
       deWidth: 8,
@@ -15,9 +16,12 @@ var Handle = React.createClass({
       min: (this.props.min) ? this.props.min : 0,
       handleColor: 'yellow'
     };
-  },
 
-  hover: function(e) {
+    const handlers = ['hover','selectElement','deSelectElement','drag'];
+    handlers.map(handler => { this[handler] = this[handler].bind(this); });
+  }
+
+  hover(e) {
     // if it's the right slider, set the bottom just to the right of the top/max slider; if it's left set it 1/5 of the way to the left of the bar (i.e. a fictional percent of 120% or 1.2)
     const deX = (this.props.max) ? DimensionsStore.getLegendGradientPercentX(this.props.max) + 4 : DimensionsStore.getLegendGradientPercentX(1.2),
       deWidth = (this.props.max) ? DimensionsStore.getLegendGradientPercentX(-0.2) - deX : DimensionsStore.getLegendGradientPercentX(this.props.min) - deX - 4;
@@ -26,26 +30,26 @@ var Handle = React.createClass({
       deX: deX,
       deWidth: deWidth
     });
-  },
+  }
 
-  selectElement: function(e) {
+  selectElement(e) {
     this.setState({
       isDragging: true,
       mouseX: e.pageX,
       handleColor: 'red'
     });
-  },
+  }
 
-  deSelectElement: function() {
+  deSelectElement() {
     this.setState({
       isDragging: false,
       deWidth: 8,
       deX: this.state.x - 2,
       handleColor: 'yellow'
     });
-  },
+  }
 
-  drag: function(e) {
+  drag(e) {
     if (this.state.isDragging) {
       const leftOrRight = (this.props.max) ? 'right' : 'left',
         deltaX = e.pageX - this.state.mouseX;
@@ -62,9 +66,9 @@ var Handle = React.createClass({
         mouseX: e.pageX
       });
     }
-  },
+  }
 
-  render: function() {
+  render () {
     return (
       <g>
         <rect 
@@ -94,6 +98,4 @@ var Handle = React.createClass({
     );
   }
 
-});
-
-module.exports = Handle;
+}

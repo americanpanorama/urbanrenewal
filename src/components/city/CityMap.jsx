@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { PropTypes } from 'react';
+import ReactDOM from 'react-dom';
 import * as L from 'leaflet';
 
 import { AppActions, AppActionTypes } from '../../utils/AppActionCreator';
@@ -55,6 +55,44 @@ export default class CityMap extends React.Component {
 
   componentDidMount() { 
     AppActions.mapInitialized(this.refs.the_map.leafletElement);
+    // console.log(this.refs);
+    // Object.keys(this.props.projects).map(projectId => {
+    //   console.log(this.refs['labelFor' + projectId]);
+    // });
+    // const projectLabels = ReactDOM.findDOMNode(this);
+    // console.log(projectLabels);
+    // Object.keys(this.props.projects).map(projectId => {
+    //   console.log(this.refs['labelFor' + projectId]);
+    // });
+  }
+
+  componentDidUpdate() {
+    let boundingBoxes = [],
+      projectIds = Object.keys(this.props.projects).filter(id => this.refs['labelFor' + id]).sort((a,b) => !(this.props.inspectedProjectStats == a || this.props.inspectedProject == a) || this.props.projects[b].totalFamilies - this.props.projects[a].totalFamilies);
+    projectIds.forEach(projectId => {
+      let theLabel = this.refs['labelFor' + projectId],
+        collides = false;
+
+      // get the bounding box for the label
+      const styles = window.getComputedStyle(theLabel.leafletElement._container),
+        x1 = parseInt(styles.transform.match(/[0-9., -]+/)[0].split(", ")[4]),
+        y1 = parseInt(styles.transform.match(/[0-9., -]+/)[0].split(", ")[5]),
+        x2 = x1 + parseInt(styles.width),
+        y2 = y1 + parseInt(styles.height),
+        bb = [ [x1,y1], [x2,y2] ];
+
+      // check for collision
+      boundingBoxes.forEach(boundingBox => {
+        if (this.intersect(boundingBox, bb)) {
+          theLabel.leafletElement._container.style.visibility = 'hidden';
+          collides = true;
+        } 
+      });
+
+      if (!collides) {
+        boundingBoxes.push(bb);
+      }
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -67,6 +105,14 @@ export default class CityMap extends React.Component {
       });
     }
   }
+
+  intersect(a, b){
+    return (a[0][0] <= b[1][0] &&
+            b[0][0] <= a[1][0] &&
+            a[0][1] <= b[1][1] &&
+            b[0][1] <= a[1][1]);
+  }
+
 
   _isRetina(){ 
     return ((window.matchMedia && (window.matchMedia('only screen and (min-resolution: 124dpi), only screen and (min-resolution: 1.3dppx), only screen and (min-resolution: 48.8dpcm)').matches || window.matchMedia('only screen and (-webkit-min-device-pixel-ratio: 1.3), only screen and (-o-min-device-pixel-ratio: 2.6/2), only screen and (min--moz-device-pixel-ratio: 1.3), only screen and (min-device-pixel-ratio: 1.3)').matches)) || (window.devicePixelRatio && window.devicePixelRatio > 1.3));
@@ -174,7 +220,7 @@ export default class CityMap extends React.Component {
                           opacity={1} 
                           permanent={true}
                           className='projectLabel'
-                          
+                          ref={ 'labelFor' + projectId }
                         >
                           <span
                             onClick={ this.props.onProjectHover }

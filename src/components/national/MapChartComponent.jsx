@@ -1,6 +1,6 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
-import { PropTypes } from 'react';
+
 import * as d3 from 'd3';
 
 import Highways from './HighwaysComponent.jsx';
@@ -46,8 +46,12 @@ export default class USMap extends React.Component {
           transform={"translate("+this.props.x+","+this.props.y+")scale(" + this.props.z +")"}
         >
 
+
+
           <ChartField
             selectedView={ this.props.selectedView }
+            onCityHover={ this.props.onCityHover }
+            onCityOut={ this.props.onCityOut }
             { ...GeographyStore.getXYZ() }
           />
 

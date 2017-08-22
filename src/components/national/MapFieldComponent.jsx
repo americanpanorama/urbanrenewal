@@ -11,6 +11,7 @@ export default class MapField extends React.Component {
     super(props);
     this.state = {
       opacity: (this.props.selectedView == 'scatterplot') ? 0 : 1,
+      fill: (this.props.selectedView == 'map') ? 'white' : '#444'
     };
   }
 
@@ -38,11 +39,38 @@ export default class MapField extends React.Component {
           });
         });
     }
+
+    // if (this.props.selectedView == 'map' && nextProps.selectedView == 'cartogram') {
+    //   d3.select(ReactDOM.findDOMNode(this)).selectAll('path')
+    //     .transition()
+    //     .duration(250)
+    //     .style('fill', '#444')
+    //     .each('end', () => {
+    //       this.setState({
+    //         fill: '#444'
+    //       });
+    //     });
+    // }
+
+    // if (this.props.selectedView == 'cartogram' && nextProps.selectedView == 'map') {
+    //   d3.select(ReactDOM.findDOMNode(this)).selectAll('path')
+    //     .transition()
+    //     .duration(250)
+    //     .style('fill', 'white')
+    //     .each('end', () => {
+    //       this.setState({
+    //         fill: 'white'
+    //       });
+    //     });
+    // }
   }
 
   render () {
     return (
-      <g opacity={this.state.opacity}>
+      <g 
+        opacity={this.state.opacity}
+        className='nationalMap'
+      >
         <defs>
           <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
             <feGaussianBlur stdDeviation="6 6" result="glow"/>
@@ -55,12 +83,7 @@ export default class MapField extends React.Component {
               key={ 'statepolygon' + polygon.id }
               d={ GeographyStore.getPath(polygon.geometry) }
               strokeWidth={ (CitiesStore.getSelectedView() == 'cartogram') ? 0.1 / this.props.z : 1 / this.props.z }
-              stroke={ (CitiesStore.getSelectedView() == 'cartogram') ? 'white' : 'silver' }
-              fillOpacity={(CitiesStore.getSelectedView() == 'cartogram') ? 0.75 : 1}
-              className='stateMap'
-              style={{
-                filter: (CitiesStore.getSelectedView() == 'map') ? '' : 'url(#glow)'
-              }}
+              className={ this.props.selectedView }
             />
           );
         }) }

@@ -1,0 +1,17 @@
+.scatterplotExplanation {
+  position: absolute;
+  left: 80px;
+  top: 32px;
+  background-color: rgba(128,128,128,0.2);
+  border: 0.5px solid #aaa;
+  font-size: 1em;
+  overflow-y: scroll;
+  color: white;
+
+  padding: 10px;
+  border-radius: 10px;
+
+  span {
+    border-bottom: 1px dotted;
+  }
+}

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { PropTypes } from 'react';
+
 import ReactDOM from 'react-dom';
 import d3 from 'd3';
 import CitiesStore from '../../stores/CitiesStore.js';
@@ -37,9 +37,7 @@ export default class Dorlings extends React.Component {
     const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4),
       scatterplotMaxY = DimensionsStore.getNationalMapHeight()/2 + shortside;
 
-
     if (this.props.r !== nextProps.r || this.props.color !== nextProps.color || this.props.cx !== nextProps.cx || this.props.cy !== nextProps.cy ) {
-      //console.log(scatterplotMaxY, nextProps.cy, nextProps.cy/scatterplotMaxY);
       d3.select(ReactDOM.findDOMNode(this))
         .transition()
         .delay((nextProps.view == 'scatterplot' && this.props.view !== 'scatterplot') ? (1- nextProps.cy/scatterplotMaxY) * 5000 : 0)
@@ -62,7 +60,7 @@ export default class Dorlings extends React.Component {
   render () {
     const labelSize = (8 * this.state.r  / 15 < 14) ? 14 : (8 * this.state.r  / 15 > 18) ? 18 : 8 * this.state.r  / 15;
     let stroke = '#333';
-    if (this.state.color == 'transparent') {
+    if (this.state.color == 'transparent' || CitiesStore.getSelectedView() == 'cartogram') {
       stroke = 'transparent';
     } 
     // else if (this.props.view == 'scatterplot' && CitiesStore.getCityData(this.props.city_id).nonwhite_1960/CitiesStore.getCityData(this.props.city_id).pop_1960 >= 0.2 && CitiesStore.getCityData(this.props.city_id).nonwhite_1960/CitiesStore.getCityData(this.props.city_id).pop_1960 <= 0.3 ) {

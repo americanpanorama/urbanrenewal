@@ -291,7 +291,6 @@ const CitiesStore = {
 
     let visibleCitiesIds = [];
     const visibleBounds = GeographyStore.getVisibleBounds();
-    console.log(visibleBounds);
 
     Object.keys(this.data.cities).forEach(city_id => {
       let cityBounds = this.data.cities[city_id].detectionBoundingBox;
@@ -302,8 +301,6 @@ const CitiesStore = {
     });
 
     this.data.visibleCitiesIds = visibleCitiesIds;
-
-    console.log(this.data.visibleCitiesIds);
 
     // reset selected city if there's only one and it's not the current selected
     if (this.data.visibleCitiesIds.length == 1 && this.data.selectedCity !== this.data.visibleCitiesIds[0]) {

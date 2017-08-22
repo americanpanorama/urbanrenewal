@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { PropTypes } from 'react';
+
 import * as d3 from 'd3';
 import ReactTransitionGroup from 'react-addons-transition-group';
 import Displacements from './DisplacementTimespanComponent.jsx';
-import { getColorForRace, formatNumber } from '../utils/HelperFunctions';
+import { getColorForRace, formatNumber } from '../../utils/HelperFunctions';
 
-import DimensionsStore from '../stores/DimensionsStore';
-import CitiesStore from '../stores/CitiesStore';
+import DimensionsStore from '../../stores/DimensionsStore';
+import CitiesStore from '../../stores/CitiesStore';
 
 export default class Timeline extends React.Component {
 

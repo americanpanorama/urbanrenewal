@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { PropTypes } from 'react';
+
 import ReactDOM from 'react-dom';
 import * as d3 from 'd3';
 

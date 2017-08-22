@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { PropTypes } from 'react';
+
 import CitiesStore from '../stores/CitiesStore.js';
 
 export default class YearStats extends React.Component {

@@ -1,4 +1,3 @@
-import { PropTypes } from 'react';
 import {GeoJSON}  from 'react-leaflet';
 
 export default class UrbanRenewalPolygon extends GeoJSON {
@@ -23,7 +22,3 @@ export default class UrbanRenewalPolygon extends GeoJSON {
     this.setStyleIfChanged(prevProps.style, this.props.style);
   }
 }
-
-UrbanRenewalPolygon.propTypes = {
-  data: PropTypes.object.isRequired
-};

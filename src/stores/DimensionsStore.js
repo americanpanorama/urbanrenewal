@@ -27,7 +27,9 @@ const DimensionsStore = {
     gradientTopBottomMargins: 20,
     
 
-    dorlingsMaxRadius: 10
+    dorlingsMaxRadius: 10,
+
+    isRetina: false
   },
 
   computeComponentDimensions () {
@@ -64,8 +66,14 @@ const DimensionsStore = {
 
     this.data.timelineProjectHeight = 20;
 
+    this.data.isRetina = this.isItRetina();
+
     this.emit(AppActionTypes.storeChanged);
   },
+
+  isItRetina: function() { return ((window.matchMedia && (window.matchMedia('only screen and (min-resolution: 124dpi), only screen and (min-resolution: 1.3dppx), only screen and (min-resolution: 48.8dpcm)').matches || window.matchMedia('only screen and (-webkit-min-device-pixel-ratio: 1.3), only screen and (-o-min-device-pixel-ratio: 2.6/2), only screen and (min--moz-device-pixel-ratio: 1.3), only screen and (min-device-pixel-ratio: 1.3)').matches)) || (window.devicePixelRatio && window.devicePixelRatio > 1.3)); },
+
+  isRetina: function () { return this.data.isRetina; },
 
   getDimensions: function() { return this.data; },
 
@@ -330,7 +338,10 @@ const DimensionsStore = {
 
   getDorlingsMaxRadius: function() { return this.data.dorlingsMaxRadius; },
 
-  dorlingHasLabel: function(city_id, visibleRadius) { return (city_id == CitiesStore.getHighlightedCity() || (CitiesStore.getSelectedView() == 'cartogram' && visibleRadius >= 20 && !CitiesStore.getHighlightedCity())); },
+  dorlingHasLabel: function(city_id, visibleRadius) { 
+    const radiusThreshold = (this.isRetina() ? 12 : 20);
+    return (city_id == CitiesStore.getHighlightedCity() || (CitiesStore.getSelectedView() == 'cartogram' && visibleRadius >= radiusThreshold && !CitiesStore.getHighlightedCity())); 
+  },
 
   getCitySnippetWidth: function() { return this.getSidebarStyle().width - 10; },
 
@@ -357,13 +368,8 @@ const DimensionsStore = {
   getScatterplotExplanationAttrs: function() {
     const shortside = Math.min(this.data.nationalMapWidth, this.data.nationalMapHeight) * 0.4;
     return {
-      x: 60,
-      y: 15,
-      width:  shortside * 1.8,
-      height:  shortside,
-      fontSize:  13,
-      style: {color: '#222'},
-      
+      width:  this.data.nationalMapWidth - 80 - (46 + 6 + 6 + 6) * 3 - this.data.containerPadding,
+      height: this.data.nationalMapHeight / 4
     };
   },
 

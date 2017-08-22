@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { PropTypes } from 'react';
-import CitiesStore from '../stores/CitiesStore.js';
-import DimensionsStore from '../stores/DimensionsStore.js';
+
+import CitiesStore from '../../stores/CitiesStore.js';
+import DimensionsStore from '../../stores/DimensionsStore.js';
 import CityTimelineComponent from './CityTimelineComponent.jsx';
 import converter from 'number-to-words';
 
