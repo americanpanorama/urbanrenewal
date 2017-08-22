@@ -856,10 +856,8 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
     break;
 
   case AppActionTypes.cityMapMoved:
-    CitiesStore.loadVisibleCities();
-    break;
   case AppActionTypes.mapInitialized:
-    //CitiesStore.loadVisibleCities();
+    CitiesStore.loadVisibleCities();
     break;
   }
 

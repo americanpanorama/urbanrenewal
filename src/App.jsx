@@ -223,7 +223,7 @@ export default class App extends React.Component {
   }
 
   render () {
-    return (      
+    return (
         <div className='container full-height'>
           <div className='row full-height'>
             <div className='columns eight full-height'>
@@ -255,7 +255,7 @@ export default class App extends React.Component {
                     />
 
                     <button
-                      className='resetView'
+                      className='resetView city'
                       onClick={ this.resetView }
                     >
                       <img src='static/us-outline.svg' />

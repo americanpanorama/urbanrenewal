@@ -129,6 +129,13 @@
   background: white;
   padding: 2px 0 0 0;
   border: 2px solid rgb(204,204,204);
+
+  &.city {
+    left: 32px;
+    top: 102px;
+  }
+
+
 }
 
 .projectFootprint {
