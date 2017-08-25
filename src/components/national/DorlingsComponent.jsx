@@ -2,7 +2,6 @@ import * as React from 'react';
 
 import ReactDOM from 'react-dom';
 import d3 from 'd3';
-import CitiesStore from '../../stores/CitiesStore.js';
 import DimensionsStore from '../../stores/DimensionsStore.js';
 
 export default class Dorlings extends React.Component {
@@ -59,13 +58,6 @@ export default class Dorlings extends React.Component {
 
   render () {
     const labelSize = (8 * this.state.r  / 15 < 14) ? 14 : (8 * this.state.r  / 15 > 18) ? 18 : 8 * this.state.r  / 15;
-    let stroke = '#333';
-    if (this.state.color == 'transparent' || CitiesStore.getSelectedView() == 'cartogram') {
-      stroke = 'transparent';
-    } 
-    // else if (this.props.view == 'scatterplot' && CitiesStore.getCityData(this.props.city_id).nonwhite_1960/CitiesStore.getCityData(this.props.city_id).pop_1960 >= 0.2 && CitiesStore.getCityData(this.props.city_id).nonwhite_1960/CitiesStore.getCityData(this.props.city_id).pop_1960 <= 0.3 ) {
-    //   stroke = 'red';
-    // } 
     return (
       <circle className='dorling'
         cx={ this.state.cx }
@@ -73,10 +65,10 @@ export default class Dorlings extends React.Component {
         r={ this.state.r }
         fill={ this.state.color }
         style={ {
-          fillOpacity: (!CitiesStore.getHighlightedCity() || CitiesStore.getHighlightedCity() == this.props.city_id) ? 1 : 0.5,
+          fillOpacity: (this.props.highlightedCities.length == 0) || this.props.highlightedCities.includes(this.props.city_id) ? 1 : 0.2,
           strokeWidth: (this.props.hasProjectGeojson) ? this.props.strokeWidth : this.props.strokeWidth,
-          strokeOpacity: (!CitiesStore.getHighlightedCity() || CitiesStore.getHighlightedCity() == this.props.city_id) ? 1 : 0.1,
-          stroke: stroke
+          strokeOpacity: (this.props.highlightedCities.length == 0) || this.props.highlightedCities.includes(this.props.city_id) ? 1 : 0,
+          stroke: this.props.stroke
         } }
         onClick={ (this.props.hasProjectGeojson) ? this.props.onCityClicked : this.props.onCityClicked}
         onMouseEnter={ this.props.onCityHover }

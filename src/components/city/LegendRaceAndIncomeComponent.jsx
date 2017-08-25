@@ -24,9 +24,10 @@ export default class LegendRaceAndIncome extends React.Component {
                     width={15}
                     height={15}
                     fill={ getColorForRace(perc) }
-                    fillOpacity={ (0.75 - 0.7 * (income * 2500 / 10000)) }
+                    fillOpacity={ (0.9 - 0.9 * (income * 2500 / 10000)) }
                     stroke={ getColorForRace(perc) }
                     strokeWidth={0.5}
+                    strokeOpacity={0.1}
                   />
                 );
               })
@@ -67,7 +68,7 @@ export default class LegendRaceAndIncome extends React.Component {
             alignmentBaseline='hanging'
             fill='black'
           >
-            ← lower income
+            families impoverished
           </text>
           <text
             x={25 + 15/2}
@@ -77,7 +78,7 @@ export default class LegendRaceAndIncome extends React.Component {
             fill='black'
             fontSize='0.9em'
           >
-            $1K
+            100%
           </text>
           <text
             x={25 + 75 - 15/2}
@@ -87,18 +88,8 @@ export default class LegendRaceAndIncome extends React.Component {
             fill='black'
             fontSize='0.9em'
           >
-            $5K+
-          </text>
-          <text
-            x={25 + 75/2}
-            y={20 + 77 + 12 }
-            textAnchor='middle'
-            alignmentBaseline='hanging'
-            fill='#444'
-            fontSize='0.8em'
-          >
-            median family incomes
-          </text>
+            0%
+          </text>b
         </svg>
       </div> 
     );

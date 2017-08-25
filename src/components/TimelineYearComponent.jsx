@@ -5,7 +5,6 @@ import ReactTransitionGroup from 'react-addons-transition-group';
 import { getColorForRace, formatNumber } from '../utils/HelperFunctions';
 
 import DimensionsStore from '../stores/DimensionsStore';
-import CitiesStore from '../stores/CitiesStore';
 
 export default class Timeline extends React.Component {
 
@@ -91,7 +90,7 @@ export default class Timeline extends React.Component {
 
         {/* label for year */}
         <text { ...DimensionsStore.getMainTimelineYearLabelAttrs() }>
-          { (CitiesStore.getSelectedYear()) ? CitiesStore.getSelectedYear() : 'All Years' }
+          { (this.props.selectedYear) ? this.props.selectedYear : 'All Years' }
         </text>
 
         <rect { ...DimensionsStore.getMainTimelineLegendBoxPOCAttrs() } />

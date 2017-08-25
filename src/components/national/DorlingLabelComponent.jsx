@@ -1,8 +1,6 @@
 import * as React from 'react';
-
 import ReactDOM from 'react-dom';
 import d3 from 'd3';
-import CitiesStore from '../../stores/CitiesStore.js';
 import DimensionsStore from '../../stores/DimensionsStore.js';
 import { formatNumber} from '../../utils/HelperFunctions';
 
@@ -24,7 +22,7 @@ export default class DorlingLabel extends React.Component {
     if (this.props.cx !== nextProps.cx || this.props.cy !== nextProps.cy ) {
       d3.select(ReactDOM.findDOMNode(this))
         .transition()
-        .delay((CitiesStore.getSelectedView() == 'scatterplot') ? Math.min((DimenxsionsStore.getNationalMapHeight() * 0.9 - nextProps.cy) * 10, 5000) : 0)
+        .delay((this.props.selectedView == 'scatterplot') ? Math.min((DimenxsionsStore.getNationalMapHeight() * 0.9 - nextProps.cy) * 10, 5000) : 0)
         .duration(750)
         .attr('transform', 'translate(' + nextProps.cx + ' ' + nextProps.cy + ')');
     }

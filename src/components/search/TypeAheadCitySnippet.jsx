@@ -1,8 +1,8 @@
 import React from 'react';
-import { AppActionTypes } from '../utils/AppActionCreator';
+import { AppActionTypes } from '../../utils/AppActionCreator';
 import CitySnippet from './CitySnippetComponent2.jsx';
 
-import DimensionsStore from '../stores/DimensionsStore';
+import DimensionsStore from '../../stores/DimensionsStore';
 
 
 export default class TypeAheadCitySnippet extends React.Component {

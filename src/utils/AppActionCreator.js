@@ -9,6 +9,7 @@ export const AppActionTypes = {
   categorySelected: 'categorySelected',
   cityInspected: 'cityInspected',
   citySelected: 'citySelected',
+  citiesHighlighted: 'cityHighlighted',
   dateSelected: 'dateSelected',
   viewSelected: 'viewSelected',
   mapMoved: 'mapMoved',
@@ -144,6 +145,13 @@ export const AppActions = {
     AppDispatcher.dispatch({
       type: AppActionTypes.HOLCToggle,
       value: bool
+    });
+  },
+
+  citiesHighlighted: (ids) => {
+    AppDispatcher.dispatch({
+      type: AppActionTypes.citiesHighlighted,
+      value: ids
     });
   },
 

@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as d3 from 'd3';
 
 import DimensionsStore from '../../stores/DimensionsStore';
-import CitiesStore from '../../stores/CitiesStore';
 
 export default class ChartField extends React.Component {
 

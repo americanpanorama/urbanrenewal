@@ -27,9 +27,19 @@ export default class CityMap extends React.Component {
   componentDidMount() { AppActions.mapInitialized(this.refs.the_map.leafletElement); }
 
   componentDidUpdate() {
+    // bring urban renewal projects to top so they're not underneath census tracts or HOLC neighborhoods
+    Object.keys(this.props.projects).map(projectId => {
+      if (this.props.projects[projectId].the_geojson) {
+        this.refs['projectFootprint' + projectId].leafletElement.bringToFront();
+      }
+    });
+
+
     // hide project labels that overlap
     let boundingBoxes = [],
-      projectIds = Object.keys(this.props.projects).filter(id => this.refs['labelFor' + id]).sort((a,b) => !(this.props.inspectedProjectStats == a || this.props.inspectedProject == a) || this.props.projects[b].totalFamilies - this.props.projects[a].totalFamilies);
+      projectIds = Object.keys(this.props.projects)
+        .filter(id => this.refs['labelFor' + id])
+        .sort((a,b) => (this.props.inspectedProjectStats == a || this.props.inspectedProject == a) ? -1 : this.props.projects[b].totalFamilies - this.props.projects[a].totalFamilies);
     projectIds.forEach(projectId => {
       let theLabel = this.refs['labelFor' + projectId],
         collides = false;
@@ -79,8 +89,8 @@ export default class CityMap extends React.Component {
       >
         <Map 
           ref='the_map' 
-          center={ (this.props.lat && this.props.lng) ? [ this.props.lat, this.props.lng ] : [0,0] } 
-          zoom={ this.props.zoom || 12 }  
+          center={ (this.props.lat && this.props.lng) ? [ this.props.lat, this.props.lng ] : (this.props.cityData.center) ? (this.props.cityData.center) : [0,0] } 
+          zoom={ this.props.zoom || 11 }  
           minZoom={ 11 }
           className='the_map'
           style={ {
@@ -105,7 +115,8 @@ export default class CityMap extends React.Component {
                     fillColor: getColorForRace(this.props.tracts[tractId].percentPeopleOfColor / 100),
                     //fillColor: 'transparent',
                     //fillOpacity: (this.props.tracts[tractId].medianIncome < 10000) ? (1 - ((this.props.tracts[tractId].medianIncome - 999) / 10000)) / 3: 0,
-                    fillOpacity: (this.props.tracts[tractId].medianIncome < 5000) ? 0.7 - (1 - ((this.props.tracts[tractId].medianIncome - 999) / 5000)): 0.05,
+                    //fillOpacity: (this.props.tracts[tractId].medianIncome < 5000) ? 0.7 - (1 - ((this.props.tracts[tractId].medianIncome - 999) / 5000)): 0.05,
+                    fillOpacity: (this.props.tracts[tractId].percentBelow  / 100) * 0.9,
                     weight: 0, //(this.props.tracts[tractId].medianIncome < 5000) ? 10 - 10 * (1 - ((this.props.tracts[tractId].medianIncome - 999) / 5000)): 0,
                     color: getColorForRace(this.props.tracts[tractId].percentPeopleOfColor / 100),
                   } }
@@ -145,12 +156,13 @@ export default class CityMap extends React.Component {
                       onClick={ this.props.onProjectClick }
                       id={ projectId }
                       style={ {
-                        weight: 5,
-                        color: (this.props.inspectedProject == projectId || this.props.inspectedProject == null) ?  'red' : 'grey',
-                        dashArray: '10, 5',
+                        weight: 3,
+                        color: (this.props.inspectedProject == projectId || this.props.inspectedProject == null) ?  '#5B3000' : 'grey',
+                        //dashArray: '5, 5',
                         fillColor: getColorForRace(this.props.projects[projectId].percentFamiliesOfColor),
-                        fillOpacity: (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId) ? 0.8 : 0,
+                        fillOpacity: (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId) ? 1 : 0,
                       } }
+                      ref={ 'projectFootprint' + projectId }
                     >
                       { (this.props.inspectedProject == projectId || this.props.inspectedProject == null) ?
                         <Tooltip 

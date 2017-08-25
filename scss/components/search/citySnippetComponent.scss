@@ -1,0 +1,16 @@
+.searchResult {
+	clear: both;
+
+	svg {
+		float: left;
+	}
+
+	h3 {
+		border-bottom: 1px solid grey;
+		font-size: 1.3em;
+	}
+		
+	* {
+		pointer-events: none;
+	}
+}

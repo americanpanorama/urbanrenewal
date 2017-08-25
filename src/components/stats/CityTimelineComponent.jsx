@@ -1,8 +1,8 @@
 import * as React from 'react';
-
 import * as d3 from 'd3';
 import ReactTransitionGroup from 'react-addons-transition-group';
 import Displacements from './DisplacementTimespanComponent.jsx';
+import ProjectSnippet from './ProjectSnippetComponent.jsx';
 import { getColorForRace, formatNumber } from '../../utils/HelperFunctions';
 
 import DimensionsStore from '../../stores/DimensionsStore';
@@ -13,73 +13,159 @@ export default class Timeline extends React.Component {
   constructor (props) { super(props); }
 
   render() {
-    const projects = CitiesStore.getProjectTimelineBars(this.props.city_id),
-      maxForYear = Math.max(...projects.map(p => p.totalFamilies/(Math.min(p.end_year, 1966) - Math.max(p.start_year,1955) + 1))),
-      years = [1955,1956,1957,1958,1959,1960,1961,1962,1963,1964,1965,1966];
+    const years = [1955,1956,1957,1958,1959,1960,1961,1962,1963,1964,1965,1966];
+
+    const sortedProjects = Object.keys(this.props.projects)
+      .map(project_id => this.props.projects[project_id])
+      .filter(p => p.totalFamilies > 0)
+      .sort((a,b)=> (a.project < b.project) ? -1 : (a.project > b.project) ? 1 : 0);
+
+    const theMax = sortedProjects.reduce((max,project) => Math.max(max, project.whites || 0, project.nonwhite || 0), 0),
+      height = (sortedProjects.length + 1) * 22;
 
     return (
-      <svg 
-        { ...DimensionsStore.getCityTimelineStyle() }
-        height={ (DimensionsStore.getDorlingRadius(CitiesStore.getMaxDisplacementsInCityForYear(), {useYear:true}) * 2 + DimensionsStore.getMainTimelineFontSize() ) + projects.length * 25 + 25 }
-        id='timeline'
-      >
+      <div>
+        <svg 
+          { ...DimensionsStore.getCityTimelineStyle() }
+          height={ height }
+          id='timeline'
+        >
 
-        { years.map(year => {
-          if (this.props.yearsData && this.props.yearsData[year] && this.props.yearsData[year].totalFamilies) {
-            return (
-              <circle 
-                { ...DimensionsStore.getTimelineXDorlingAttrs(year, this.props.yearsData[year].totalFamilies, getColorForRace(this.props.yearsData[year].percentFamiliesOfColor) ) } 
+      {/* JSX Comment 
+          { years.map(year => {
+            if (this.props.yearsData && this.props.yearsData[year] && this.props.yearsData[year].totalFamilies) {
+              return (
+                <circle 
+                  { ...DimensionsStore.getTimelineXDorlingAttrs(year, this.props.yearsData[year].totalFamilies, getColorForRace(this.props.yearsData[year].percentFamiliesOfColor) ) } 
+                  onClick={ this.props.onYearClick } 
+                  id={ year }
+                />
+              );
+            }
+          })}
+
+          { years.map(year => {
+            if (this.props.yearsData && this.props.yearsData[year] && this.props.yearsData[year].totalFamilies) {
+              return (
+                <text { ...DimensionsStore.getTimelineXDorlingLabelAttrs(year, this.props.yearsData[year].totalFamilies) }> 
+                  { formatNumber(this.props.yearsData[year].totalFamilies) }
+                </text>
+              );
+            }
+          })}
+
+          <g transform={'translate(0 ' + (DimensionsStore.getDorlingRadius(CitiesStore.getMaxDisplacementsInCityForYear(), {useYear:true}) * 2) + ')'}>
+            { years.map(year => 
+              <text 
+                { ...DimensionsStore.getTimelineXAxisAttrs(year) }
                 onClick={ this.props.onYearClick } 
                 id={ year }
-              />
-            );
-          }
-        })}
-
-        { years.map(year => {
-          if (this.props.yearsData && this.props.yearsData[year] && this.props.yearsData[year].totalFamilies) {
-            return (
-              <text { ...DimensionsStore.getTimelineXDorlingLabelAttrs(year, this.props.yearsData[year].totalFamilies) }> 
-                { formatNumber(this.props.yearsData[year].totalFamilies) }
+              >
+                { year }
               </text>
-            );
-          }
-        })}
+            )}
+          </g>
 
-        <g transform={'translate(0 ' + (DimensionsStore.getDorlingRadius(CitiesStore.getMaxDisplacementsInCityForYear(), {useYear:true}) * 2) + ')'}>
-          { years.map(year => 
-            <text 
-              { ...DimensionsStore.getTimelineXAxisAttrs(year) }
-              onClick={ this.props.onYearClick } 
-              id={ year }
+        */}
+        
+
+          <text
+            x={ DimensionsStore.getCityTimelineStyle().width / 2 - 5 }
+            y={ 0 }
+            fontWeight='bold'
+            textAnchor='end'
+            alignmentBaseline='hanging'
+            fill='grey'
+          >
+            Renewal Projects
+          </text>
+          <text
+            x={ DimensionsStore.getCityTimelineStyle().width * 0.75 }
+            y={ 0 }
+            fontWeight='bold'
+            textAnchor='middle'
+            alignmentBaseline='hanging'
+            fill='grey'
+          >
+            Families Displaced
+          </text>
+
+          <line
+            x1={ DimensionsStore.getCityTimelineStyle().width * 0.75 }
+            x2={ DimensionsStore.getCityTimelineStyle().width * 0.75 }
+            y1={20}
+            y2={height}
+            stroke='#aaa'
+            strokeWidth={0.5}
+          />
+
+
+
+          { sortedProjects.map((p, i) => 
+            <g 
+              key={ 'projectData' + p.project_id }
+              onMouseEnter={ (p.the_geojson) ? this.props.onProjectInspected : null }
+              onMouseLeave={ (p.the_geojson) ? this.props.onProjectOut : null }
+              id={ p.project_id  }
+              transform='translate(0 22)'
             >
-              { year }
-            </text>
-          )}
-        </g>
-
-        { (this.props.projects) ? 
-          <g transform={'translate(0 ' + (DimensionsStore.getDorlingRadius(CitiesStore.getMaxDisplacementsInCityForYear(), {useYear:true}) * 2 + DimensionsStore.getMainTimelineFontSize() ) + ')'}>
-            { projects.map((project, i) => 
-              <Displacements
-                inSelectedYear={ (this.props.year >= project.start_year && this.props.year <= project.end_year) }
-                width={ DimensionsStore.getTimelineYearsSpanWidth(project.start_year, project.end_year + 1)  }
-                height={ DimensionsStore.getTimelineProjectHeight() }
-                x={ DimensionsStore.getTimelineXOffset(project.start_year) }
-                y={ ((project.row + 1) * DimensionsStore.getTimelineProjectHeight() * 1.2 )  }
-                text={ project.project.replace(/\b\w/g, l => l.toUpperCase()) }
-                key={ 'projectSpan' + i }
-                maxForYear={ maxForYear }
-                projectData={ project }
-                maxForYear={ projects[0].totalFamilies/ (projects[0].end_year-projects[0].start_year+1)}
-                onProjectInspected={ this.props.onProjectInspected }
-                onProjectOut={ this.props.onProjectOut }
+              <text
+                x={ DimensionsStore.getCityTimelineStyle().width / 2 - 5}
+                y={ i * 20 }
+                fontWeight={ (p.the_geojson) ? 'bold' : '' }
+                fill={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 'black' : '#aaa' }
+                textAnchor='end'
+                alignmentBaseline='hanging'
+                id={ p.project_id  }
+              >
+                { p.project }
+              </text>
+              <rect
+                x={DimensionsStore.getCityTimelineStyle().width * 0.75  - ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6}
+                y={i * 20}
+                width={ ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 }
+                height={14}
+                fillOpacity={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 1 : 0.25 }
+                className='poc'
+                id={ p.project_id  }
               />
-            ) }
-          </g>:
-          '' 
-        }
-      </svg>
+              <text
+                x={ DimensionsStore.getCityTimelineStyle().width * 0.75  - ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 - 3}
+                y={ i * 20 + 1 }
+                fillOpacity={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 1 : 0.25 }
+                textAnchor='end'
+                alignmentBaseline='hanging'
+                fontSize={12}
+                fill='grey'
+              >
+                { formatNumber(p.nonwhite) }
+              </text>
+              <rect
+                x={DimensionsStore.getCityTimelineStyle().width * 0.75}
+                y={i * 20}
+                width={ ((p.whites || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 }
+                height={14}
+                fillOpacity={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 1 : 0.25 }
+                className='white'
+                id={ p.project_id  }
+              />
+              <text
+                x={ DimensionsStore.getCityTimelineStyle().width * 0.75 + ((p.whites || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 + 3}
+                y={ i * 20 + 1 }
+                fillOpacity={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 1 : 0.25 }
+                textAnchor='start'
+                alignmentBaseline='hanging'
+                fontSize={12}
+                fill='grey'
+                id={ p.project_id  }
+              >
+                { formatNumber(p.whites) }
+              </text>
+            </g>
+          )} 
+        
+        </svg>
+      </div>
     );
   }
 

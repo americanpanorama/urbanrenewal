@@ -1,19 +1,21 @@
 import React from 'react';
 import d3 from 'd3';
 
-import CitiesStore from '../stores/CitiesStore';
-import DimensionsStore from '../stores/DimensionsStore';
+import DimensionsStore from '../../stores/DimensionsStore';
 
-import { getColorForRace, formatNumber } from '../utils/HelperFunctions';
+import { getColorForRace, formatNumber } from '../../utils/HelperFunctions';
 
 export default class CitySnippet extends React.Component {
 
   constructor () { super();}
 
-  render () {    
+  render () {
     return (
-      <div className='searchResult'>
-
+      <div 
+        className='searchResult'
+        onClick={ this.props.onCityClick }
+        id={ this.props.cityData.city_id }
+      >
         <svg 
           width={ DimensionsStore.getDorlingsMaxRadius() * 2 }
           height={ DimensionsStore.getDorlingsMaxRadius() * 2 }

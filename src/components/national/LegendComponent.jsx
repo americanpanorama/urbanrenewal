@@ -5,8 +5,6 @@ import * as d3 from 'd3';
 import LegendGradient from './LegendGradientComponent.jsx';
 import LegendDorlings from './LegendDorlingsComponent.jsx';
 
-import GeographyStore from '../../stores/GeographyStore';
-import CitiesStore from '../../stores/CitiesStore';
 import DimensionsStore from '../../stores/DimensionsStore';
 
 export default class LegendAndControls extends React.Component {
@@ -25,10 +23,11 @@ export default class LegendAndControls extends React.Component {
           poc={ this.props.poc }
           onDragUpdate={ this.props.onDragUpdate }
         />
-        <LegendDorlings />
+        <LegendDorlings 
+          dorlingScale={ this.props.dorlingScale }
+          dorlingIncrements={ this.props.dorlingIncrements }
+        />
       </div> 
-);
-
+    );
   }
-
 }

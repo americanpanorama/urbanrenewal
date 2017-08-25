@@ -11,19 +11,4 @@
 	position: fixed;
 	overflow-y: scroll;
 	background-color: $text-background-color;
-
-	.searchResult {
-		clear: both;
-
-		svg {
-			float: left;
-		}
-
-		h3 {
-			border-bottom: 1px solid grey;
-			font-size: 1.3em;
-		}
-	}
-
-
 }

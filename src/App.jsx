@@ -1,7 +1,6 @@
-// import node modules
 import d3 from 'd3';
 import * as React from 'react';
-import ReactTransitionGroup from 'react-addons-transition-group';
+import { Typeahead } from 'react-typeahead';
 
 // stores
 import CitiesStore from './stores/CitiesStore';
@@ -11,41 +10,33 @@ import HighwaysStore from './stores/HighwaysStore';
 import HashManager from './stores/HashManager';
 
 // components
-// national
+  // national
 import MapChart from './components/national/MapChartComponent.jsx';
 import Legend from  './components/national/LegendComponent.jsx';
 import VizControls from './components/national/VizControlsComponent.jsx';
 import ZoomControls from './components/national/ZoomControlsComponent.jsx';
 
-// city
+  // city
 import CityMap from './components/city/CityMap.jsx';
 import CityMapControls from  './components/city/CityMapControlsComponent.jsx';
 import LegendRaceAndIncome from  './components/city/LegendRaceAndIncomeComponent.jsx';
 import LegendHOLC from  './components/city/LegendHOLCComponent.jsx';
 
-// stats
+  // stats
 import CityStats from './components/stats/CityStats.jsx';
 import ProjectStats from './components/stats/ProjectStats.jsx';
 
+  // search
+import TypeAheadCitySnippet from './components/search/TypeAheadCitySnippet.jsx';
 
-import CityTimelineComponent from './components/stats/CityTimelineComponent.jsx';
+  // timeline
 import TimelineYearComponent from './components/TimelineYearComponent.jsx';
 
-
-import YearStats from './components/YearStats.jsx';
-import TypeAheadCitySnippet from './components/TypeAheadCitySnippet.jsx';
-import CitySnippet from './components/CitySnippetComponent.jsx';
-import { Typeahead } from 'react-typeahead';
-
-
 // utils
-// TODO: refactor to use same structure as PanoramaDispatcher;
-// Having `flux` as a dependency, and two different files, is overkill.
 import { AppActions, AppActionTypes } from './utils/AppActionCreator';
 import AppDispatcher from './utils/AppDispatcher';
 import { getColorForRace } from './utils/HelperFunctions';
 
-// main app container
 export default class App extends React.Component {
 
   constructor (props) {
@@ -58,7 +49,7 @@ export default class App extends React.Component {
     this.coords = {};
 
     // bind handlers
-    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle', 'onProjectInspected', 'onProjectOut', 'onSearching', 'onProjectMapHover', 'onProjectSelected', 'onProjectMapUnhover'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle', 'onProjectInspected', 'onProjectOut', 'onSearching', 'onProjectMapHover', 'onProjectSelected', 'onProjectMapUnhover','onSearchBlur'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
 
     console.time('update');
@@ -96,10 +87,12 @@ export default class App extends React.Component {
 
   onCityClicked(event) { 
     const id = event.city_id || event.target.id;
+    console.log(id);
     AppActions.citySelected(id); 
+    this.refs.typeahead.setEntryText('');
   }
 
-  onCityInspected(event) { AppActions.cityInspected(event.target.id); }
+  onCityInspected(event) { AppActions.cityInspected(parseInt(event.target.id)); }
 
   onCityMapMove(event) { AppActions.cityMapMoved(); }
 
@@ -117,9 +110,19 @@ export default class App extends React.Component {
 
   onProjectOut() { AppActions.projectInspected(null); }
 
-  onSearching(d) { 
-    console.log(d);
+  onSearchBlur() { 
+    // you don't want this firing before a click on the search results
+    let waitingId = setInterval(() => {
+      if (!this.refs.typeahead.refs.entry.value) {
+        clearInterval(waitingId);
+        this.refs.typeahead.setEntryText('');
+        AppActions.citiesHighlighted([]); 
+      }
+    }, 150);
+
   }
+
+  onSearching(e) { AppActions.citiesHighlighted(this.refs.typeahead.getOptionsForValue(this.refs.typeahead.refs.entry.value, CitiesStore.getCitiesListWithDisplacements()).map(c => c.city_id)); }
 
   onViewSelected(event) { 
     if (event.target.id !== CitiesStore.getSelectedView()) {
@@ -284,6 +287,7 @@ export default class App extends React.Component {
                     <MapChart
                       { ...GeographyStore.getXYZ() }
                       selectedView= { CitiesStore.getSelectedView() }
+                      highlightedCities={ CitiesStore.getHighlightedCities() }
                       onCityClicked={ this.onCityClicked }
                       onStateClicked={ this.zoomToState }
                       onViewSelected={ this.onViewSelected }
@@ -315,6 +319,8 @@ export default class App extends React.Component {
                     { (this.state.legendVisible) ?
                       <Legend
                         poc={ CitiesStore.getPOC() }
+                        dorlingScale={ (CitiesStore.getSelectedView() == 'cartogram') ? GeographyStore.getZ() : 1 }
+                        dorlingIncrements={ DimensionsStore.getLegendDimensionsIntervals() }
                         onDragUpdate={ this.onDragUpdate }
                       /> : ''
                     }
@@ -342,7 +348,9 @@ export default class App extends React.Component {
             <CityStats 
               { ...CitiesStore.getCityData(CitiesStore.getHighlightedCity()) }
               categories={ CitiesStore.getCategories() }
-              year={ this.state.year }
+              selectedYear={ CitiesStore.getSelectedYear() }
+              inspectedProject={ CitiesStore.getInspectedProject() }
+              projectBars={ CitiesStore.getProjectTimelineBars(CitiesStore.getHighlightedCity()) }
               onCityClicked={ this.onCityClicked }
               onCategoryClicked={ this.onCategoryClicked }
               onProjectInspected={ this.onProjectInspected }
@@ -356,29 +364,16 @@ export default class App extends React.Component {
             style = { DimensionsStore.getTimelineAttrs() }
             className='timelineControls'
           >
-            { (false && CitiesStore.getSelectedCity()) ?
-              <CityTimelineComponent 
-                onClick={ this.onYearClicked }
-                state={ this.state }
-                year={ this.state.year }
-                yearSpan={ (CitiesStore.getSelectedCity()) ? [CitiesStore.getCityData(CitiesStore.getSelectedCity()).startYear, CitiesStore.getCityData(CitiesStore.getSelectedCity()).endYear] : [1954, 1972] }
-                yearsData={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData : CitiesStore.getYearsTotals() }
-                projects={ (CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).projects : false }
-                maxForYear={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).maxDisplacmentsForYear }
-                name={ (CitiesStore.getSelectedCity()) ? (CitiesStore.getCityData(CitiesStore.getSelectedCity()).city + ', ' + CitiesStore.getCityData(CitiesStore.getSelectedCity()).state).toUpperCase() : 'United States' }
-                style={ DimensionsStore.getTimelineStyle() }
-              /> :
-              <TimelineYearComponent 
-                onClick={ this.onYearClicked }
-                state={ this.state }
-                year={ this.state.year }
-                yearSpan={ (false && CitiesStore.getSelectedCity()) ? [CitiesStore.getCityData(CitiesStore.getSelectedCity()).startYear, CitiesStore.getCityData(CitiesStore.getSelectedCity()).endYear] : [1954, 1972] }
-                yearsData={ (false && CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData : CitiesStore.getYearsTotals() }
-                projects={ (false && CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).projects : false }
-                name={ (false && CitiesStore.getSelectedCity()) ? (CitiesStore.getCityData(CitiesStore.getSelectedCity()).city + ', ' + CitiesStore.getCityData(CitiesStore.getSelectedCity()).state).toUpperCase() : 'United States' }
-                style={ DimensionsStore.getTimelineStyle() }
-              />
-            }
+            <TimelineYearComponent 
+              onClick={ this.onYearClicked }
+              state={ this.state }
+              selectedYear={ CitiesStore.getSelectedYear() }
+              yearSpan={ (false && CitiesStore.getSelectedCity()) ? [CitiesStore.getCityData(CitiesStore.getSelectedCity()).startYear, CitiesStore.getCityData(CitiesStore.getSelectedCity()).endYear] : [1954, 1972] }
+              yearsData={ (false && CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData : CitiesStore.getYearsTotals() }
+              projects={ (false && CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).projects : false }
+              name={ (false && CitiesStore.getSelectedCity()) ? (CitiesStore.getCityData(CitiesStore.getSelectedCity()).city + ', ' + CitiesStore.getCityData(CitiesStore.getSelectedCity()).state).toUpperCase() : 'United States' }
+              style={ DimensionsStore.getTimelineStyle() }
+            />
           </div>
 
         <div 
@@ -392,7 +387,9 @@ export default class App extends React.Component {
             displayOption={(city, i) => city.city }
             onOptionSelected={ this.onCityClicked }
             customListComponent={ TypeAheadCitySnippet }
-            onKeyPress={ this.onSearching }
+            onKeyUp={ this.onSearching }
+            //onBlur={ this.onSearchBlur }
+            ref='typeahead'
             //maxVisible={ 8 }
             
           />

@@ -322,6 +322,7 @@ GeographyStore.dispatchToken = AppDispatcher.register((action) => {
   case AppActionTypes.mapInitialized:
     GeographyStore.setTheMap(action.value);
     break;
+    
   case AppActionTypes.citySelected:
     if (action.value == null) {
       GeographyStore.setView(null,null,null);

@@ -46,8 +46,6 @@ export default class USMap extends React.Component {
           transform={"translate("+this.props.x+","+this.props.y+")scale(" + this.props.z +")"}
         >
 
-
-
           <ChartField
             selectedView={ this.props.selectedView }
             onCityHover={ this.props.onCityHover }
@@ -65,7 +63,9 @@ export default class USMap extends React.Component {
               <Dorlings
                 { ...cityData }
                 { ...GeographyStore.getXYZ() }
+                highlightedCities={ this.props.highlightedCities }
                 r={ DimensionsStore.getDorlingRadius(cityData.value) }
+                stroke={ (CitiesStore.getSelectedView() == 'cartogram') ? 'transparent' : '#333'}
                 view={ CitiesStore.getSelectedView() }
                 key={'cityCircle' + cityData.city_id }
                 strokeWidth={ 0.5/GeographyStore.getZ()}
@@ -78,12 +78,13 @@ export default class USMap extends React.Component {
 
           { CitiesStore.getDorlingsForce().map((cityData, i) => {
             const visibleRadius = (CitiesStore.getSelectedView() == 'cartogram') ? DimensionsStore.getDorlingRadius(cityData.value) * GeographyStore.getZ() : DimensionsStore.getDorlingRadius(cityData.value) ;
-            if (DimensionsStore.dorlingHasLabel(cityData.city_id, visibleRadius)) {
+            if (DimensionsStore.dorlingHasLabel(cityData.city_id, visibleRadius) && (this.props.highlightedCities.length == 0 || this.props.highlightedCities.includes(cityData.city_id))) {
               return (
                 <DorlingLabel
                   { ...cityData }
                   { ...GeographyStore.getXYZ() }
                   r={ DimensionsStore.getDorlingRadius(cityData.value) }
+                  selectedView={ CitiesStore.getSelectedView() }
                   key={'cityCircle' + cityData.city_id }
                   strokeWidth={ 0.5/GeographyStore.getZ()}
                   onCityClicked={ this.props.onCityClicked }
