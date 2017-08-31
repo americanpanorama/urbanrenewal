@@ -9,13 +9,17 @@ export default class CityStats extends React.Component {
   constructor (props) { super(props); }
 
   render() {
+
+    const someWithNoDisplacements = (Object.keys(this.props.projects).map(project_id => this.props.projects[project_id]).filter(p => !p.totalFamilies || p.totalFamilies == 0).length > 0); 
+
     return (
       <div className='cityStats'>
-        <div 
-          onClick={ this.props.onCityClicked }
-          id={ null }
-          className='closeicon'
-        >x</div>
+        { (this.props.selected) ?
+          <div 
+            onClick={ this.props.resetView }
+            className='closeicon'
+          >x</div> :''
+        }
 
         <h2>{ this.props.city + ', ' + this.props.state.toUpperCase() }</h2>
 
@@ -27,10 +31,12 @@ export default class CityStats extends React.Component {
 
         <CityTimelineComponent {...this.props } />
 
-        <p className='footprintExplanation'>The following projects either did not involve displacements or happened after 1966 when the federal government stopped collecting displacement data.</p>
-
-        <NoDisplacements {...this.props} />
-
+        { (someWithNoDisplacements) ? 
+          <div>
+            <p className='footprintExplanation'>The following projects either did not involve displacements or happened after 1966 when the federal government stopped collecting displacement data.</p>
+            <NoDisplacements {...this.props} />
+          </div> : ''
+        }
 
         { (true) ? 
           <div>
@@ -47,7 +53,7 @@ export default class CityStats extends React.Component {
                   <td>total</td>
                   <td className='total' key='total1950'>{ this.props.pop_1950.toLocaleString() }</td>
                   <td className='total' key='total1960'>{ this.props.pop_1960.toLocaleString()}</td>
-                  <td className='total' key='total1970'>{ this.props.pop_1970.toLocaleString()}</td>
+                  <td className='total' key='total1970'>{ (this.props.pop_1970) ? this.props.pop_1970.toLocaleString() : 'not available'}</td>
                 </tr>
 
                 <tr>
@@ -61,7 +67,7 @@ export default class CityStats extends React.Component {
                   <td>of color</td>
                   <td>not available</td>
                   <td>{ Math.round(1000 * this.props.nonwhite_1960 / this.props.pop_1960) / 10  + '%'}</td>
-                  <td>{ Math.round(1000 * this.props.nonwhite_1970 / this.props.pop_1970) / 10  + '%'}</td>
+                  <td>{ (this.props.nonwhite_1970 && this.props.pop_1970) ? Math.round(1000 * this.props.nonwhite_1970 / this.props.pop_1970) / 10  + '%' : ''}</td>
                 </tr>
 
                 

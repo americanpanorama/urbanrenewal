@@ -78,14 +78,25 @@ export default class ProjectStats extends React.Component {
     return (
       <div className='projectStats'>
         <div 
-          onClick={ this.props.onProjectClicked }
-          id={ null }
+          onClick={ this.props.resetView }
           className='closeicon'
         >x</div>
 
-        <h2>{ this.props.city + ', ' + this.props.state }</h2>
+        <h2>{ this.props.city + ', ' + this.props.state.toUpperCase() }</h2>
+
+        { (this.props.selected) ?
+          <div 
+            onClick={ this.props.onProjectClick }
+            className='closeicon'
+          >x</div> : ''
+        }
+
 
         <h3>{ theProject.project }</h3>
+
+        <div className='duration'>
+          { theProject.start_year +((theProject.end_year !== theProject.start_year) ? '-' + theProject.end_year : '') }
+        </div>
 
         { (theProject.funding_dispursed) ?
           <div className='summary'>
@@ -93,199 +104,163 @@ export default class ProjectStats extends React.Component {
           </div> : ''
         }
 
-        <svg
-          { ...DimensionsStore.getProjectStatsOverallDimensions() }
-        >
-          <g transform='translate(50)'>
+        { (theProject.totalFamilies > 0) ?
+          <svg
+            { ...DimensionsStore.getProjectStatsOverallDimensions() }
+          >
+            <g transform='translate(50)'>
 
-            <text 
-              x={50}
-              y={25}
-              fontWeight='bold'
-              textAnchor='middle'
-              fontSize='1.3em'
-            >
-              {theProject.totalFamilies.toLocaleString()}
-            </text>
-            <text 
-              x={50}
-              y={45}
-              textAnchor='middle'
-            >
-              families displaced
-            </text>
+              <text 
+                x={50}
+                y={25}
+                fontWeight='bold'
+                textAnchor='middle'
+                fontSize='1.3em'
+              >
+                {theProject.totalFamilies.toLocaleString()}
+              </text>
+              <text 
+                x={50}
+                y={45}
+                textAnchor='middle'
+              >
+                families displaced
+              </text>
 
-          {/* families of color */}
-            <rect
-              width={ widths.familiesOfColor }
-              height={20}
-              x={0}
-              y={20}
-              fill='#a387be'
-              transform='translate(120)'
-            />
-            { this._label('of color', theProject.percentFamiliesOfColor, widths.familiesOfColor / 2)}
+            {/* families of color */}
+              <rect
+                width={ widths.familiesOfColor }
+                height={20}
+                x={0}
+                y={20}
+                fill='#a387be'
+                transform='translate(120)'
+              />
+              { this._label('of color', theProject.percentFamiliesOfColor, widths.familiesOfColor / 2)}
 
-            <rect
-              width={ widths.whiteFamilies }
-              height={20}
-              x={ widths.familiesOfColor }
-              y={20}
-              fill='#2ca02c'
-              transform='translate(120)'
-            />
-            { this._label('white', (1-theProject.percentFamiliesOfColor), widths.familiesOfColor + widths.whiteFamilies / 2) }
-          </g>
-        </svg>
-
-        <svg
-          { ...DimensionsStore.getProjectStatsOverallDimensions() }
-        >
-          <g transform='translate(50)'>
-            <text 
-              x={50}
-              y={25}
-              fontWeight='bold'
-              textAnchor='middle'
-              fontSize='1.3em'
-            >
-              { houses.toLocaleString() }
-            </text>
-            <text 
-              x={50}
-              y={45}
-              textAnchor='middle'
-            >
-              houses razed
-            </text>
-
-            <rect
-              width={ widths.standard }
-              height={20}
-              x={0}
-              y={20}
-              fill='maroon'
-              transform='translate(120)'
-            />
-            { this._label('standard', (theProject.houses_standard/(theProject.houses_sub_standard + theProject.houses_standard)), widths.standard / 2) }
-
-            <rect
-              width={ widths.substandard }
-              height={20}
-              x={ widths.standard}
-              y={20}
-              fill='#008080'
-              transform='translate(120)'
-            />
-            { this._label('substandard', (theProject.houses_sub_standard/(theProject.houses_sub_standard + theProject.houses_standard)), widths.standard + widths.substandard / 2) }
-
-          </g>
-        </svg>
-        
-        <svg
-          { ...DimensionsStore.getProjectStatsOverallDimensions() }
-        >
-          <g transform='translate(50)'>
-            <text 
-              x={50}
-              y={25}
-              fontWeight='bold'
-              textAnchor='middle'
-              fontSize='1.3em'
-            >
-              { Math.round(acres * 10)/10 }
-            </text>
-            <text 
-              x={50}
-              y={45}
-              textAnchor='middle'
-            >
-              acres redeveloped
-            </text>
-
-            <rect
-              width={ widths.residential }
-              height={20}
-              x={0}
-              y={20}
-              fill='#8b4600'
-              transform='translate(120)'
-            />
-            { this._label('residential', theProject.reuse_residential/acres, widths.residential / 2) }
-
-            <rect
-              width={ widths.commercial }
-              height={20}
-              x={ widths.residential}
-              y={20}
-              fill='#00008b'
-              transform='translate(120)'
-            />
-            { this._label('commercial', theProject.reuse_commercial/acres, widths.residential + widths.commercial / 2, (widths.residential > 100) ? 'sub' : 'super') }
-
-            <rect
-              width={ widths.industrial }
-              height={20}
-              x={ widths.residential + widths.commercial }
-              y={20}
-              fill='#8b8b00'
-              transform='translate(120)'
-            />
-            { this._label('industrial', theProject.reuse_industrial/acres, widths.residential + widths.commercial + widths.industrial / 2, (true || (widths.residential >= 100 && widths.commercial <= 100 && widths.commercial >= 10) || (widths.residential < 100 && widths.commercial > 100)) ? 'super' : 'sub') }
-
-            <rect
-              width={ widths.public }
-              height={20}
-              x={ widths.residential + widths.commercial + widths.industrial }
-              y={20}
-              fill='#8b008b'
-              transform='translate(120)'
-            />
-            { this._label('public', theProject.reuse_public/acres, widths.residential + widths.commercial + widths.industrial + widths.public / 2) }
-          </g>
-
-
-
-        </svg>
-
-
-
-        { (false) ? 
-          <table className='population-stats'>
-            <tbody>
-              <tr>
-                <th></th>
-                <th>1950</th>
-                <th>1960</th>
-                <th>1970</th>
-              </tr>
-              <tr>
-                <td>Population</td>
-                <td className='total' key='total1950'>{ this.props.pop_1950.toLocaleString() }</td>
-                <td className='total' key='total1960'>{ this.props.pop_1960.toLocaleString()}</td>
-                <td className='total' key='total1970'>{ this.props.pop_1970.toLocaleString()}</td>
-              </tr>
-
-              <tr>
-                <td>white</td>
-                <td>not available</td>
-                <td>{ Math.round(1000 * this.props.white_1960 / this.props.pop_1960) / 10  + '%'}</td>
-                <td>{ Math.round(1000 * this.props.white_1970 / this.props.pop_1970) / 10  + '%'}</td>
-              </tr>
-
-              <tr>
-                <td>of color</td>
-                <td>not available</td>
-                <td>{ Math.round(1000 * this.props.nonwhite_1960 / this.props.pop_1960) / 10  + '%'}</td>
-                <td>{ Math.round(1000 * this.props.nonwhite_1970 / this.props.pop_1970) / 10  + '%'}</td>
-              </tr>
-
-              
-            </tbody>
-          </table> :
-          ''
+              <rect
+                width={ widths.whiteFamilies }
+                height={20}
+                x={ widths.familiesOfColor }
+                y={20}
+                fill='#2ca02c'
+                transform='translate(120)'
+              />
+              { this._label('white', (1-theProject.percentFamiliesOfColor), widths.familiesOfColor + widths.whiteFamilies / 2) }
+            </g>
+          </svg> : ''
         }
 
+        { (houses > 0) ?
+          <svg
+            { ...DimensionsStore.getProjectStatsOverallDimensions() }
+          >
+            <g transform='translate(50)'>
+              <text 
+                x={50}
+                y={25}
+                fontWeight='bold'
+                textAnchor='middle'
+                fontSize='1.3em'
+              >
+                { houses.toLocaleString() }
+              </text>
+              <text 
+                x={50}
+                y={45}
+                textAnchor='middle'
+              >
+                housing units razed
+              </text>
+
+              <rect
+                width={ widths.standard }
+                height={20}
+                x={0}
+                y={20}
+                fill='maroon'
+                transform='translate(120)'
+              />
+              { this._label('standard', (theProject.houses_standard/(theProject.houses_sub_standard + theProject.houses_standard)), widths.standard / 2) }
+
+              <rect
+                width={ widths.substandard }
+                height={20}
+                x={ widths.standard}
+                y={20}
+                fill='#008080'
+                transform='translate(120)'
+              />
+              { this._label('substandard', (theProject.houses_sub_standard/(theProject.houses_sub_standard + theProject.houses_standard)), widths.standard + widths.substandard / 2) }
+
+            </g>
+          </svg> : ''
+        }
+         
+        { (acres > 0) ? 
+          <svg
+            { ...DimensionsStore.getProjectStatsOverallDimensions() }
+          >
+            <g transform='translate(50)'>
+              <text 
+                x={50}
+                y={25}
+                fontWeight='bold'
+                textAnchor='middle'
+                fontSize='1.3em'
+              >
+                { Math.round(acres * 10)/10 }
+              </text>
+              <text 
+                x={50}
+                y={45}
+                textAnchor='middle'
+              >
+                acres redeveloped
+              </text>
+
+              <rect
+                width={ widths.residential }
+                height={20}
+                x={0}
+                y={20}
+                fill='#8b4600'
+                transform='translate(120)'
+              />
+              { this._label('residential', theProject.reuse_residential/acres, widths.residential / 2) }
+
+              <rect
+                width={ widths.commercial }
+                height={20}
+                x={ widths.residential}
+                y={20}
+                fill='#00008b'
+                transform='translate(120)'
+              />
+              { this._label('commercial', theProject.reuse_commercial/acres, widths.residential + widths.commercial / 2, (widths.residential > 100) ? 'sub' : 'super') }
+
+              <rect
+                width={ widths.industrial }
+                height={20}
+                x={ widths.residential + widths.commercial }
+                y={20}
+                fill='#8b8b00'
+                transform='translate(120)'
+              />
+              { this._label('industrial', theProject.reuse_industrial/acres, widths.residential + widths.commercial + widths.industrial / 2, (true || (widths.residential >= 100 && widths.commercial <= 100 && widths.commercial >= 10) || (widths.residential < 100 && widths.commercial > 100)) ? 'super' : 'sub') }
+
+              <rect
+                width={ widths.public }
+                height={20}
+                x={ widths.residential + widths.commercial + widths.industrial }
+                y={20}
+                fill='#8b008b'
+                transform='translate(120)'
+              />
+              { this._label('public', theProject.reuse_public/acres, widths.residential + widths.commercial + widths.industrial + widths.public / 2) }
+            </g>
+          </svg> : ''
+        }
       </div>
     );
   }

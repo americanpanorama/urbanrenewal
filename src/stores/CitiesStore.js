@@ -61,7 +61,7 @@ const CitiesStore = {
         format: 'JSON'
       },
       // data for projects: duration, displacments, etc.
-      { query: "select projects.city_id, projects.project_id, projects.project, st_asgeojson(projects.the_geom) as the_geojson, duration.start_year, duration.end_year, whites.value as whites, nonwhites.value as nonwhite from urdr_id_key projects left join (SELECT project_id, min(year) as start_year, max(year) as end_year FROM combined_dire_char_raw group by project_id, city_id) duration on projects.project_id = duration.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 71 order by project_id, year desc) whites on whites.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 72 order by project_id, year desc) nonwhites on nonwhites.project_id = projects.project_id",
+      { query: "select projects.city_id, projects.project_id, projects.project, st_asgeojson(projects.the_geom) as the_geojson, round(st_xmin(st_envelope(projects.the_geom))::numeric, 3) as bbxmin, round(st_ymin(st_envelope(projects.the_geom))::numeric, 3) as bbymin, round(st_xmax(st_envelope(projects.the_geom))::numeric, 3) as bbxmax, round(st_ymax(st_envelope(projects.the_geom))::numeric, 3) as bbymax, round(st_y(st_centroid(projects.the_geom))::numeric, 3) as centerlat, round(st_x(st_centroid(projects.the_geom))::numeric, 3) as centerlng, duration.start_year, duration.end_year, whites.value as whites, nonwhites.value as nonwhite from urdr_id_key projects left join (SELECT project_id, min(year) as start_year, max(year) as end_year FROM combined_dire_char_raw group by project_id, city_id) duration on projects.project_id = duration.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 71 order by project_id, year desc) whites on whites.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 72 order by project_id, year desc) nonwhites on nonwhites.project_id = projects.project_id",
         format: 'JSON'
       }
     ]).then((responses) => {
@@ -84,7 +84,7 @@ const CitiesStore = {
         r.hasProjectGeojson = (r.centerlat !== null);
         r.boundingBox = (r.bbymin !== null) ? [[r.bbymin,r.bbxmin],[r.bbymax,r.bbxmax]] : null;
         r.tractsBoundingBox = (r.tbbymin !== null) ? [[r.tbbymin,r.tbbxmin],[r.tbbymax,r.tbbxmax]] : null;
-        r.detectionBoundingBox = (r.boundingBox) ? r.boundingBox : r.center;
+        r.detectionBoundingBox = r.boundingBox || r.center || [[r.lat + 0.05, r.lng - 0.05], [r.lat - 0.05, r.lng + 0.05]];
         r.projects = {};
         r.yearsData = {};
         r.tracts = {};
@@ -119,6 +119,15 @@ const CitiesStore = {
         r.totalFamilies = r.nonwhite + r.whites;
         r.percentFamiliesOfColor = r.nonwhite / r.totalFamilies;
         r.yearsData = {};
+        r.center = [r.centerlat,r.centerlng];
+        r.boundingBox = (r.bbymin) ? [[r.bbymin,r.bbxmin],[r.bbymax,r.bbxmax]] : null;
+
+        delete r.centerlat;
+        delete r.centerlng;
+        delete r.bbymin;
+        delete r.bbxmin;
+        delete r.bbymax;
+        delete r.bbxmax;
 
         // add the project
         this.data.cities[r.city_id].projects[r.project_id] = r;
@@ -229,8 +238,6 @@ const CitiesStore = {
         };
       });
 
-      console.log(this.data.cities[city_id].tracts);
-
       responses[1].forEach(response => {
         this.data.cities[city_id].holc_areas.push({
           the_geojson: JSON.parse(response.the_geojson),
@@ -305,7 +312,10 @@ const CitiesStore = {
       }
     });
 
-    this.data.visibleCitiesIds = visibleCitiesIds;
+    if (visibleCitiesIds.length!==this.data.visibleCitiesIds.length || !visibleCitiesIds.every((v,i)=> v === this.data.visibleCitiesIds[i])) {
+      this.data.visibleCitiesIds = visibleCitiesIds;
+      this.emit(AppActionTypes.storeChanged);
+    }
 
     // reset selected city if there's only one and it's not the current selected
     if (this.data.visibleCitiesIds.length == 1 && this.data.selectedCity !== this.data.visibleCitiesIds[0]) {
@@ -601,6 +611,10 @@ const CitiesStore = {
 
   getPOCTop: function() { return this.data.poc[1]; },
 
+  getProjectBoundingBox: function (id) { return (this.data.cities[this.getHighlightedCity()].projects[id]) ? this.data.cities[this.getHighlightedCity()].projects[id].boundingBox : null; },
+
+  getProjectCenter: function (id) { return (this.data.cities[this.getHighlightedCity()].projects[id]) ? this.data.cities[this.getHighlightedCity()].projects[id].center : null; },
+
   getProjectTimelineBars: function(cityId) {
     let projects = Object.keys(this.data.cities[cityId].projects)
         .filter(id => this.data.cities[cityId].projects[id].start_year <= 1966)
@@ -800,6 +814,9 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
           clearInterval(waitingId);
           CitiesStore.loadCityData(CitiesStore.getCityIdFromSlug(action.hashState.city));
           CitiesStore.setSelectedCity(CitiesStore.getCityIdFromSlug(action.hashState.city));
+          if (action.hashState.project) {
+            CitiesStore.setSelectedProject(action.hashState.project);
+          }
         }
       }, 50);
     }
@@ -876,6 +893,7 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
   case AppActionTypes.cityMapMoved:
     CitiesStore.loadVisibleCities();
     break;
+
   case AppActionTypes.mapInitialized:
     // wait until GeographyStore initialized before loading cities
     let waitingId= setInterval(() => {

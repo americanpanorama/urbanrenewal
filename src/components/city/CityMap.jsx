@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as L from 'leaflet';
 
 import { AppActions, AppActionTypes } from '../../utils/AppActionCreator';
 import { getColorForRace, formatNumber } from '../../utils/HelperFunctions';
@@ -19,12 +18,19 @@ export default class CityMap extends React.Component {
     this.state = {
       viewport: {
         center: (this.props.lat && this.props.lng) ? [ this.props.lat, this.props.lng ] : [0,0],
-        zoom: this.props.zoom || 12   
-      }
+        zoom: this.props.zoom || 12
+      },
+      moving: false
     };
+
+    const handlers = ['onMove','onMoveEnd'];
+    handlers.map(handler => { this[handler] = this[handler].bind(this); });
+
   }
 
-  componentDidMount() { AppActions.mapInitialized(this.refs.the_map.leafletElement); }
+  componentDidMount() { 
+    AppActions.mapInitialized(this.refs.the_map.leafletElement); 
+  }
 
   componentDidUpdate() {
     // bring urban renewal projects to top so they're not underneath census tracts or HOLC neighborhoods
@@ -33,7 +39,6 @@ export default class CityMap extends React.Component {
         this.refs['projectFootprint' + projectId].leafletElement.bringToFront();
       }
     });
-
 
     // hide project labels that overlap
     let boundingBoxes = [],
@@ -77,6 +82,12 @@ export default class CityMap extends React.Component {
     }
   }
 
+  onMove() { this.setState({ moving: true }); }
+
+  onMoveEnd() { this.setState({ moving: false }); }
+
+  isMoving() { return this.state.moving; }
+
   intersect(a, b) { return (a[0][0] <= b[1][0] && b[0][0] <= a[1][0] && a[0][1] <= b[1][1] && b[0][1] <= a[1][1]); }
 
   render () {
@@ -99,6 +110,8 @@ export default class CityMap extends React.Component {
           } }
           viewport={ this.state.viewport }
           onViewportChanged={ this.props.onMoveend }
+          onMove={ this.onMove }
+          onMoveend={ this.onMoveEnd }
         >
 
           {/* base map */}

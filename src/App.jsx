@@ -55,9 +55,7 @@ export default class App extends React.Component {
     console.time('update');
   }
 
-  componentWillMount () {
-    AppActions.loadInitialData(this.state, HashManager.getState());
-  }
+  componentWillMount () { AppActions.loadInitialData(this.state, HashManager.getState()); }
 
   componentDidMount () {
     window.addEventListener('resize', this.onWindowResize);
@@ -87,14 +85,21 @@ export default class App extends React.Component {
 
   onCityClicked(event) { 
     const id = event.city_id || event.target.id;
-    console.log(id);
     AppActions.citySelected(id); 
     this.refs.typeahead.setEntryText('');
   }
 
   onCityInspected(event) { AppActions.cityInspected(parseInt(event.target.id)); }
 
-  onCityMapMove(event) { AppActions.cityMapMoved(); }
+  onCityMapMove(event) { 
+    // wait until move has stopped before executying
+    let waitingId = setInterval(() => {
+      if (!this.refs.cityMap.isMoving()) {
+        clearInterval(waitingId);
+        AppActions.cityMapMoved();
+      }
+    }, 100);
+  }
 
   onCityOut() { AppActions.cityInspected(null); }
 
@@ -106,7 +111,10 @@ export default class App extends React.Component {
 
   onProjectMapUnhover(event) { AppActions.projectInspectedStats(null); }
 
-  onProjectSelected(event) { AppActions.projectSelected(parseInt(event.target.options.id)); }
+  onProjectSelected(event) { 
+    const id = (event.target.id) ? event.target.id : (event.target.options) ? parseInt(event.target.options.id) : null;
+    AppActions.projectSelected(id); 
+  }
 
   onProjectOut() { AppActions.projectInspected(null); }
 
@@ -167,6 +175,7 @@ export default class App extends React.Component {
 
   resetView() { 
     AppActions.citySelected(null);
+    AppActions.projectSelected(null);
     AppActions.mapMoved(0,0,1); 
   }
 
@@ -211,7 +220,8 @@ export default class App extends React.Component {
       view: [GeographyStore.getX(), GeographyStore.getY(), GeographyStore.getZ()].join('/'),
       city: CitiesStore.getSlug(),
       viz: CitiesStore.getSelectedView(),
-      holc: CitiesStore.getHOLCSelected() || null
+      holc: CitiesStore.getHOLCSelected() || null,
+      project: CitiesStore.getSelectedProject()
     };
     if (CitiesStore.getSelectedCity() && GeographyStore.getLatLngZoom().lat) {
       vizState.loc = { 
@@ -255,6 +265,7 @@ export default class App extends React.Component {
                       HOLCSelected={ CitiesStore.getHOLCSelected() }
                       inspectedProject={ CitiesStore.getInspectedProject() }
                       inspectedProjectStats={ CitiesStore.getHighlightedProject() }
+                      ref='cityMap'
                     />
 
                     <button
@@ -341,6 +352,9 @@ export default class App extends React.Component {
               project_id={ CitiesStore.getHighlightedProject() }
               categories={ CitiesStore.getCategories() }
               year={ this.state.year }
+              resetView={ this.resetView }
+              onProjectClick={ this.onProjectSelected }
+              selected={ CitiesStore.getHighlightedProject() == CitiesStore.getSelectedProject() }
             /> : ''
           }
 
@@ -350,12 +364,14 @@ export default class App extends React.Component {
               categories={ CitiesStore.getCategories() }
               selectedYear={ CitiesStore.getSelectedYear() }
               inspectedProject={ CitiesStore.getInspectedProject() }
-              projectBars={ CitiesStore.getProjectTimelineBars(CitiesStore.getHighlightedCity()) }
+              selected={ CitiesStore.getHighlightedCity() == CitiesStore.getSelectedCity() }
               onCityClicked={ this.onCityClicked }
               onCategoryClicked={ this.onCategoryClicked }
+              onProjectSelected={ this.onProjectSelected }
               onProjectInspected={ this.onProjectInspected }
               onProjectOut={ this.onProjectOut }
               onYearClick={ this.onYearClicked }
+              resetView={ this.resetView }
             /> : ''
           }
         </aside>

@@ -53,6 +53,7 @@ export default class NoDisplacements extends React.Component {
               key={ 'projectData' + p.project_id }
               onMouseEnter={ (p.the_geojson) ? this.props.onProjectInspected : null }
               onMouseLeave={ (p.the_geojson) ? this.props.onProjectOut : null }
+              onClick={ this.props.onProjectSelected }
               id={ p.project_id  }
               transform='translate(0 22)'
             >

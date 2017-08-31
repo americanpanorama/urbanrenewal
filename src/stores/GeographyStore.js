@@ -39,8 +39,8 @@ const GeographyStore = {
   },
 
   setViewFromBounds(city_id) {
-    this.data.lat = (CitiesStore.getCityData(city_id).center) ? CitiesStore.getCityData(city_id).center[0] : 0;
-    this.data.lng = (CitiesStore.getCityData(city_id).center) ? CitiesStore.getCityData(city_id).center[1] : 0;
+    this.data.lat = (CitiesStore.getCityData(city_id).center) ? CitiesStore.getCityData(city_id).center[0] : CitiesStore.getCityData(city_id).lat;
+    this.data.lng = (CitiesStore.getCityData(city_id).center) ? CitiesStore.getCityData(city_id).center[1] : CitiesStore.getCityData(city_id).lng;
     this.data.zoom = (CitiesStore.getCityData(city_id).boundingBox) ? this.data.theMap.getBoundsZoom(CitiesStore.getCityData(city_id).boundingBox) : 12;
     this.emit(AppActionTypes.storeChanged);
   },
@@ -341,6 +341,18 @@ GeographyStore.dispatchToken = AppDispatcher.register((action) => {
   case AppActionTypes.cityMapMoved:
     if (GeographyStore.getTheMap !== null) {
       GeographyStore.updateLOC();
+    }
+    break;
+
+  case AppActionTypes.projectInspected:
+  case AppActionTypes.projectSelected:
+    if (GeographyStore.getTheMap() !== null && action.value !== null) {
+      const bb = CitiesStore.getProjectBoundingBox(action.value);
+      if (bb && !GeographyStore.getTheMap().getBounds().contains(bb)) {
+        GeographyStore.getTheMap().stop();
+        GeographyStore.getTheMap().panTo(CitiesStore.getProjectCenter(action.value), { noMoveStart: true });
+        //GeographyStore.setView(CitiesStore.getProjectCenter(action.value)[0],CitiesStore.getProjectCenter(action.value)[1],GeographyStore.getLatLngZoom().zoom);
+      }
     }
     break;
   }
