@@ -5,6 +5,14 @@
 		width: 60%;
 		margin-left: 20%;
 	}
+
+	.close {
+		position: fixed;
+		right: 0;
+		color: grey;
+		font-size: 15px;
+		padding-top: 6px;
+	}
 }
 
 .searchResults {

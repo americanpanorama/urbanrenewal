@@ -8,6 +8,7 @@ export default class LegendRaceAndIncome extends React.Component {
       <div 
         className='mapLegend demographics'
       >
+        <span className='tooltip'>The poverty line in 1960 was approximately $3000 for average-sized families. Census tracts with no families below $3000 in annual income are full transparent, invisible. The deeper the color the higher percentage of families whose income was below the poverty line.</span>
         <svg
           width={135}
           height={130}

@@ -27,7 +27,6 @@ export default class USMap extends React.Component {
     };
   }
 
-
   render () {
     return (
       <svg 

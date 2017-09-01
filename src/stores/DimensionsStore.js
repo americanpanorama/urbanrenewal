@@ -289,6 +289,13 @@ const DimensionsStore = {
     };
   },
 
+  getSearchCloseStyle: function() {
+    return {
+      top: this.data.headerHeight / 3,
+      right: this.getSidebarStyle().width / 5 + this.data.containerPadding * 1.75
+    };
+  },
+
   getSearchResultsStyle: function() {
     return {
       width: this.getSidebarStyle().width + this.data.containerPadding,

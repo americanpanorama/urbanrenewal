@@ -7,9 +7,11 @@
 	text-align: center;
 
 
+
+
 	&.selected {
-		border: 3px solid red;
-		background-color: pink;
+		border: 3px solid #444;
+		background-color: white;
 	}
 
 	img {
@@ -29,7 +31,7 @@
 	z-index: 10000;
 
 	div {
-		background-color: white;
+		background-color: grey;
 		@include chartButtons;
 		display: inline-block;
 		background-repeat: no-repeat;
@@ -59,7 +61,7 @@
 		}
 
 		&:hover {
-			background-color: pink;
+			background-color: white;
 
 		    .tooltip {
 		        visibility: visible;

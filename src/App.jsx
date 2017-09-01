@@ -1,4 +1,3 @@
-import d3 from 'd3';
 import * as React from 'react';
 import { Typeahead } from 'react-typeahead';
 
@@ -43,19 +42,28 @@ export default class App extends React.Component {
     super(props);
 
     this.state = {
-      legendVisible: true
+      legendVisible: true,
+      searching: false,
+      initialCityLoading: false
     };
 
     this.coords = {};
 
     // bind handlers
-    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle', 'onProjectInspected', 'onProjectOut', 'onSearching', 'onProjectMapHover', 'onProjectSelected', 'onProjectMapUnhover','onSearchBlur'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle', 'onProjectInspected', 'onProjectOut', 'onSearching', 'onProjectMapHover', 'onProjectSelected', 'onProjectMapUnhover','onSearchBlur','onCloseSearch'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
 
     console.time('update');
   }
 
-  componentWillMount () { AppActions.loadInitialData(this.state, HashManager.getState()); }
+  componentWillMount () { 
+    AppActions.loadInitialData(this.state, HashManager.getState()); 
+    // check whether city is loading
+    if (HashManager.getState().city) {
+      this.setState({initialCityLoading: true});
+    }
+
+  }
 
   componentDidMount () {
     window.addEventListener('resize', this.onWindowResize);
@@ -65,7 +73,12 @@ export default class App extends React.Component {
     HighwaysStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
   }
 
-  componentDidUpdate () { this.changeHash(); }
+  componentDidUpdate () { 
+    this.changeHash(); 
+    if (this.state.initialCityLoading && CitiesStore.getSelectedCity()) {
+      this.setState({initialCityLoading: false});
+    }
+  }
 
   // ============================================================ //
   // Handlers
@@ -86,7 +99,11 @@ export default class App extends React.Component {
   onCityClicked(event) { 
     const id = event.city_id || event.target.id;
     AppActions.citySelected(id); 
+
+    // clear and blur search
     this.refs.typeahead.setEntryText('');
+    this.refs.typeahead.refs.entry.blur();
+    this.setState({ searching: false });
   }
 
   onCityInspected(event) { AppActions.cityInspected(parseInt(event.target.id)); }
@@ -102,6 +119,12 @@ export default class App extends React.Component {
   }
 
   onCityOut() { AppActions.cityInspected(null); }
+
+  onCloseSearch() {
+    this.refs.typeahead.setEntryText('');
+    this.setState({ searching: false });
+    AppActions.citiesHighlighted([]);
+  }
 
   onHOLCToggle() { AppActions.HOLCToggle(!CitiesStore.getHOLCSelected()); }
 
@@ -130,7 +153,10 @@ export default class App extends React.Component {
 
   }
 
-  onSearching(e) { AppActions.citiesHighlighted(this.refs.typeahead.getOptionsForValue(this.refs.typeahead.refs.entry.value, CitiesStore.getCitiesListWithDisplacements()).map(c => c.city_id)); }
+  onSearching(e) { 
+    AppActions.citiesHighlighted(this.refs.typeahead.getOptionsForValue(this.refs.typeahead.refs.entry.value, CitiesStore.getCitiesListWithDisplacements()).map(c => c.city_id)); 
+    this.setState({ searching: true });
+  }
 
   onViewSelected(event) { 
     if (event.target.id !== CitiesStore.getSelectedView()) {
@@ -186,11 +212,9 @@ export default class App extends React.Component {
   }
 
   handleMouseDown(e) {
-
     this.dragging = true;
     //Set coords
     this.coords = {x: e.pageX, y:e.pageY};
-    //AppActions.mapMoved(e.pageX,e.pageY,GeographyStore.getZ());
   }
 
   handleMouseMove(e) {
@@ -250,7 +274,7 @@ export default class App extends React.Component {
                 { ...DimensionsStore.getMainPanelDimensions() }
               >
 
-                { CitiesStore.getSelectedCity() ? 
+                { (CitiesStore.getSelectedCity()) ? 
                   <div>
                     <CityMap
                       { ...CitiesStore.getVisibleCitiesDetails() }
@@ -293,49 +317,52 @@ export default class App extends React.Component {
                       /> : ''
                     }
                   </div>
-                  :
-                  <div>
-                    <MapChart
-                      { ...GeographyStore.getXYZ() }
-                      selectedView= { CitiesStore.getSelectedView() }
-                      highlightedCities={ CitiesStore.getHighlightedCities() }
-                      onCityClicked={ this.onCityClicked }
-                      onStateClicked={ this.zoomToState }
-                      onViewSelected={ this.onViewSelected }
-                      onCityHover={ this.onCityInspected }
-                      onCityOut={ this.onCityOut }
-                      resetView={ this.resetView }
-                      onMapClicked={ this.onZoomIn }
-                    />
+                  : (!this.state.initialCityLoading) ? 
+                    <div>
+                      <MapChart
+                        { ...GeographyStore.getXYZ() }
+                        selectedView= { CitiesStore.getSelectedView() }
+                        highlightedCities={ CitiesStore.getHighlightedCities() }
+                        onCityClicked={ this.onCityClicked }
+                        onStateClicked={ this.zoomToState }
+                        onViewSelected={ this.onViewSelected }
+                        onCityHover={ this.onCityInspected }
+                        onCityOut={ this.onCityOut }
+                        resetView={ this.resetView }
+                        onMapClicked={ this.onZoomIn }
+                        handleMouseDown={ this.handleMouseDown }
+                        handleMouseMove={ this.handleMouseMove }
+                        handleMouseUp={ this.handleMouseUp }
+                      />
 
-                    { (CitiesStore.getSelectedView() == 'scatterplot') ?
-                        <p 
-                          style={ DimensionsStore.getScatterplotExplanationAttrs() }
-                          className='scatterplotExplanation'
-                        >James Baldwin famously characterized urban renewal as "Negro removal," a point made too by this chart. Cities below the yellow line, which is most cities, displaced families of color disproportionately relative to their overall population. For example, the bottom left of the graph shows cities like <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('cincinnatiOH')}>Cincinnati</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('norfolkVA')}>Norfolk</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('clevelandOH')}>Cleveland</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('saintlouisMO')}>St. Louis</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('philadelphiaPA')}>Philadelphia</span>, and <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('detroitMI')}>Detroit</span> where people of color were 20% to 30% of the overall population but made up two-thirds or more of those displaced. On the far right are usually smaller white cities with tiny populations of color. With people of color being less than 10% of those cities populations, though the majority of families displaced were white, families of color were still <em>disproportionately</em> displaced by most of these cities. For example, while 96% of the families displaced in <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('scrantonPA')}>Scranton</span> where white, more than 99% of the population was white.
-                        </p> : ''
-                    }
+                      { (CitiesStore.getSelectedView() == 'scatterplot') ?
+                          <p 
+                            style={ DimensionsStore.getScatterplotExplanationAttrs() }
+                            className='scatterplotExplanation'
+                          >James Baldwin famously characterized urban renewal as "Negro removal," a point made too by this chart. Cities below the yellow line, which is most cities, displaced families of color disproportionately relative to their overall population. For example, the bottom left of the graph shows cities like <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('cincinnatiOH')}>Cincinnati</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('norfolkVA')}>Norfolk</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('clevelandOH')}>Cleveland</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('saintlouisMO')}>St. Louis</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('philadelphiaPA')}>Philadelphia</span>, and <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('detroitMI')}>Detroit</span> where people of color were 20% to 30% of the overall population but made up two-thirds or more of those displaced. On the far right are usually smaller white cities with tiny populations of color. With people of color being less than 10% of those cities populations, though the majority of families displaced were white, families of color were still <em>disproportionately</em> displaced by most of these cities. For example, while 96% of the families displaced in <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('scrantonPA')}>Scranton</span> where white, more than 99% of the population was white.
+                          </p> : ''
+                      }
 
-                    <ZoomControls
-                      onZoomIn={ this.onZoomIn }
-                      onZoomOut={ this.zoomOut }
-                      resetView={ this.resetView }
-                    />
+                      <ZoomControls
+                        onZoomIn={ this.onZoomIn }
+                        onZoomOut={ this.zoomOut }
+                        resetView={ this.resetView }
+                      />
 
-                    <VizControls
-                      selectedView={ CitiesStore.getSelectedView() }
-                      onViewSelected={ this.onViewSelected }
-                    />
+                      <VizControls
+                        selectedView={ CitiesStore.getSelectedView() }
+                        onViewSelected={ this.onViewSelected }
+                      />
 
-                    { (this.state.legendVisible) ?
-                      <Legend
-                        poc={ CitiesStore.getPOC() }
-                        dorlingScale={ (CitiesStore.getSelectedView() == 'cartogram') ? GeographyStore.getZ() : 1 }
-                        dorlingIncrements={ DimensionsStore.getLegendDimensionsIntervals() }
-                        onDragUpdate={ this.onDragUpdate }
-                      /> : ''
-                    }
-                  </div>
+                      { (this.state.legendVisible) ?
+                        <Legend
+                          poc={ CitiesStore.getPOC() }
+                          dorlingScale={ (CitiesStore.getSelectedView() == 'cartogram') ? GeographyStore.getZ() : 1 }
+                          dorlingIncrements={ DimensionsStore.getLegendDimensionsIntervals() }
+                          onDragUpdate={ this.onDragUpdate }
+                        /> : ''
+                      }
+                    </div> : ''
                 }
 
               </div> 
@@ -407,8 +434,18 @@ export default class App extends React.Component {
             //onBlur={ this.onSearchBlur }
             ref='typeahead'
             //maxVisible={ 8 }
-            
           />
+
+          { (this.state.searching) ?
+            <div 
+              className='close'
+              style={ DimensionsStore.getSearchCloseStyle() }
+              onClick={ this.onCloseSearch }
+              ref='closeSearch'
+            >X</div> : ''
+          }
+
+
         </div>
       </div>
     );

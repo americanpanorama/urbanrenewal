@@ -844,6 +844,7 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
       }, 100);
     }
     CitiesStore.setInspectedCity(null);
+    CitiesStore.setHighlightedCities([]);
     break;
 
   case AppActionTypes.cityInspected:
