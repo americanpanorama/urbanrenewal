@@ -61,8 +61,8 @@ export default class ProjectStats extends React.Component {
 
   render() {
     let theProject = this.props.projects[this.props.project_id],
-      houses = theProject.houses_sub_standard + theProject.houses_standard,
-      acres = theProject.reuse_residential + theProject.reuse_commercial + theProject.reuse_industrial + theProject.reuse_public,
+      houses = (theProject && theProject.houses_sub_standard && theProject.houses_standard) ?  theProject.houses_sub_standard + theProject.houses_standard : 0,
+      acres = (theProject && theProject.reuse_residential && theProject.reuse_commercial && theProject.reuse_industrial && theProject.reuse_public) ? theProject.reuse_residential + theProject.reuse_commercial + theProject.reuse_industrial + theProject.reuse_public : 0,
 
       widths = {
         familiesOfColor: DimensionsStore.getProjectStatProportionWidth(theProject.percentFamiliesOfColor),

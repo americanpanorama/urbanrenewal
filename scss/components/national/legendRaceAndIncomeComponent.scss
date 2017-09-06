@@ -1,6 +1,14 @@
 .mapLegend.demographics {
+	width: 150px;
+	height: 130px;
 	pointer-events: auto; 
 	overflow: visible;
+	padding: 10px 0 0 10px;
+
+	.quantities {
+		fill: grey;
+		font-size: 0.9em;
+	}
 
 	.tooltip {
 	    visibility: hidden;

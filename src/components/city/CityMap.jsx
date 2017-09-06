@@ -18,7 +18,7 @@ export default class CityMap extends React.Component {
     this.state = {
       viewport: {
         center: (this.props.lat && this.props.lng) ? [ this.props.lat, this.props.lng ] : [0,0],
-        zoom: this.props.zoom || 12
+        zoom: this.props.zoom || 14
       },
       moving: false
     };
@@ -84,7 +84,10 @@ export default class CityMap extends React.Component {
 
   onMove() { this.setState({ moving: true }); }
 
-  onMoveEnd() { this.setState({ moving: false }); }
+  onMoveEnd() {
+    this.setState({ moving: false }); 
+    this.props.onMoveend(); 
+  }
 
   isMoving() { return this.state.moving; }
 
@@ -101,7 +104,7 @@ export default class CityMap extends React.Component {
         <Map 
           ref='the_map' 
           center={ (this.props.lat && this.props.lng) ? [ this.props.lat, this.props.lng ] : (this.props.cityData.center) ? (this.props.cityData.center) : [0,0] } 
-          zoom={ this.props.zoom || 11 }  
+          zoom={ this.props.zoom || 14 }  
           minZoom={ 11 }
           className='the_map'
           style={ {
@@ -109,13 +112,28 @@ export default class CityMap extends React.Component {
             height: DimensionsStore.getNationalMapHeight()
           } }
           viewport={ this.state.viewport }
-          onViewportChanged={ this.props.onMoveend }
+          //onViewportChanged={ this.props.onMoveend }
           onMove={ this.onMove }
           onMoveend={ this.onMoveEnd }
         >
 
           {/* base map */}
           <TileLayer url={ (DimensionsStore.isRetina()) ? 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}@2x.png' : 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png' } />
+
+          {/* city outlines */}
+          { this.props.cities_geoms.map((city_geom, i) =>
+            <GeoJSON
+              data={ city_geom }
+              key={ 'city_geom' + i}
+              style= { {
+                fillColor: 'transparent',
+                color: '#999',
+                dashArray: '5, 5',
+                weight: 2 //(this.props.tracts[tractId].medianIncome < 5000) ? 10 - 10 * (1 - ((this.props.tracts[tractId].medianIncome - 999) / 5000)): 0
+              } }
+              className='city_boundary'
+            />
+          )}
 
           {/* race and income data in census tracts */}
           { (this.props.holc_areas.length == 0 || (!this.props.HOLCSelected && this.props.tracts)) ? 

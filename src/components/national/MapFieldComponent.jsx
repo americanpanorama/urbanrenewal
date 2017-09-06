@@ -10,7 +10,7 @@ export default class MapField extends React.Component {
     super(props);
     this.state = {
       opacity: (this.props.selectedView == 'scatterplot') ? 0 : 1,
-      fill: (this.props.selectedView == 'map') ? 'white' : '#444'
+      fill: (this.props.selectedView == 'map') ? '#F5F5F3' : '#aaa'
     };
   }
 
@@ -51,6 +51,18 @@ export default class MapField extends React.Component {
             <feGaussianBlur stdDeviation="6 6" result="glow"/>
           </filter>
         </defs>
+
+      {/* JSX Comment 
+        <text
+          x={ GeographyStore.projectedX([-94.5, 51]) }
+          y={ GeographyStore.projectedY([-94.5, 51])}
+          textAnchor='middle'
+          fontSize={24}
+          fill='white'
+        >
+          { 'FAMILIES DISPLACED, ' + this.props.selectedYear }
+        </text> */}
+
 
         { GeographyStore.getStatesGeojson().map(polygon => {
           return (

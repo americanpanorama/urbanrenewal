@@ -2,9 +2,9 @@
 	line {
 
 		&.gridline {
-			stroke: silver;
+			stroke: #D1D2D1;
 			stroke-width: 1;
-			stroke-opacity: 0.2;
+			stroke-opacity: 0.5;
 		}
 
 		&.proportional {
@@ -14,7 +14,7 @@
 	}
 
 	text {
-		fill: white;
+		fill: black;
 		text-anchor: middle;
 		alignment-baseline: hanging;
 	}

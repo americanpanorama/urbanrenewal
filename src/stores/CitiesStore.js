@@ -84,7 +84,7 @@ const CitiesStore = {
         r.hasProjectGeojson = (r.centerlat !== null);
         r.boundingBox = (r.bbymin !== null) ? [[r.bbymin,r.bbxmin],[r.bbymax,r.bbxmax]] : null;
         r.tractsBoundingBox = (r.tbbymin !== null) ? [[r.tbbymin,r.tbbxmin],[r.tbbymax,r.tbbxmax]] : null;
-        r.detectionBoundingBox = r.boundingBox || r.center || [[r.lat + 0.05, r.lng - 0.05], [r.lat - 0.05, r.lng + 0.05]];
+        r.detectionBoundingBox = r.boundingBox || r.center || [[r.lat + 0.025, r.lng - 0.025], [r.lat - 0.025, r.lng + 0.025]];
         r.projects = {};
         r.yearsData = {};
         r.tracts = {};
@@ -220,6 +220,10 @@ const CitiesStore = {
         format: 'JSON'
       },
       {
+        query: "select st_asgeojson(st_union(ct.the_geom)) as city_geom from us_tracts_1960 ct join urdr_city_id_key cities on cities.nhgiscty = ct.nhgiscty and cities.city_id = "+ city_id,
+        format: 'JSON'
+      },
+      {
         query: "select ST_asgeojson(the_geom, 4) as the_geojson, holc_grade from holc_polygons where ad_id in (select ad_id from holc_polygons join (select city_id, st_envelope(st_collect(the_geom)) as the_geom from urdr_id_key where city_id = " + city_id + " and the_geom is not null group by city_id) projects on st_intersects(projects.the_geom, holc_polygons.the_geom) group by ad_id)",
         format: 'JSON'
       },
@@ -239,6 +243,10 @@ const CitiesStore = {
       });
 
       responses[1].forEach(response => {
+        this.data.cities[city_id].city_geom = JSON.parse(response.city_geom);
+      });
+
+      responses[2].forEach(response => {
         this.data.cities[city_id].holc_areas.push({
           the_geojson: JSON.parse(response.the_geojson),
           grade: response.holc_grade
@@ -255,7 +263,7 @@ const CitiesStore = {
         'urban renewal grants dispursed': 'funding_dispursed',
         'urban renewal grants approved/reserved': 'funding_approved'
       };
-      responses[2].forEach(r => {
+      responses[3].forEach(r => {
         if (this.data.cities[city_id].projects[r.project_id]) {
           this.data.cities[city_id].projects[r.project_id][cat_codes[r.assessed_category]] = r.value; 
         }
@@ -352,12 +360,18 @@ const CitiesStore = {
   },
 
   setInspectedProject: function(project_id) {
+    console.log(project_id);
     this.data.inspectedProject = project_id;
+    if (project_id) {
+      this.data.inspectedCity = this.getCityId(project_id);
+      console.log(this.data.inspectedCity);
+    }
     this.emit(AppActionTypes.storeChanged);
   },
 
   setInspectedProjectStats: function(project_id) {
     this.data.inspectedProjectStats = project_id;
+    this.data.inspectedCity = (project_id) ? this.getCityId(project_id) : null;
     this.emit(AppActionTypes.storeChanged);
   },
 
@@ -694,12 +708,16 @@ const CitiesStore = {
   },
 
   getVisibleCitiesDetails: function() {
-    const visibleCitiesData = this.getCitiesList().filter(d => this.data.visibleCitiesIds.includes(d.city_id));
-    let visibleCitiesSpatialData = { projects: {}, tracts: {}, holc_areas: [] };
+    const visibleCitiesData = this.getCitiesList().filter(d => this.data.visibleCitiesIds.includes(d.city_id) && this.data.cities[d.city_id].totalFamilies > 0);
+    let visibleCitiesSpatialData = { cities: [], projects: {}, tracts: {}, holc_areas: [], cities_geoms: [] };
 
     visibleCitiesData.forEach(cd => {
+      visibleCitiesSpatialData.cities.push(cd);
       Object.keys(cd.projects).forEach(project_id => visibleCitiesSpatialData.projects[project_id] = cd.projects[project_id]);
       Object.keys(cd.tracts).forEach(tract_id => visibleCitiesSpatialData.tracts[tract_id] = cd.tracts[tract_id]);
+      if (cd.city_geom) {
+        visibleCitiesSpatialData.cities_geoms.push(cd.city_geom);
+      }
       visibleCitiesSpatialData.holc_areas = visibleCitiesSpatialData.holc_areas.concat(cd.holc_areas);
     });
 

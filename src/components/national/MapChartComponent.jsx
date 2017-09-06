@@ -55,6 +55,7 @@ export default class USMap extends React.Component {
           <MapField
             selectedView={ this.props.selectedView }
             z={ GeographyStore.getXYZ().z }
+            selectedYear={ CitiesStore.getSelectedYear() || '1955-1966' }
           />
 
           { CitiesStore.getDorlingsForce().map((cityData, i) => {
@@ -64,7 +65,7 @@ export default class USMap extends React.Component {
                 { ...GeographyStore.getXYZ() }
                 highlightedCities={ this.props.highlightedCities }
                 r={ DimensionsStore.getDorlingRadius(cityData.value) }
-                stroke={ (CitiesStore.getSelectedView() == 'cartogram') ? 'transparent' : '#333'}
+                stroke={ (CitiesStore.getSelectedView() == 'cartogram') ? 'transparent' : 'grey'}
                 view={ CitiesStore.getSelectedView() }
                 key={'cityCircle' + cityData.city_id }
                 strokeWidth={ 0.5/GeographyStore.getZ()}

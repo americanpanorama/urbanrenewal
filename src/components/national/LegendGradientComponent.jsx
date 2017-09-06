@@ -28,8 +28,8 @@ export default class LegendGradient extends React.Component {
           />
 
           {/* category labels */}
-          <text { ...DimensionsStore.getLegendGradientPOCLabelAttrs() }>% families of color displaced</text>
-          <text { ...DimensionsStore.getLegendGradientWhitesLabelAttrs() }>% white families displaced</text>
+          <text { ...DimensionsStore.getLegendGradientPOCLabelAttrs() }>% of color</text>
+          <text { ...DimensionsStore.getLegendGradientWhitesLabelAttrs() }>% white</text>
 
           {/* percent labels */}
           <g>

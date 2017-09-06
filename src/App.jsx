@@ -109,7 +109,7 @@ export default class App extends React.Component {
   onCityInspected(event) { AppActions.cityInspected(parseInt(event.target.id)); }
 
   onCityMapMove(event) { 
-    // wait until move has stopped before executying
+    // wait until move has stopped before executing
     let waitingId = setInterval(() => {
       if (!this.refs.cityMap.isMoving()) {
         clearInterval(waitingId);
@@ -357,6 +357,7 @@ export default class App extends React.Component {
                       { (this.state.legendVisible) ?
                         <Legend
                           poc={ CitiesStore.getPOC() }
+                          selectedYear={ CitiesStore.getSelectedYear() || '1955-1966' }
                           dorlingScale={ (CitiesStore.getSelectedView() == 'cartogram') ? GeographyStore.getZ() : 1 }
                           dorlingIncrements={ DimensionsStore.getLegendDimensionsIntervals() }
                           onDragUpdate={ this.onDragUpdate }
@@ -388,6 +389,7 @@ export default class App extends React.Component {
           { (!CitiesStore.getHighlightedProject() && CitiesStore.getHighlightedCity()) ? 
             <CityStats 
               { ...CitiesStore.getCityData(CitiesStore.getHighlightedCity()) }
+              otherCities={ CitiesStore.getVisibleCitiesDetails().cities }
               categories={ CitiesStore.getCategories() }
               selectedYear={ CitiesStore.getSelectedYear() }
               inspectedProject={ CitiesStore.getInspectedProject() }

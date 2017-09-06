@@ -67,8 +67,8 @@ export default class ChartField extends React.Component {
             <stop offset="100%" style={{stopColor:'rgb(44,160,44)', stopOpacity:0.5}} />
           </linearGradient>
           <linearGradient id="maskgradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="75%" style={{stopColor:'rgb(128,128,128)', stopOpacity:1}} />
-            <stop offset="100%" style={{stopColor:'rgb(128,128,128)', stopOpacity:0}} />
+            <stop offset="75%" style={{stopColor:'rgb(209,213,215)', stopOpacity:1}} />
+            <stop offset="100%" style={{stopColor:'rgb(209,213,215)', stopOpacity:0}} />
           </linearGradient>
         </defs>
 

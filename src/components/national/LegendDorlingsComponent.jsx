@@ -32,7 +32,7 @@ export default class LegendDorlings extends React.Component {
                 { ...DimensionsStore.getLegendDorlingsTextPositioning(value, this.props.dorlingScale) }
                 transform={ 'scale(' + this.props.dorlingScale +")"}
               >
-                { value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' families' }
+                { value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") }
               </text>
             </g>
           )) }

@@ -10,9 +10,8 @@ export default class LegendRaceAndIncome extends React.Component {
       >
         <span className='tooltip'>The poverty line in 1960 was approximately $3000 for average-sized families. Census tracts with no families below $3000 in annual income are full transparent, invisible. The deeper the color the higher percentage of families whose income was below the poverty line.</span>
         <svg
-          width={135}
+          width={170}
           height={130}
-          style={{ margin: '10px 0 0 5px' }}
         >
 
           { [0,1,2,3,4].map(income => {
@@ -20,8 +19,8 @@ export default class LegendRaceAndIncome extends React.Component {
               [1,0.75,0.5,0.25,0].map((perc, i) => {
                 return (
                   <rect
-                    x={25 + income * 15}
-                    y={20 + i * 15}
+                    x={30 + i * 15}
+                    y={25 + income * 15}
                     width={15}
                     height={15}
                     fill={ getColorForRace(perc) }
@@ -36,61 +35,77 @@ export default class LegendRaceAndIncome extends React.Component {
           })}
           <text
             x={0}
-            y={62.5}
+            y={57.5}
             textAnchor='middle'
             alignmentBaseline='hanging'
             transform='rotate(270 0,57.5)'
             fill='black'
           >
-            people of color
+            GREATER POVERTY →
           </text>
           <text
-            x={103}
+            x={113}
             y={20}
             alignmentBaseline='hanging'
-            fill='black'
-            fontSize='0.9em'
+            className='quantities'
           >
             100%
           </text>
           <text
-            x={103}
+            x={113}
             y={95}
             alignmentBaseline='baseline'
-            fill='black'
-            fontSize='0.9em'
+            className='quantities'
           >
             0%
           </text>
           <text
-            x={25 + (75/2)}
+            x={30 + (75/2)}
             y={0}
             textAnchor='middle'
             alignmentBaseline='hanging'
             fill='black'
           >
-            families impoverished
+            RACE
           </text>
           <text
-            x={25 + 15/2}
+            x={30 + 15/2}
             y={20 + 77}
             textAnchor='middle'
             alignmentBaseline='hanging'
-            fill='black'
-            fontSize='0.9em'
+            className='quantities'
           >
             100%
           </text>
           <text
-            x={25 + 75 - 15/2}
+            x={30 + 15/2}
+            y={20 + 77 + 12}
+            textAnchor='middle'
+            alignmentBaseline='hanging'
+            className='quantities'
+          >
+            of color
+          </text>
+          <text
+            x={30
+             + 75 - 15/2}
             y={20 + 77}
             textAnchor='middle'
             alignmentBaseline='hanging'
-            fill='black'
-            fontSize='0.9em'
+            className='quantities'
           >
-            0%
-          </text>b
+            100%
+          </text>
+          <text
+            x={30
+             + 75 - 15/2}
+            y={20 + 77 + 12}
+            textAnchor='middle'
+            alignmentBaseline='hanging'
+            className='quantities'
+          >
+            white
+          </text>
         </svg>
       </div> 
     );

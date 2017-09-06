@@ -19,6 +19,9 @@ export default class LegendAndControls extends React.Component {
         className='mapLegend'
         style={ DimensionsStore.getLegendDimensions() }
       >
+
+        <h3>{ 'FAMILIES DISPLACED, ' + this.props.selectedYear }</h3>
+        
         <LegendGradient
           poc={ this.props.poc }
           onDragUpdate={ this.props.onDragUpdate }

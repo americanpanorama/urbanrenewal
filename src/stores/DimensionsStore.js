@@ -50,7 +50,7 @@ const DimensionsStore = {
     
     this.data.legendHeight = 2 * this.data.dorlingsMaxRadius + this.data.legendVerticalGutter * 2;
 
-    this.data.legendDorlingWidth =  4 * this.data.dorlingsMaxRadius + this.data.legendVerticalGutter * 2; // I'm estimating the labels take the same width as the diameter 3 for gutters on either side
+    this.data.legendDorlingWidth =  3 * this.data.dorlingsMaxRadius + this.data.legendVerticalGutter * 2; // I'm estimating the labels take half the width as the diameter + 3 for gutters on either side
     this.data.legendDorlingHeight = 2 * this.data.dorlingsMaxRadius + this.data.legendVerticalGutter * 2; // 10 for gutters on either side
 
     this.data.legendGradientHeight = this.data.legendHeight - this.data.legendVerticalGutter * 2;
@@ -132,7 +132,7 @@ const DimensionsStore = {
   getLegendDimensions: function() { 
     return {
       width: this.data.legendWidth,
-      height: this.data.legendHeight,
+      height: this.data.legendHeight + 40,
       //right: this.data.legendRight
     };
   },
