@@ -78,7 +78,7 @@ const CitiesStore = {
       responses[1].forEach(r => {
         // calculate some additional/aggregate and initialization values 
         r.id = r.city_id;
-        r.slug = r.city.replace(/ /g,'') + r.state.toUpperCase();
+        r.slug = r.city.replace(/ /g,'').toLowerCase() + r.state.toUpperCase();
         r.searchName = r.city.replace(/ /g,'') + ' ' + StateAbbrs[r.state.toUpperCase()];
         r.center = (r.centerlat !== null) ? [r.centerlat,r.centerlng] : null;
         r.hasProjectGeojson = (r.centerlat !== null);

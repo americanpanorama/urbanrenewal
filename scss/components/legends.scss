@@ -1,0 +1,73 @@
+.mapLegend {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background-color: rgba(255,255,255, 1);
+  overflow: hidden;
+  border-top-left-radius: 15px;
+  pointer-events: none;
+  z-index: 10000;
+  padding: 20px 0 20px 20px;
+
+  h3 {
+    text-align: center;
+    font-size: 1.5em;
+  }
+
+  .footprint text {
+    text-shadow: -1px 0 #f5f5f3, 0 1px #f5f5f3, 1px 0 #f5f5f3, 0 -1px #f5f5f3;
+  }
+
+  .cityMapBubble {
+    paddingleft: 10px;
+    padding-right: 30px;
+  }
+
+  &.holc {
+    .redlining {
+      display: inline-block;
+      width: 150px;
+    }
+
+    .colorkey {
+      width: 14px;
+      height: 14px;
+      display: inline-block;
+      margin-right: 14px;
+
+      &.A { 
+        background-color: #418e41;
+      }
+      &.B { 
+        background-color: #4a4ae4;
+      }
+      &.C { 
+        background-color: #ffdf00;
+      }
+      &.D { 
+        background-color: #eb3f3f;
+      }
+    }
+
+    .link {
+      pointer-events: auto;
+      font-style: italic;
+      line-height: 15px;
+    }
+  }
+
+  .handle {
+    pointer-events: auto;
+  }
+}
+
+
+.hideLegend {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  padding: 0 5px;
+  z-index: 10001;
+  pointer-events: auto;
+  color: grey;
+}

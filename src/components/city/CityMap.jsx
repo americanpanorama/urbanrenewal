@@ -33,10 +33,16 @@ export default class CityMap extends React.Component {
   }
 
   componentDidUpdate() {
-    // bring urban renewal projects to top so they're not underneath census tracts or HOLC neighborhoods
+    // bring urban renewal projects and city markers to top so they're not underneath census tracts or HOLC neighborhoods
     Object.keys(this.props.projects).map(projectId => {
       if (this.props.projects[projectId].the_geojson) {
         this.refs['projectFootprint' + projectId].leafletElement.bringToFront();
+      }
+    });
+
+    this.props.cities.forEach(cityData => {
+      if (!cityData.hasProjectGeojson) {
+        this.refs['cityMarker' + cityData.city_id].leafletElement.bringToFront();
       }
     });
 
@@ -107,6 +113,7 @@ export default class CityMap extends React.Component {
           zoom={ this.props.zoom || 14 }  
           minZoom={ 11 }
           className='the_map'
+          attributionControl={false}
           style={ {
             width: DimensionsStore.getMapDimensions().width,
             height: DimensionsStore.getNationalMapHeight()
@@ -171,9 +178,9 @@ export default class CityMap extends React.Component {
             />
           )}
 
+          { /* cities without projects */ }
           { this.props.cities.map(cityData => {
             if (!cityData.hasProjectGeojson) {
-              console.log(cityData);
               return (
                 <CircleMarker
                   center={[ cityData.lat, cityData.lng ]}
@@ -181,11 +188,17 @@ export default class CityMap extends React.Component {
                   weight={ 0 }
                   fillColor={ getColorForRace(cityData.percentFamiliesOfColor) }
                   fillOpacity={ 0.8 }
+                  onClick={ this.props.onCitySelected }
+                  onMouseOver={ this.props.onCityHover }
+                  onMouseOut={ this.props.onCityOut }
+                  id={ cityData.city_id }
                   style={{
                     fillColor:  getColorForRace(cityData.percentPeopleOfColor),
                     weight: 0
-
                   }}
+                  key={'cityMarker' + cityData.city_id }
+                  ref={'cityMarker' + cityData.city_id }
+
                   
                 >
                   <Tooltip
@@ -193,10 +206,13 @@ export default class CityMap extends React.Component {
                     offset={[0,0]} 
                     opacity={1} 
                     permanent={true}
-                    className='projectLabel'
+                    className='cityMapCityLabel'
                     ref={ 'labelForCity' + cityData.city_id }
                   >
-                    <span>{ cityData.city.toUpperCase() }
+                    <span
+
+                    >
+                      { cityData.city.toUpperCase() }
                       <br />
                        <span className='displacements'>{ formatNumber(cityData.totalFamilies) }</span>
                       <br />
@@ -228,7 +244,7 @@ export default class CityMap extends React.Component {
                         weight: 3,
                         color: (this.props.inspectedProject == projectId || this.props.inspectedProject == null) ?  '#5B3000' : 'grey',
                         //dashArray: '5, 5',
-                        fillColor: getColorForRace(this.props.projects[projectId].percentFamiliesOfColor),
+                        fillColor: (this.props.projects[projectId].totalFamilies) ?getColorForRace(this.props.projects[projectId].percentFamiliesOfColor) : '#eee',
                         fillOpacity: (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId) ? 1 : 0,
                       } }
                       ref={ 'projectFootprint' + projectId }

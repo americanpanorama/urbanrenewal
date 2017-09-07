@@ -32,7 +32,82 @@ export default class LegendAndControls extends React.Component {
           className='resetView'
           onClick={ this.props.resetView }
         >
-          <img src='static/us-outline.svg' />
+          <svg
+            width={18}
+            height={18}
+          >
+            <line
+              x1={1}
+              x2={1}
+              y1={0}
+              y2={7}
+              stroke='#111'
+              strokeWidth={2}
+            />
+
+            <line
+              x1={1}
+              x2={1}
+              y1={11}
+              y2={18}
+              stroke='#111'
+              strokeWidth={2}
+            />
+
+            <line
+              x1={17}
+              x2={17}
+              y1={0}
+              y2={7}
+              stroke='#111'
+              strokeWidth={2}
+            />
+
+            <line
+              x1={17}
+              x2={17}
+              y1={11}
+              y2={18}
+              stroke='#111'
+              strokeWidth={2}
+            />
+
+            <line
+              y1={1}
+              y2={1}
+              x1={0}
+              x2={7}
+              stroke='#111'
+              strokeWidth={2}
+            />
+
+            <line
+              y1={1}
+              y2={1}
+              x1={11}
+              x2={18}
+              stroke='#111'
+              strokeWidth={2}
+            />
+
+            <line
+              y1={17}
+              y2={17}
+              x1={0}
+              x2={7}
+              stroke='#111'
+              strokeWidth={2}
+            />
+
+            <line
+              y1={17}
+              y2={17}
+              x1={11}
+              x2={18}
+              stroke='#111'
+              strokeWidth={2}
+            />
+          </svg>
         </button>
       </div>
     );

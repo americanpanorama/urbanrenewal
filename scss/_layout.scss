@@ -72,59 +72,6 @@ header {
     
   }
 
-  .mapLegend {
-      position: absolute;
-      bottom: 40px;
-      right: 40px;
-      background-color: rgba(255,255,255, 0.9);
-      border: 2px solid rgba($map-background-color, 0.9);
-      overflow: hidden;
-      border-radius: 15px;
-      pointer-events: none;
-      z-index: 10000;
-
-      h3 {
-        text-align: center;
-        font-size: 1.5em;
-      }
-
-      &.holc {
-        padding: 20px;
-        width: 145px;
-
-        .colorkey {
-          width: 14px;
-          height: 14px;
-          display: inline-block;
-          margin-right: 14px;
-
-          &.A { 
-            background-color: #418e41;
-          }
-          &.B { 
-            background-color: #4a4ae4;
-          }
-          &.C { 
-            background-color: #ffdf00;
-          }
-          &.D { 
-            background-color: #eb3f3f;
-          }
-        }
-
-        .link {
-          pointer-events: auto;
-        }
-      }
-
-      svg text {
-         fill: #111;
-      }
-
-      .handle {
-        pointer-events: auto;
-      }
-    }
 }
 
 .timelineControls {

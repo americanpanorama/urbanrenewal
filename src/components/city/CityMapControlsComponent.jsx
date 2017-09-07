@@ -12,7 +12,7 @@ export default class LegendHOLC extends React.Component {
           onClick={ this.props.onHOLCToggle } 
         >  
           <span className='tooltip'>View the racial demographics and median incomes from the 1960s census.</span>   
-          1960 Race and Income    
+          Poverty & Race    
         </div>    
 
         <div    

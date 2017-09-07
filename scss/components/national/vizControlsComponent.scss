@@ -2,16 +2,18 @@
 	position: relative;
 	padding: 3px;
 	margin: 0px;
-	border-radius: 23px;
+	border-bottom-left-radius: 7px;
+	border-bottom-right-radius: 7px;
 	border: 3px solid transparent;
 	text-align: center;
+	color: #555;
 
 
 
 
 	&.selected {
-		border: 3px solid #444;
 		background-color: white;
+		color: #222;
 	}
 
 	img {
@@ -26,24 +28,25 @@
 
 #mapChartToggle {
 	position: absolute;
-	right: 28px;
-	top: 32px;
+	right: 25px;
+	top: 20px;
 	z-index: 10000;
 
 	div {
-		background-color: grey;
+		background-color: #aaa;
 		@include chartButtons;
 		display: inline-block;
 		background-repeat: no-repeat;
-		width: 46px;
-		height: 35px;
-		color: white;
+		padding: 0 10px;
 		margin: 0 3px;
-		padding-top: 11px;
-		font-size: 0.9em;
-		text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+		font-size: 1.3em;
+		border-left: 1px silver solid;
+		border-right: 1px silver solid;
+		border-bottom: 1px silver solid;
+		text-transform: uppercase;
 
 		.tooltip {
+			text-transform: none;
 		    visibility: hidden;
 		    width: 240px;
 		    background-color: white;
@@ -62,6 +65,7 @@
 
 		&:hover {
 			background-color: white;
+			color: #222;
 
 		    .tooltip {
 		        visibility: visible;

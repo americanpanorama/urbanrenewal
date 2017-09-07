@@ -83,7 +83,8 @@ export default class ChartField extends React.Component {
             y={0}
             width={ DimensionsStore.getScatterplotLength() }
             height={ DimensionsStore.getScatterplotLength() }
-            fill="url(#graphgradient2)"
+            //fill="url(#graphgradient2)"
+            fill='#F5F5F3'
           />
 
           { [...Array(11).keys()].map(decile => {

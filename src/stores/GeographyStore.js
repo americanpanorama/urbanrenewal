@@ -332,6 +332,10 @@ GeographyStore.dispatchToken = AppDispatcher.register((action) => {
         if (GeographyStore.getTheMap()) {
           clearInterval(waitingId);
           GeographyStore.setViewFromBounds(action.value);
+          // only reset the map if it's not already on the map
+          // if (!GeographyStore.getTheMap().getBounds().contains([CitiesStore.getCityData(action.value).lat, CitiesStore.getCityData(action.value).lng])) {
+          //   GeographyStore.setViewFromBounds(action.value);
+          // }
         }
       }, 500);
     }

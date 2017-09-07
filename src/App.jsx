@@ -43,6 +43,7 @@ export default class App extends React.Component {
 
     this.state = {
       legendVisible: true,
+      scatterplotExplanationVisible: true,
       searching: false,
       initialCityLoading: false
     };
@@ -50,7 +51,7 @@ export default class App extends React.Component {
     this.coords = {};
 
     // bind handlers
-    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle', 'onProjectInspected', 'onProjectOut', 'onSearching', 'onProjectMapHover', 'onProjectSelected', 'onProjectMapUnhover','onSearchBlur','onCloseSearch'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle', 'onProjectInspected', 'onProjectOut', 'onSearching', 'onProjectMapHover', 'onProjectSelected', 'onProjectMapUnhover','onSearchBlur','onCloseSearch','toggleScatterplotExplanationVisibility'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
 
     console.time('update');
@@ -97,7 +98,7 @@ export default class App extends React.Component {
   onCategoryClicked(event) { AppActions.categorySelected(event.target.id); }
 
   onCityClicked(event) { 
-    const id = event.city_id || event.target.id;
+    const id = event.city_id || event.target.id || event.target.options.id;
     AppActions.citySelected(id); 
 
     // clear and blur search
@@ -106,7 +107,10 @@ export default class App extends React.Component {
     this.setState({ searching: false });
   }
 
-  onCityInspected(event) { AppActions.cityInspected(parseInt(event.target.id)); }
+  onCityInspected(event) {
+    const id = event.city_id || event.target.id || event.target.options.id;
+    AppActions.cityInspected(parseInt(id)); 
+  }
 
   onCityMapMove(event) { 
     // wait until move has stopped before executing
@@ -135,7 +139,8 @@ export default class App extends React.Component {
   onProjectMapUnhover(event) { AppActions.projectInspectedStats(null); }
 
   onProjectSelected(event) { 
-    const id = (event.target.id) ? event.target.id : (event.target.options) ? parseInt(event.target.options.id) : null;
+    let id = (event.target.id) ? event.target.id : (event.target.options) ? parseInt(event.target.options.id) : null;
+    id = (id == CitiesStore.getSelectedProject()) ? null : id;
     AppActions.projectSelected(id); 
   }
 
@@ -173,9 +178,11 @@ export default class App extends React.Component {
 
   toggleLegendVisibility() { this.setState({ legendVisible: !this.state.legendVisible }); }
 
+  toggleScatterplotExplanationVisibility() { this.setState({ scatterplotExplanationVisible: !this.state.scatterplotExplanationVisible}); }
+
   onZoomIn(event) {
     event.preventDefault();
-    const z = GeographyStore.getZ() * 1.6,
+    const z = Math.min(GeographyStore.getZ() * 1.62, 18),
       centerX = (event.target.id == 'zoomInButton') ? DimensionsStore.getMainPaneWidth()  / 2 - GeographyStore.getX() : event.nativeEvent.offsetX - GeographyStore.getX(),
       centerY = (event.target.id == 'zoomInButton') ? DimensionsStore.getNationalMapHeight()  / 2 - GeographyStore.getY() : event.nativeEvent.offsetY - GeographyStore.getY(),
       x = DimensionsStore.getMainPaneWidth()  / 2 - centerX / GeographyStore.getZ() * z,
@@ -184,7 +191,7 @@ export default class App extends React.Component {
   }
 
   zoomOut() {
-    const z = GeographyStore.getZ() / 1.6,
+    const z = Math.max(GeographyStore.getZ() / 1.62, 1),
       x = DimensionsStore.getMainPaneWidth()  / 2 - (DimensionsStore.getMainPaneWidth()  / 2 - GeographyStore.getX()) / GeographyStore.getZ() * z,
       y = DimensionsStore.getNationalMapHeight()  / 2 - (DimensionsStore.getNationalMapHeight()  / 2 - GeographyStore.getY()) / GeographyStore.getZ() * z;
     AppActions.mapMoved(x,y,z);
@@ -283,6 +290,9 @@ export default class App extends React.Component {
                       { ...GeographyStore.getLatLngZoom() }
                       maxForYear={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).maxDisplacmentsForYear }
                       onMoveend={ this.onCityMapMove }
+                      onCitySelected={ this.onCityClicked }
+                      onCityHover={ this.onCityInspected }
+                      onCityOut={ this.onCityOut }
                       onProjectHover={ this.onProjectMapHover }
                       onProjectUnhover={ this.onProjectMapUnhover }
                       onProjectClick={ this.onProjectSelected }
@@ -299,11 +309,11 @@ export default class App extends React.Component {
                       <img src='static/us-outline.svg' />
                     </button>
 
-                    { (!CitiesStore.getHOLCSelected() && CitiesStore.hasDemographicData(CitiesStore.getSelectedCity())) ? 
+                    { (!CitiesStore.getHOLCSelected() && CitiesStore.hasDemographicData(CitiesStore.getSelectedCity()) && this.state.legendVisible) ? 
                       <LegendRaceAndIncome /> : ''
                     }
 
-                    { (CitiesStore.getHOLCSelected() && CitiesStore.hasHOLCData(CitiesStore.getSelectedCity())) ? 
+                    { (CitiesStore.getHOLCSelected() && CitiesStore.hasHOLCData(CitiesStore.getSelectedCity()) && this.state.legendVisible) ? 
                       <LegendHOLC 
                         miurl={ 'https://dsl.richmond.edu/panorama/redlining/#loc=' + [GeographyStore.getLatLngZoom().zoom, GeographyStore.getLatLngZoom().lat, GeographyStore.getLatLngZoom().lng].join('/') + "&opacity=0" }
                         city={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).city }
@@ -316,6 +326,13 @@ export default class App extends React.Component {
                        onHOLCToggle={ this.onHOLCToggle }
                       /> : ''
                     }
+
+                    <div 
+                      className='hideLegend'
+                      onClick={ this.toggleLegendVisibility }
+                    >
+                      { (this.state.legendVisible) ? '⇲ hide legend' : '⇱ show legend' }
+                    </div>
                   </div>
                   : (!this.state.initialCityLoading) ? 
                     <div>
@@ -336,12 +353,21 @@ export default class App extends React.Component {
                       />
 
                       { (CitiesStore.getSelectedView() == 'scatterplot') ?
-                          <p 
-                            style={ DimensionsStore.getScatterplotExplanationAttrs() }
-                            className='scatterplotExplanation'
-                          >James Baldwin famously characterized urban renewal as "Negro removal," a point made too by this chart. Cities below the yellow line, which is most cities, displaced families of color disproportionately relative to their overall population. For example, the bottom left of the graph shows cities like <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('cincinnatiOH')}>Cincinnati</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('norfolkVA')}>Norfolk</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('clevelandOH')}>Cleveland</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('saintlouisMO')}>St. Louis</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('philadelphiaPA')}>Philadelphia</span>, and <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('detroitMI')}>Detroit</span> where people of color were 20% to 30% of the overall population but made up two-thirds or more of those displaced. On the far right are usually smaller white cities with tiny populations of color. With people of color being less than 10% of those cities populations, though the majority of families displaced were white, families of color were still <em>disproportionately</em> displaced by most of these cities. For example, while 96% of the families displaced in <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('scrantonPA')}>Scranton</span> where white, more than 99% of the population was white.
-                          </p> : ''
+                          <div className='scatterplotExplanation'>
+                            { (this.state.scatterplotExplanationVisible) ?
+                              <p>James Baldwin famously characterized urban renewal as "Negro removal," a point made too by this chart. Most cities fall below the orange line because they displaced families of color disproportionately relative to their overall population. For example, the bottom left of the graph shows cities like <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('cincinnatiOH')}>Cincinnati</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('norfolkVA')}>Norfolk</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('clevelandOH')}>Cleveland</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('saintlouisMO')}>St. Louis</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('philadelphiaPA')}>Philadelphia</span>, and <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('detroitMI')}>Detroit</span> where people of color were 20% to 30% of the overall population but made up two-thirds or more of those displaced. On the far right are usually smaller white cities with tiny populations of color. With people of color being less than 10% of those cities populations, though the majority of families displaced were white, families of color were still <em>disproportionately</em> displaced by most of these cities. For example, while 96% of the families displaced in <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('scrantonPA')}>Scranton</span> were white, more than 99% of the population was white.
+                              </p> : ''
+                            }
+                            <div 
+                              className='hideExplanation'
+                              onClick={ this.toggleScatterplotExplanationVisibility }
+                            >
+                              { (this.state.scatterplotExplanationVisible) ? '↙ hide explanation' : '↗ show explanation' }
+                            </div>
+                          </div> : ''
                       }
+
+                      
 
                       <ZoomControls
                         onZoomIn={ this.onZoomIn }
@@ -363,6 +389,13 @@ export default class App extends React.Component {
                           onDragUpdate={ this.onDragUpdate }
                         /> : ''
                       }
+
+                      <div 
+                        className='hideLegend'
+                        onClick={ this.toggleLegendVisibility }
+                      >
+                        { (this.state.legendVisible) ? '⇲ hide legend' : '⇱ show legend' }
+                      </div>
                     </div> : ''
                 }
 
