@@ -8,7 +8,7 @@ import DimensionsStore from '../../stores/DimensionsStore';
 import GeographyStore from '../../stores/GeographyStore';
 
 // components
-import { Map, TileLayer, GeoJSON, Tooltip, LayerGroup} from 'react-leaflet';
+import { Map, TileLayer, GeoJSON, Tooltip, LayerGroup, Marker, CircleMarker} from 'react-leaflet';
 import UrbanRenewalPolygon from './UrbanRenewalPolygon.jsx';
 
 export default class CityMap extends React.Component {
@@ -170,6 +170,44 @@ export default class CityMap extends React.Component {
               }}
             />
           )}
+
+          { this.props.cities.map(cityData => {
+            if (!cityData.hasProjectGeojson) {
+              console.log(cityData);
+              return (
+                <CircleMarker
+                  center={[ cityData.lat, cityData.lng ]}
+                  radius={ Math.max(DimensionsStore.getDorlingRadius(cityData.totalFamilies) * 3, 10) }
+                  weight={ 0 }
+                  fillColor={ getColorForRace(cityData.percentFamiliesOfColor) }
+                  fillOpacity={ 0.8 }
+                  style={{
+                    fillColor:  getColorForRace(cityData.percentPeopleOfColor),
+                    weight: 0
+
+                  }}
+                  
+                >
+                  <Tooltip
+                    direction='center'
+                    offset={[0,0]} 
+                    opacity={1} 
+                    permanent={true}
+                    className='projectLabel'
+                    ref={ 'labelForCity' + cityData.city_id }
+                  >
+                    <span>{ cityData.city.toUpperCase() }
+                      <br />
+                       <span className='displacements'>{ formatNumber(cityData.totalFamilies) }</span>
+                      <br />
+                      { Object.keys(cityData.projects).length + ' project' + ((Object.keys(cityData.projects).length > 1) ? 's' : '') }
+                    </span>
+                  </Tooltip>
+                </CircleMarker>
+              );
+            }
+
+          })}
 
           {/* projects */}
           { (this.props.projects) ?

@@ -41,7 +41,7 @@ const GeographyStore = {
   setViewFromBounds(city_id) {
     this.data.lat = (CitiesStore.getCityData(city_id).center) ? CitiesStore.getCityData(city_id).center[0] : CitiesStore.getCityData(city_id).lat;
     this.data.lng = (CitiesStore.getCityData(city_id).center) ? CitiesStore.getCityData(city_id).center[1] : CitiesStore.getCityData(city_id).lng;
-    this.data.zoom = (CitiesStore.getCityData(city_id).boundingBox) ? this.data.theMap.getBoundsZoom(CitiesStore.getCityData(city_id).boundingBox) : 13;
+    this.data.zoom = (CitiesStore.getCityData(city_id).boundingBox) ? Math.min(this.data.theMap.getBoundsZoom(CitiesStore.getCityData(city_id).boundingBox), 16) : 14;
     this.emit(AppActionTypes.storeChanged);
   },
 

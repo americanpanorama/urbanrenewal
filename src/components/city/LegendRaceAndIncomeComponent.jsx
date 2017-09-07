@@ -8,6 +8,108 @@ export default class LegendRaceAndIncome extends React.Component {
       <div 
         className='mapLegend demographics'
       >
+        <svg
+          width={100}
+          height={130}
+          className='footprint'
+        >
+          <path 
+            stroke="#5B3000" 
+            strokeWidth="3" 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            fill={getColorForRace(0.2)}
+            fillOpacity="0.6" 
+            d="M20 50L0 20L45 0L70 40z"
+            transform='translate(10 10)'
+          />
+
+          <text
+            x={ 100 / 2}
+            y={ -20 + 130/2 - 10}
+            textAnchor='middle'
+            fill='black'
+            className='shadow'
+          >
+            Project
+          </text>
+
+          <text
+            x={ 100 / 2}
+            y={ -20 + 130/2 + 10}
+            textAnchor='middle'
+            fill='grey'
+            className='shadow'
+          >
+            # displacements
+          </text>
+
+        </svg>
+
+        <svg
+          width={120}
+          height={130}
+          className='cityMapBubble'
+        >
+          <circle
+            cx={ 120 / 2}
+            cy={ -20 + 130/2}
+            r={25}
+            fill={getColorForRace(0.7)}
+          />
+
+          <text
+            x={ 120 / 2}
+            y={ -20 + 130/2 - 20}
+            textAnchor='middle'
+            fill='black'
+            className='shadow'
+          >
+            CITY
+          </text>
+
+          <text
+            x={ 120 / 2}
+            y={ -20 + 130/2 }
+            textAnchor='middle'
+            fill='grey'
+            className='shadow'
+          >
+            # displacements
+          </text>
+
+          <text
+            x={ 120 / 2}
+            y={ -20 + 130/2 + 20}
+            textAnchor='middle'
+            fill='black'
+            className='shadow'
+          >
+            # projects
+          </text>
+
+          <text
+            x={ 120 / 2}
+            y={ -20 + 130/2 + 45}
+            textAnchor='middle'
+            fill='black'
+          >
+            no project maps yet 
+          </text>
+
+          <text
+            x={ 120 / 2}
+            y={ -20 + 130/2 + 60}
+            textAnchor='middle'
+            fill='black'
+          >
+            available for these cities
+          </text>
+
+        </svg>
+
+
+
         <span className='tooltip'>The poverty line in 1960 was approximately $3000 for average-sized families. Census tracts with no families below $3000 in annual income are full transparent, invisible. The deeper the color the higher percentage of families whose income was below the poverty line.</span>
         <svg
           width={170}
