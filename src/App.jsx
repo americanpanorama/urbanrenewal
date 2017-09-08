@@ -297,6 +297,7 @@ export default class App extends React.Component {
                       onProjectUnhover={ this.onProjectMapUnhover }
                       onProjectClick={ this.onProjectSelected }
                       HOLCSelected={ CitiesStore.getHOLCSelected() }
+                      inspectedCity={ CitiesStore.getInspectedCity() }
                       inspectedProject={ CitiesStore.getInspectedProject() }
                       inspectedProjectStats={ CitiesStore.getHighlightedProject() }
                       ref='cityMap'

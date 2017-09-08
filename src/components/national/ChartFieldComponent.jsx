@@ -126,6 +126,7 @@ export default class ChartField extends React.Component {
               x={ DimensionsStore.getScatterplotLength() * 0.5}
               y={ DimensionsStore.getScatterplotLength() * -0.12 }
               transform={'rotate(180 ' + DimensionsStore.getScatterplotLength() * 0.5 + ' ' + DimensionsStore.getScatterplotLength() * -0.12 + ')'}
+              fontSize='1.5em'
             >
               WHITE POPULATION OF CITY (1960)
             </text>
@@ -141,17 +142,32 @@ export default class ChartField extends React.Component {
                   alignmentBaseline='hanging'
                   transform={'rotate(180 ' + x + ' ' + y + ')'}
                   key={ 'xLabel' + decile }
+                  fillOpacity={ (!this.props.percentWhitePop) ? 1 : 0.1 }
                 >
                   { 90 -decile * 10 + '%' }
                 </text>
               );
             }) }
+
+            { (this.props.percentWhitePop) ? 
+              <text
+                x={ (1-this.props.percentWhitePop) * DimensionsStore.getScatterplotLength() }
+                y={ DimensionsStore.getScatterplotLength() * -0.03 }
+                textAnchor='middle'
+                alignmentBaseline='hanging'
+                fontWeight='bold'
+                transform={'rotate(180 ' + (1-this.props.percentWhitePop) * DimensionsStore.getScatterplotLength() + ' ' + DimensionsStore.getScatterplotLength() * -0.03 + ')'}
+              >
+                { Math.round(this.props.percentWhitePop * 1000)/10 + '% white' }
+              </text> : ''
+            }
           </g>
 
           <g>
             <text
               x={ DimensionsStore.getScatterplotLength() * -0.12 }
               y={ DimensionsStore.getScatterplotLength() * 0.5 }
+              fontSize='1.5em'
               transform={'rotate(90 ' + DimensionsStore.getScatterplotLength() * -0.12 + ' ' + DimensionsStore.getScatterplotLength()*0.5 + ')'}
             >
               RACE OF FAMILIES DISPLACED
@@ -181,12 +197,14 @@ export default class ChartField extends React.Component {
                   x={ x }
                   y={ y }
                   transform={'rotate(90 ' + x + ' ' + y + ')'}
+                  fillOpacity={ (!this.props.percentFamiliesOfColor) ? 1 : 0.1 }
                   key={ 'yLabelWhite' + decile }
                 >
                   { 100 -decile * 10 + '%' }
                 </text>
               );
             }) }
+
 
             { [...Array(5).reverse().keys()].map(decile => {
               let x = DimensionsStore.getScatterplotLength() * -0.03,
@@ -197,6 +215,7 @@ export default class ChartField extends React.Component {
                   y={ y }
                   transform={'rotate(90 ' + x + ' ' + y + ')'}
                   key={ 'yLabelPOC' + decile }
+                  fillOpacity={ (!this.props.percentFamiliesOfColor) ? 1 : 0.1 }
                 >
                   { 100 - decile * 10 + '%' }
                 </text>
@@ -207,9 +226,21 @@ export default class ChartField extends React.Component {
               x={ DimensionsStore.getScatterplotLength() * -0.03 }
               y={ DimensionsStore.getScatterplotLength()/2 }
               transform={'rotate(90 ' + DimensionsStore.getScatterplotLength() * -0.03 + ' ' + DimensionsStore.getScatterplotLength()/2 + ')'}
+              fillOpacity={ (!this.props.percentFamiliesOfColor) ? 1 : 0.1 }
             >
               { 'even' }
             </text>
+
+            { (this.props.percentFamiliesOfColor) ?
+              <text
+                x={ DimensionsStore.getScatterplotLength() * -0.03 }
+                y={ DimensionsStore.getScatterplotLength() * (1 - this.props.percentFamiliesOfColor) }
+                transform={'rotate(90 ' + DimensionsStore.getScatterplotLength() * -0.03 + ' ' + DimensionsStore.getScatterplotLength() * (1 - this.props.percentFamiliesOfColor) + ')'}
+                fontWeight='bold'
+              >
+                { ((this.props.percentFamiliesOfColor <= 0.5) ? 100 - Math.round(this.props.percentFamiliesOfColor * 1000)/10 + '% white' : 100 - Math.round((1-this.props.percentFamiliesOfColor) * 1000)/10 + '% of color') }
+              </text> : ''
+            }
           </g>
         </g>
 

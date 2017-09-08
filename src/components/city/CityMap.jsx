@@ -48,11 +48,41 @@ export default class CityMap extends React.Component {
 
     // hide project labels that overlap
     let boundingBoxes = [],
-      projectIds = Object.keys(this.props.projects)
+      projects = Object.keys(this.props.projects)
         .filter(id => this.refs['labelFor' + id])
-        .sort((a,b) => (this.props.inspectedProjectStats == a || this.props.inspectedProject == a) ? -1 : this.props.projects[b].totalFamilies - this.props.projects[a].totalFamilies);
-    projectIds.forEach(projectId => {
-      let theLabel = this.refs['labelFor' + projectId],
+        .map(id => {return {id: id, type: 'project'}; }),
+      cities = this.props.cities
+        .filter(cityData => !cityData.hasProjectGeojson)
+        .map(cityData => {return {id: cityData.city_id, type: 'city'};}),
+      projectsAndCities = projects.concat(cities)
+        .sort((a,b) => {
+          if (a.type == 'project' && this.props.inspectedProjectStats == a.id || this.props.inspectedProject == a.id) {
+            return -1;
+          } 
+          if (b.type == 'project' && this.props.inspectedProjectStats == b.id || this.props.inspectedProject == b.id) {
+            return 1;
+          } 
+          if (a.type == 'city' && this.props.inspectedCity == a.id) {
+            return -1;
+          } 
+          if (b.type == 'city' && this.props.inspectedCity == b.id) {
+            return 1;
+          } 
+          if (a.type=='project' && b.type=='city') {
+            return -1;
+          } 
+          if (a.type=='city' && b.type=='project') {
+            return 1;
+          } 
+          if (a.type=='project' && b.type=='project') {
+            return this.props.projects[b.id].totalFamilies - this.props.projects[a.id].totalFamilies;
+          } else {
+            return this.props.cities.find(cityData=>cityData.city_id == b.id).totalFamilies - this.props.cities.find(cityData=>cityData.city_id == a.id).totalFamilies;
+          }
+        });
+
+    projectsAndCities.forEach(item => {
+      let theLabel = (item.type == 'project') ? this.refs['labelFor' + item.id] : this.refs['labelForCity' + item.id],
         collides = false;
 
       // get the bounding box for the label
@@ -75,6 +105,8 @@ export default class CityMap extends React.Component {
         boundingBoxes.push(bb);
       }
     });
+
+ 
   }
 
   componentWillReceiveProps(nextProps) {
