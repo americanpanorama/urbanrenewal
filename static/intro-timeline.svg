@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg
+  version="1.1" 
+  xmlns="http://www.w3.org/2000/svg" 
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  width='250'
+  height='65'
+>
+  <style type="text/css">
+      @import url('https://fonts.googleapis.com/css?family=Oswald:200|Roboto+Condensed:400');
+   </style>
+
+<text dx="16" dy="64" fill="#aaa" stroke="transparent" font-size="16" id="1960" text-anchor='middle' style='font-family: Oswald; font-size: 13px;'>1955</text>
+<text dx="46.2" dy="64" fill="#aaa" stroke="transparent" font-size="16" id="1960" text-anchor='middle' style='font-family: Oswald; font-size: 13px;'>1956</text>
+<text dx="77.4" dy="64" fill="#aaa" stroke="transparent" font-size="16" id="1960" text-anchor='middle' style='font-family: Oswald; font-size: 13px;'>1957</text>
+<text dx="108.6" dy="64" fill="#aaa" stroke="transparent" font-size="16" id="1960" text-anchor='middle' style='font-family: Oswald; font-size: 13px;'>1958</text>
+<text dx="139.8" dy="64" fill="white" stroke="transparent" font-size="16" id="1960" text-anchor='middle' style='font-family: Oswald; font-size: 13px;'>1959</text>
+      <text dx="170" dy="64" fill="#aaa" stroke="transparent" font-size="16" id="1960" text-anchor='middle' style='font-family: Oswald; font-size: 13px;'>1960</text>
+      <text dx="201.2" dy="64" fill="#aaa" stroke="transparent" font-size="16" id="1960" text-anchor='middle' style='font-family: Oswald; font-size: 13px;'>1961</text>
+      <text dx="232.4" dy="64" fill="#aaa" stroke="transparent" font-size="16" id="1960" text-anchor='middle' style='font-family: Oswald; font-size: 13px;'>1962</text>
+
+   <g class="bars" transform='translate(0 -20) scale(1.02 0.3)'>
+      <g>
+         <rect x="3" y="212.6798841767547" width="12.199725" height="26.98678248991197" stroke="transparent" fill-opacity="0.5" stroke-width="1" fill='#A387BE' class="nonwhite bar" id="1955"></rect>
+         <rect x="15.199725" y="222.35784111073355" width="12.199725" height="17.308825555933154" stroke="transparent" fill-opacity="0.5" stroke-width="1" fill='#2CA02C' class="white bar" id="1955"></rect>
+      </g>
+      <g>
+         <rect x="33.39945" y="209.24791005637076" width="12.199725" height="30.418756610295944" stroke="transparent" fill-opacity="0.5" stroke-width="1" fill='#A387BE' class="nonwhite bar" id="1956"></rect>
+         <rect x="45.599175" y="217.7797097869498" width="12.199725" height="21.886956879716863" stroke="transparent" fill-opacity="0.5" stroke-width="1" fill='#2CA02C' class="white bar" id="1956"></rect>
+      </g>
+      <g>
+         <rect x="63.7989" y="185.94576740745617" width="12.199725" height="53.720899259210526" stroke="transparent" fill-opacity="0.5" stroke-width="1" fill='#A387BE' class="nonwhite bar" id="1957"></rect>
+         <rect x="75.998625" y="193.24967151276041" width="12.199725" height="46.41699515390627" stroke="transparent" fill-opacity="0.5" stroke-width="1" fill='#2CA02C' class="white bar" id="1957"></rect>
+      </g>
+      <g>
+         <rect x="94.19835" y="165.1846269783009" width="12.199725" height="74.48203968836576" stroke="transparent" fill-opacity="0.5" stroke-width="1" fill='#A387BE' class="nonwhite bar" id="1958"></rect>
+         <rect x="106.398075" y="179.65721159670557" width="12.199725" height="60.009455069961106" stroke="transparent" fill-opacity="0.5" stroke-width="1" fill='#2CA02C' class="white bar" id="1958"></rect>
+      </g>
+      <g>
+         <rect x="124.5978" y="152.8422389812318" width="12.199725" height="86.8244276854349" stroke="transparent" fill-opacity="1" stroke-width="1" fill='#A387BE' class="nonwhite bar" id="1959"></rect>
+         <rect x="136.797525" y="175.5850722922799" width="12.199725" height="64.08159437438677" stroke="transparent" fill-opacity="1" stroke-width="1" fill='#2CA02C' class="white bar" id="1959"></rect>
+      </g>
+      <g>
+         <rect x="154.99725" y="133.03417717320616" width="12.199725" height="106.63248949346054" stroke="transparent" fill-opacity="0.5" stroke-width="1" fill='#A387BE' class="nonwhite bar" id="1960"></rect>
+         <rect x="167.196975" y="154.84684840656817" width="12.199725" height="84.81981826009851" stroke="transparent" fill-opacity="0.5" stroke-width="1" fill='#2CA02C' class="white bar" id="1960"></rect>
+      </g>
+      <g>
+         <rect x="185.3967" y="113.2029719252674" width="12.199725" height="126.46369474139928" stroke="transparent" fill-opacity="0.5" stroke-width="1" fill='#A387BE' class="nonwhite bar" id="1961"></rect>
+         <rect x="197.596425" y="142.44519788780968" width="12.199725" height="97.22146877885699" stroke="transparent" fill-opacity="0.5" stroke-width="1" fill='#2CA02C' class="white bar" id="1961"></rect>
+      </g>
+      <g>
+         <rect x="215.79615" y="104.31895410095657" width="12.199725" height="135.3477125657101" stroke="transparent" fill-opacity="0.5" stroke-width="1" fill='#A387BE' class="nonwhite bar" id="1962"></rect>
+         <rect x="227.995875" y="125.01165301487393" width="12.199725" height="114.65501365179276" stroke="transparent" fill-opacity="0.5" stroke-width="1" fill='#2CA02C' class="white bar" id="1962"></rect>
+      </g>
+      <g>
+         <rect x="246.1956" y="101.1187779297295" width="12.199725" height="138.54788873693718" stroke="transparent" fill-opacity="0.5" stroke-width="1" fill='#A387BE' class="nonwhite bar" id="1963"></rect>
+         <rect x="258.395325" y="120.39274994249996" width="12.199725" height="119.27391672416672" stroke="transparent" fill-opacity="0.5" stroke-width="1" fill='#2CA02C' class="white bar" id="1963"></rect>
+      </g>
+      <g>
+         <rect x="276.59505" y="91.11502602726733" width="12.199725" height="148.55164063939935" stroke="transparent" fill-opacity="1" stroke-width="1" fill='#A387BE' class="nonwhite bar" id="1964"></rect>
+         <rect x="288.794775" y="111.22284256632065" width="12.199725" height="128.44382410034603" stroke="transparent" fill-opacity="1" stroke-width="1" fill='#2CA02C' class="white bar" id="1964"></rect>
+      </g>
+      <g>
+         <rect x="306.9945" y="91.47953520589957" width="12.199725" height="148.18713146076712" stroke="transparent" fill-opacity="0.5" stroke-width="1" fill='#A387BE' class="nonwhite bar" id="1965"></rect>
+         <rect x="319.194225" y="111.9804498787719" width="12.199725" height="127.68621678789478" stroke="transparent" fill-opacity="0.5" stroke-width="1" fill='#2CA02C' class="white bar" id="1965"></rect>
+      </g>
+      <g>
+         <rect x="337.39395" y="20" width="12.199725" height="219.66666666666669" stroke="transparent" fill-opacity="0.5" stroke-width="1" fill='#A387BE' class="nonwhite bar" id="1966"></rect>
+         <rect x="349.593675" y="43.860116907325875" width="12.199725" height="195.8065497593408" stroke="transparent" fill-opacity="0.5" stroke-width="1" fill='#2CA02C' class="white bar" id="1966"></rect>
+      </g>
+   </g>
+
+
+
+
+
+
+</svg>

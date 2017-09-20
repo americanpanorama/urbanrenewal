@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg
+  version="1.1" 
+  xmlns="http://www.w3.org/2000/svg" 
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  width='250'
+  height='65'
+>
+  <style type="text/css">
+      @import url('https://fonts.googleapis.com/css?family=Oswald:200|Roboto+Condensed:400');
+   </style>
+
+
+
+   <rect
+    x='90'
+    y='6'
+    width='130'
+    height='10'
+    fill='#A387BE'
+  />
+
+   <rect
+    x='220'
+    y='6'
+    width='30'
+    height='10'
+    fill='#2CA02C'
+  />
+
+
+
+   <rect
+    x='90'
+    y='28'
+    width='80'
+    height='10'
+    fill='#800000'
+  />
+
+   <rect
+    x='170'
+    y='28'
+    width='80'
+    height='10'
+    fill='#00AAAA'
+  />
+
+
+   <rect
+    x='90'
+    y='50'
+    width='32'
+    height='10'
+    fill='#8B4600'
+  />
+
+   <rect
+    x='122'
+    y='50'
+    width='24'
+    height='10'
+    fill='#00008B'
+  />
+
+   <rect
+    x='146'
+    y='50'
+    width='64'
+    height='10'
+    fill='#AAAA00'
+  />
+
+   <rect
+    x='210'
+    y='50'
+    width='40'
+    height='10'
+    fill='#8B008B'
+  />
+
+  <g transform='translate(45 11)'>
+    <text
+      x="0"
+      y='0'
+      text-anchor='middle'
+      alignment-baseline='central'
+      fill='white'
+      style='font-family: Oswald; font-size: 13px;'
+    >
+      families displaced
+    </text>
+  </g>
+
+  <g transform='translate(45 33)'>
+    <text
+      x="0"
+      y='0'
+      text-anchor='middle'
+      alignment-baseline='central'
+      fill='white'
+      style='font-family: Oswald; font-size: 13px;'
+    >
+      housing units razed
+    </text>
+  </g>
+
+  <g transform='translate(45 55)'>
+    <text
+      x="0"
+      y='0'
+      text-anchor='middle'
+      alignment-baseline='central'
+      fill='white'
+      style='font-family: Oswald; font-size: 13px;'
+    >
+      acres redeveloped
+    </text>
+  </g>
+
+
+
+
+
+
+
+</svg>

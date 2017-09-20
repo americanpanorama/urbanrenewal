@@ -31,6 +31,8 @@ import TypeAheadCitySnippet from './components/search/TypeAheadCitySnippet.jsx';
   // timeline
 import TimelineYearComponent from './components/TimelineYearComponent.jsx';
 
+import IntroModal from './components/IntroModalComponent.jsx';
+
 // utils
 import { AppActions, AppActionTypes } from './utils/AppActionCreator';
 import AppDispatcher from './utils/AppDispatcher';
@@ -45,13 +47,14 @@ export default class App extends React.Component {
       legendVisible: true,
       scatterplotExplanationVisible: true,
       searching: false,
-      initialCityLoading: false
+      initialCityLoading: false,
+      showIntroModal: false // window.localStorage.getItem('hasViewedIntroModal-renewal') !== 'true',
     };
 
     this.coords = {};
 
     // bind handlers
-    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle', 'onProjectInspected', 'onProjectOut', 'onSearching', 'onProjectMapHover', 'onProjectSelected', 'onProjectMapUnhover','onSearchBlur','onCloseSearch','toggleScatterplotExplanationVisibility'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle', 'onProjectInspected', 'onProjectOut', 'onSearching', 'onProjectMapHover', 'onProjectSelected', 'onProjectMapUnhover','onSearchBlur','onCloseSearch','toggleScatterplotExplanationVisibility','onDismissIntroModal'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
 
     console.time('update');
@@ -128,6 +131,15 @@ export default class App extends React.Component {
     this.refs.typeahead.setEntryText('');
     this.setState({ searching: false });
     AppActions.citiesHighlighted([]);
+  }
+
+  onDismissIntroModal (persist) {
+    if (persist) {
+      window.localStorage.setItem('hasViewedIntroModal-executiveabroad', 'true');
+    }
+    this.setState({
+      showIntroModal: false
+    });
   }
 
   onHOLCToggle() { AppActions.HOLCToggle(!CitiesStore.getHOLCSelected()); }
@@ -276,118 +288,59 @@ export default class App extends React.Component {
                 <h2> Urban Renewal, Family Displacements, and Race 1955-1966</h2>
               </header>
 
-              <div 
-                className='mainPanel row template-tile' 
-                { ...DimensionsStore.getMainPanelDimensions() }
-              >
+              { (!this.state.showIntroModal) ?
+                <div 
+                  className='mainPanel row template-tile' 
+                  { ...DimensionsStore.getMainPanelDimensions() }
+                >
 
-                { (CitiesStore.getSelectedCity()) ? 
-                  <div>
-                    <CityMap
-                      { ...CitiesStore.getVisibleCitiesDetails() }
-                      cityData= { CitiesStore.getCityData(CitiesStore.getSelectedCity()) }
-                      //visibleCityIds = { CitiesStore.getVisibleCityIds() }
-                      { ...GeographyStore.getLatLngZoom() }
-                      maxForYear={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).maxDisplacmentsForYear }
-                      onMoveend={ this.onCityMapMove }
-                      onCitySelected={ this.onCityClicked }
-                      onCityHover={ this.onCityInspected }
-                      onCityOut={ this.onCityOut }
-                      onProjectHover={ this.onProjectMapHover }
-                      onProjectUnhover={ this.onProjectMapUnhover }
-                      onProjectClick={ this.onProjectSelected }
-                      HOLCSelected={ CitiesStore.getHOLCSelected() }
-                      inspectedCity={ CitiesStore.getInspectedCity() }
-                      inspectedProject={ CitiesStore.getInspectedProject() }
-                      inspectedProjectStats={ CitiesStore.getHighlightedProject() }
-                      ref='cityMap'
-                    />
-
-                    <button
-                      className='resetView city'
-                      onClick={ this.resetView }
-                    >
-                      <img src='static/us-outline.svg' />
-                    </button>
-
-                    { (!CitiesStore.getHOLCSelected() && CitiesStore.hasDemographicData(CitiesStore.getSelectedCity()) && this.state.legendVisible) ? 
-                      <LegendRaceAndIncome /> : ''
-                    }
-
-                    { (CitiesStore.getHOLCSelected() && CitiesStore.hasHOLCData(CitiesStore.getSelectedCity()) && this.state.legendVisible) ? 
-                      <LegendHOLC 
-                        miurl={ 'https://dsl.richmond.edu/panorama/redlining/#loc=' + [GeographyStore.getLatLngZoom().zoom, GeographyStore.getLatLngZoom().lat, GeographyStore.getLatLngZoom().lng].join('/') + "&opacity=0" }
-                        city={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).city }
-                      /> : ''
-                    }
-
-                    { (CitiesStore.hasHOLCData(CitiesStore.getSelectedCity())) ?
-                      <CityMapControls 
-                       holcSelected={ CitiesStore.getHOLCSelected() }
-                       onHOLCToggle={ this.onHOLCToggle }
-                      /> : ''
-                    }
-
-                    <div 
-                      className='hideLegend'
-                      onClick={ this.toggleLegendVisibility }
-                    >
-                      { (this.state.legendVisible) ? '⇲ hide legend' : '⇱ show legend' }
-                    </div>
-                  </div>
-                  : (!this.state.initialCityLoading) ? 
+                  { (CitiesStore.getSelectedCity()) ? 
                     <div>
-                      <MapChart
-                        { ...GeographyStore.getXYZ() }
-                        selectedView= { CitiesStore.getSelectedView() }
-                        highlightedCities={ CitiesStore.getHighlightedCities() }
-                        onCityClicked={ this.onCityClicked }
-                        onStateClicked={ this.zoomToState }
-                        onViewSelected={ this.onViewSelected }
+                      <CityMap
+                        { ...CitiesStore.getVisibleCitiesDetails() }
+                        cityData= { CitiesStore.getCityData(CitiesStore.getSelectedCity()) }
+                        //visibleCityIds = { CitiesStore.getVisibleCityIds() }
+                        { ...GeographyStore.getLatLngZoom() }
+                        maxForYear={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).maxDisplacmentsForYear }
+                        onMoveend={ this.onCityMapMove }
+                        onCitySelected={ this.onCityClicked }
                         onCityHover={ this.onCityInspected }
                         onCityOut={ this.onCityOut }
-                        resetView={ this.resetView }
-                        onMapClicked={ this.onZoomIn }
-                        handleMouseDown={ this.handleMouseDown }
-                        handleMouseMove={ this.handleMouseMove }
-                        handleMouseUp={ this.handleMouseUp }
+                        onProjectHover={ this.onProjectMapHover }
+                        onProjectUnhover={ this.onProjectMapUnhover }
+                        onProjectClick={ this.onProjectSelected }
+                        HOLCSelected={ CitiesStore.getHOLCSelected() }
+                        highlightedCity={ CitiesStore.getHighlightedCity() }
+                        inspectedCity={ CitiesStore.getInspectedCity() }
+                        inspectedProject={ CitiesStore.getInspectedProject() }
+                        inspectedProjectStats={ CitiesStore.getHighlightedProject() }
+                        selectedYear={ CitiesStore.getSelectedYear() }
+                        ref='cityMap'
                       />
 
-                      { (CitiesStore.getSelectedView() == 'scatterplot') ?
-                          <div className='scatterplotExplanation'>
-                            { (this.state.scatterplotExplanationVisible) ?
-                              <p>James Baldwin famously characterized urban renewal as "Negro removal," a point made too by this chart. Most cities fall below the orange line because they displaced families of color disproportionately relative to their overall population. For example, the bottom left of the graph shows cities like <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('cincinnatiOH')}>Cincinnati</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('norfolkVA')}>Norfolk</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('clevelandOH')}>Cleveland</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('saintlouisMO')}>St. Louis</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('philadelphiaPA')}>Philadelphia</span>, and <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('detroitMI')}>Detroit</span> where people of color were 20% to 30% of the overall population but made up two-thirds or more of those displaced. On the far right are usually smaller white cities with tiny populations of color. With people of color being less than 10% of those cities populations, though the majority of families displaced were white, families of color were still <em>disproportionately</em> displaced by most of these cities. For example, while 96% of the families displaced in <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('scrantonPA')}>Scranton</span> were white, more than 99% of the population was white.
-                              </p> : ''
-                            }
-                            <div 
-                              className='hideExplanation'
-                              onClick={ this.toggleScatterplotExplanationVisibility }
-                            >
-                              { (this.state.scatterplotExplanationVisible) ? '↙ hide explanation' : '↗ show explanation' }
-                            </div>
-                          </div> : ''
+                      <button
+                        className='resetView city'
+                        onClick={ this.resetView }
+                      >
+                        <img src='static/us-outline.svg' />
+                      </button>
+
+                      { (!CitiesStore.getHOLCSelected() && this.state.legendVisible) ? 
+                        <LegendRaceAndIncome selectedYear={ CitiesStore.getSelectedYear() } /> : ''
                       }
 
-                      
+                      { (CitiesStore.getHOLCSelected() && CitiesStore.hasHOLCData(CitiesStore.getSelectedCity()) && this.state.legendVisible) ? 
+                        <LegendHOLC 
+                          miurl={ 'https://dsl.richmond.edu/panorama/redlining/#loc=' + [GeographyStore.getLatLngZoom().zoom, GeographyStore.getLatLngZoom().lat, GeographyStore.getLatLngZoom().lng].join('/') + "&opacity=0" }
+                          city={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).city }
+                          selectedYear={ CitiesStore.getSelectedYear() }
+                        /> : ''
+                      }
 
-                      <ZoomControls
-                        onZoomIn={ this.onZoomIn }
-                        onZoomOut={ this.zoomOut }
-                        resetView={ this.resetView }
-                      />
-
-                      <VizControls
-                        selectedView={ CitiesStore.getSelectedView() }
-                        onViewSelected={ this.onViewSelected }
-                      />
-
-                      { (this.state.legendVisible) ?
-                        <Legend
-                          poc={ CitiesStore.getPOC() }
-                          selectedYear={ CitiesStore.getSelectedYear() || '1955-1966' }
-                          dorlingScale={ (CitiesStore.getSelectedView() == 'cartogram') ? GeographyStore.getZ() : 1 }
-                          dorlingIncrements={ DimensionsStore.getLegendDimensionsIntervals() }
-                          onDragUpdate={ this.onDragUpdate }
+                      { (CitiesStore.hasHOLCData(CitiesStore.getSelectedCity())) ?
+                        <CityMapControls 
+                         holcSelected={ CitiesStore.getHOLCSelected() }
+                         onHOLCToggle={ this.onHOLCToggle }
                         /> : ''
                       }
 
@@ -397,11 +350,75 @@ export default class App extends React.Component {
                       >
                         { (this.state.legendVisible) ? '⇲ hide legend' : '⇱ show legend' }
                       </div>
-                    </div> : ''
-                }
+                    </div>
+                    : (!this.state.initialCityLoading) ? 
+                      <div>
+                        <MapChart
+                          { ...GeographyStore.getXYZ() }
+                          selectedView= { CitiesStore.getSelectedView() }
+                          highlightedCities={ CitiesStore.getHighlightedCities() }
+                          onCityClicked={ this.onCityClicked }
+                          onStateClicked={ this.zoomToState }
+                          onViewSelected={ this.onViewSelected }
+                          onCityHover={ this.onCityInspected }
+                          onCityOut={ this.onCityOut }
+                          resetView={ this.resetView }
+                          onMapClicked={ this.onZoomIn }
+                          handleMouseDown={ this.handleMouseDown }
+                          handleMouseMove={ this.handleMouseMove }
+                          handleMouseUp={ this.handleMouseUp }
+                        />
 
-              </div> 
-            </div>
+                        { (CitiesStore.getSelectedView() == 'scatterplot') ?
+                            <div className='scatterplotExplanation'>
+                              { (this.state.scatterplotExplanationVisible) ?
+                                <p>James Baldwin famously characterized urban renewal as "Negro removal," a point made too by this chart. Most cities fall below the orange line because they displaced families of color disproportionately relative to their overall population. For example, the bottom left of the graph shows cities like <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('cincinnatiOH')}>Cincinnati</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('norfolkVA')}>Norfolk</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('clevelandOH')}>Cleveland</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('saintlouisMO')}>St. Louis</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('philadelphiaPA')}>Philadelphia</span>, and <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('detroitMI')}>Detroit</span> where people of color were 20% to 30% of the overall population but made up two-thirds or more of those displaced. On the far right are usually smaller white cities with tiny populations of color. With people of color being less than 10% of those cities populations, though the majority of families displaced were white, racial disparities still characterized urban renewal in most of these citeis as well. For example, while 96% of the families displaced in <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('scrantonPA')}>Scranton</span> were white, more than 99% of the population was white.
+                                </p> : ''
+                              }
+                              <div 
+                                className='hideExplanation'
+                                onClick={ this.toggleScatterplotExplanationVisibility }
+                              >
+                                { (this.state.scatterplotExplanationVisible) ? '↙ hide explanation' : '↗ show explanation' }
+                              </div>
+                            </div> : ''
+                        }
+
+                        
+
+                        <ZoomControls
+                          onZoomIn={ this.onZoomIn }
+                          onZoomOut={ this.zoomOut }
+                          resetView={ this.resetView }
+                        />
+
+                        <VizControls
+                          selectedView={ CitiesStore.getSelectedView() }
+                          onViewSelected={ this.onViewSelected }
+                        />
+
+                        { (this.state.legendVisible) ?
+                          <Legend
+                            poc={ CitiesStore.getPOC() }
+                            selectedYear={ CitiesStore.getSelectedYear() || '1955-1966' }
+                            dorlingScale={ (CitiesStore.getSelectedView() == 'cartogram') ? GeographyStore.getZ() : 1 }
+                            dorlingIncrements={ DimensionsStore.getLegendDimensionsIntervals() }
+                            onDragUpdate={ this.onDragUpdate }
+                          /> : ''
+                        }
+
+                        <div 
+                          className='hideLegend'
+                          onClick={ this.toggleLegendVisibility }
+                        >
+                          { (this.state.legendVisible) ? '⇲ hide legend' : '⇱ show legend' }
+                        </div>
+                      </div> : ''
+                  }
+
+                </div> : ''
+              }
+            </div> 
           </div>
 
         <aside
@@ -480,6 +497,8 @@ export default class App extends React.Component {
               ref='closeSearch'
             >X</div> : ''
           }
+
+          { this.state.showIntroModal ? <IntroModal onDismiss={ this.onDismissIntroModal } /> : '' }
 
 
         </div>

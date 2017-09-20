@@ -30,6 +30,9 @@ export default class LegendGradient extends React.Component {
           {/* category labels */}
           <text { ...DimensionsStore.getLegendGradientPOCLabelAttrs() }>of color</text>
           <text { ...DimensionsStore.getLegendGradientWhitesLabelAttrs() }>white</text>
+          <text { ...DimensionsStore.getLegendGradientNoRaceLabelAttrs() }>no racial data collected</text>
+
+
 
           {/* percent labels */}
           <g>
@@ -80,6 +83,11 @@ export default class LegendGradient extends React.Component {
               /> :
               ''
             }
+
+            <rect 
+              { ...DimensionsStore.getLegendGradientNoRaceBoxAttrs() }
+              fill='#E18942'
+            />
 
             {/* top and bottom handles */}
             { (!this.props.percent) ? 

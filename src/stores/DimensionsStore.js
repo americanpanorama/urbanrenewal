@@ -165,6 +165,18 @@ const DimensionsStore = {
     };
   },
 
+  getLegendGradientNoRaceLabelAttrs: function() {
+    return {
+      x: this.getLegendGradientPercentX(1) + this.data.legendGradientHeightQuints + 5, 
+      y: this.data.legendGradientHeightQuints * 5,
+      fontSize: this.data.dorlingsMaxRadius / 3,
+      textAnchor: 'start',
+      alignmentBaseline: 'hanging'
+    };
+  },
+
+
+
   getLegendGradientPOC0Attrs: function() {
     return {
       x: this.getLegendGradientPercentX(0), 
@@ -192,6 +204,15 @@ const DimensionsStore = {
       fontSize: this.data.dorlingsMaxRadius / 3,
       textAnchor: 'end',
       alignmentBaseline: 'hanging'
+    };
+  },
+
+  getLegendGradientNoRaceBoxAttrs: function() {
+    return {
+      x: DimensionsStore.getLegendGradientPercentX(1),
+      y: this.data.legendGradientHeightQuints * 5,
+      width: this.data.legendGradientHeightQuints,
+      height: this.data.legendGradientHeightQuints
     };
   },
 
@@ -387,7 +408,7 @@ const DimensionsStore = {
 
   getMainTimelineBarAttrs: function(year, race) {
     return {
-      x: (race == 'whites') ? this.getMainTimlineXOffset(year) : this.getMainTimlineXOffset(year) - this.getMainTimelineBarWidth(),
+      x: (race == 'whites') ? this.getMainTimlineXOffset(year) - this.getMainTimelineBarWidth() / 2 : (race == 'nonwhite') ? this.getMainTimlineXOffset(year) - 1.5 * this.getMainTimelineBarWidth() : this.getMainTimlineXOffset(year) + this.getMainTimelineBarWidth() / 2,
       y: this.getMainTimelineBarY(year, race),
       width: this.getMainTimelineBarWidth(),
       height: this.getMainTimelineBarHeight(year, race),
@@ -397,6 +418,19 @@ const DimensionsStore = {
       //key: 'bar' + year
     };
   },
+
+  // getMainTimelineBarAttrs: function(year, race) {
+  //   return {
+  //     x: (race == 'whites') ? this.getMainTimlineXOffset(year) : this.getMainTimlineXOffset(year) - this.getMainTimelineBarWidth(),
+  //     y: this.getMainTimelineBarY(year, race),
+  //     width: this.getMainTimelineBarWidth(),
+  //     height: this.getMainTimelineBarHeight(year, race),
+  //     stroke: (year == CitiesStore.getSelectedYear()) ? 'transparent' : 'transparent',
+  //     fillOpacity: (year == CitiesStore.getSelectedYear() || CitiesStore.getSelectedYear() == null) ? 1 : 0.3,
+  //     strokeWidth: 1,
+  //     //key: 'bar' + year
+  //   };
+  // },
 
   // 90% of the height
   getMainTimelineBarBottom: function() { return this.getTimelineAttrs().height - this.data.containerPadding ; },
@@ -410,7 +444,7 @@ const DimensionsStore = {
 
   getMainTimelineYearWidth: function() { return this.getMainTimelineBarFieldWidth() / (1966-1954); },
   
-  getMainTimelineBarWidth: function() { return this.getMainTimelineYearWidth() / 2 - 3; },
+  getMainTimelineBarWidth: function() { return this.getMainTimelineYearWidth() / 3 - 1.5; },
 
   getMainTimelineBarXOffset: function(year) {  return (year == 1955) ? 0 : this.getMainTimlineXOffset(year) + this.getMainTimelineBarWidth() / 6; },
 

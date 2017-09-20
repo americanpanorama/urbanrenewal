@@ -8,7 +8,7 @@ import DimensionsStore from '../../stores/DimensionsStore';
 import GeographyStore from '../../stores/GeographyStore';
 
 // components
-import { Map, TileLayer, GeoJSON, Tooltip, LayerGroup, Marker, CircleMarker} from 'react-leaflet';
+import { Map, TileLayer, GeoJSON, Tooltip, LayerGroup, Marker, CircleMarker, Rectangle} from 'react-leaflet';
 import UrbanRenewalPolygon from './UrbanRenewalPolygon.jsx';
 
 export default class CityMap extends React.Component {
@@ -74,6 +74,12 @@ export default class CityMap extends React.Component {
           if (a.type=='city' && b.type=='project') {
             return 1;
           } 
+          if (a.type=='project' && b.type=='project' && this.props.selectedYear && this.props.projects[a.id].start_year <= this.props.selectedYear && this.props.projects[a.id].end_year >= this.props.selectedYear && (this.props.projects[b.id].start_year > this.props.selectedYear || this.props.projects[b.id].end_year < this.props.selectedYear)) {
+            return -1;
+          }
+          if (a.type=='project' && b.type=='project' && this.props.selectedYear && this.props.projects[b.id].start_year <= this.props.selectedYear && this.props.projects[b.id].end_year >= this.props.selectedYear && (this.props.projects[a.id].start_year > this.props.selectedYear || this.props.projects[a.id].end_year < this.props.selectedYear)) {
+            return 1;
+          }
           if (a.type=='project' && b.type=='project') {
             return this.props.projects[b.id].totalFamilies - this.props.projects[a.id].totalFamilies;
           } else {
@@ -216,7 +222,7 @@ export default class CityMap extends React.Component {
               return (
                 <CircleMarker
                   center={[ cityData.lat, cityData.lng ]}
-                  radius={ Math.max(DimensionsStore.getDorlingRadius(cityData.totalFamilies) * 3, 10) }
+                  radius={ Math.max(DimensionsStore.getDorlingRadius(cityData.totalFamilies, {useAll: true}) * 3, 10) }
                   weight={ 0 }
                   fillColor={ getColorForRace(cityData.percentFamiliesOfColor) }
                   fillOpacity={ 0.8 }
@@ -242,7 +248,10 @@ export default class CityMap extends React.Component {
                     ref={ 'labelForCity' + cityData.city_id }
                   >
                     <span
-
+                      style={ {
+                        color: (this.props.inspectedProject || (this.props.inspectedCity && this.props.inspectedCity !== cityData.city_id)) ?  'grey' : 'black',
+                        opacity: (this.props.inspectedProject || (this.props.inspectedCity && this.props.inspectedCity !== cityData.city_id)) ? 0.5 : 1
+                      } }
                     >
                       { cityData.city.toUpperCase() }
                       <br />
@@ -274,8 +283,8 @@ export default class CityMap extends React.Component {
                       id={ projectId }
                       style={ {
                         weight: 3,
-                        color: (this.props.inspectedProject == projectId || this.props.inspectedProject == null) ?  '#5B3000' : 'grey',
-                        //dashArray: '5, 5',
+                        color: ((this.props.highlightedCity && this.props.highlightedCity == this.props.projects[projectId].city_id) &&  (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId || (this.props.inspectedProject == null && this.props.inspectedProjectStats == null))) ?  '#5B3000' : 'grey',
+                        dashArray: (!this.props.selectedYear || (this.props.projects[projectId].start_year <= this.props.selectedYear && this.props.projects[projectId].end_year >= this.props.selectedYear)) ? 'none' : (this.props.projects[projectId].start_year <= this.props.selectedYear) ? '2, 2' : '5, 10',
                         fillColor: (this.props.projects[projectId].totalFamilies) ?getColorForRace(this.props.projects[projectId].percentFamiliesOfColor) : '#eee',
                         fillOpacity: (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId) ? 1 : 0,
                       } }
@@ -293,6 +302,10 @@ export default class CityMap extends React.Component {
                           <span
                             onClick={ this.props.onProjectHover }
                             id={ projectId }
+                            style={ {
+                              color: ((this.props.highlightedCity && this.props.highlightedCity == this.props.projects[projectId].city_id) &&  (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId || (this.props.inspectedProject == null && this.props.inspectedProjectStats == null))) ?  'black' : 'grey',
+                              opacity: (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId || (this.props.inspectedProject == null && this.props.inspectedProjectStats == null)) ? 1 : 0.5
+                            } }
                           >
                             {this.props.projects[projectId].project.replace(/\b\w/g, l => l.toUpperCase())}
                             <br />

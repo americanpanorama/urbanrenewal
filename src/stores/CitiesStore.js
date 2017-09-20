@@ -61,7 +61,7 @@ const CitiesStore = {
         format: 'JSON'
       },
       // data for projects: duration, displacments, etc.
-      { query: "select projects.city_id, projects.project_id, projects.project, st_asgeojson(projects.the_geom) as the_geojson, round(st_xmin(st_envelope(projects.the_geom))::numeric, 3) as bbxmin, round(st_ymin(st_envelope(projects.the_geom))::numeric, 3) as bbymin, round(st_xmax(st_envelope(projects.the_geom))::numeric, 3) as bbxmax, round(st_ymax(st_envelope(projects.the_geom))::numeric, 3) as bbymax, round(st_y(st_centroid(projects.the_geom))::numeric, 3) as centerlat, round(st_x(st_centroid(projects.the_geom))::numeric, 3) as centerlng, duration.start_year, duration.end_year, whites.value as whites, nonwhites.value as nonwhite from urdr_id_key projects left join (SELECT project_id, min(year) as start_year, max(year) as end_year FROM combined_dire_char_raw group by project_id, city_id) duration on projects.project_id = duration.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 71 order by project_id, year desc) whites on whites.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 72 order by project_id, year desc) nonwhites on nonwhites.project_id = projects.project_id",
+      { query: "select projects.city_id, projects.project_id, projects.project, st_asgeojson(projects.the_geom) as the_geojson, round(st_xmin(st_envelope(projects.the_geom))::numeric, 3) as bbxmin, round(st_ymin(st_envelope(projects.the_geom))::numeric, 3) as bbymin, round(st_xmax(st_envelope(projects.the_geom))::numeric, 3) as bbxmax, round(st_ymax(st_envelope(projects.the_geom))::numeric, 3) as bbymax, round(st_y(st_centroid(projects.the_geom))::numeric, 3) as centerlat, round(st_x(st_centroid(projects.the_geom))::numeric, 3) as centerlng, duration.start_year, duration.end_year, whites.value as whites, nonwhites.value as nonwhite, pr.value as pr_total from urdr_id_key projects left join (SELECT project_id, min(year) as start_year, max(year) as end_year FROM combined_dire_char_raw group by project_id, city_id) duration on projects.project_id = duration.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 71 order by project_id, year desc) whites on whites.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 72 order by project_id, year desc) nonwhites on nonwhites.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 80 order by project_id, year desc) pr on pr.project_id = projects.project_id",
         format: 'JSON'
       }
     ]).then((responses) => {
@@ -79,12 +79,12 @@ const CitiesStore = {
         // calculate some additional/aggregate and initialization values 
         r.id = r.city_id;
         r.slug = r.city.replace(/ /g,'').toLowerCase() + r.state.toUpperCase();
-        r.searchName = r.city.replace(/ /g,'') + ' ' + StateAbbrs[r.state.toUpperCase()];
+        r.searchName = r.city + ' ' + StateAbbrs[r.state.toUpperCase()];
         r.center = (r.centerlat !== null) ? [r.centerlat,r.centerlng] : null;
         r.hasProjectGeojson = (r.centerlat !== null);
         r.boundingBox = (r.bbymin !== null) ? [[r.bbymin,r.bbxmin],[r.bbymax,r.bbxmax]] : null;
         r.tractsBoundingBox = (r.tbbymin !== null) ? [[r.tbbymin,r.tbbxmin],[r.tbbymax,r.tbbxmax]] : null;
-        r.detectionBoundingBox = r.boundingBox || r.center || [[r.lat + 0.025, r.lng - 0.025], [r.lat - 0.025, r.lng + 0.025]];
+        r.detectionBoundingBox = r.boundingBox || r.center || [[r.lat + 0.008, r.lng - 0.01], [r.lat - 0.008, r.lng + 0.01]];
         r.projects = {};
         r.yearsData = {};
         r.tracts = {};
@@ -116,8 +116,8 @@ const CitiesStore = {
       responses[2].forEach(r => {
         // calculate some additional/aggregate and initialization values 
         r.the_geojson = JSON.parse(r.the_geojson);
-        r.totalFamilies = r.nonwhite + r.whites;
-        r.percentFamiliesOfColor = r.nonwhite / r.totalFamilies;
+        r.totalFamilies = r.nonwhite + r.whites + r.pr_total;
+        r.percentFamiliesOfColor = (this.data.cities[r.city_id].state !== 'pr' && this.data.cities[r.city_id].state !== 'vi') ? r.nonwhite / r.totalFamilies : null;
         r.yearsData = {};
         r.center = [r.centerlat,r.centerlng];
         r.boundingBox = (r.bbymin) ? [[r.bbymin,r.bbxmin],[r.bbymax,r.bbxmax]] : null;
@@ -136,7 +136,7 @@ const CitiesStore = {
         this.data.cities[r.city_id].whites += r.whites;
         this.data.cities[r.city_id].nonwhite += r.nonwhite;
         this.data.cities[r.city_id].totalFamilies += r.totalFamilies;
-        this.data.cities[r.city_id].percentFamiliesOfColor = this.data.cities[r.city_id].nonwhite / this.data.cities[r.city_id].totalFamilies;
+        this.data.cities[r.city_id].percentFamiliesOfColor = (this.data.cities[r.city_id].state !== 'pr' && this.data.cities[r.city_id].state !== 'vi') ? this.data.cities[r.city_id].nonwhite / this.data.cities[r.city_id].totalFamilies : null;
         if (r.totalFamilies > 0) {
           this.data.cities[r.city_id].projectsWithDisplacements += 1;
         }
@@ -145,13 +145,15 @@ const CitiesStore = {
         for (let aYear = r.start_year; aYear <= r.end_year; aYear += 1) {
           const duration = 1 + Math.min(r.end_year, 1966) - Math.max(r.start_year, 1955),
             whites = r.whites / duration,
-            nonwhite = r.nonwhite / duration;
+            nonwhite = r.nonwhite / duration,
+            prForYear = r.pr_total / duration;
 
           // total up year data
           if (aYear >= 1955 && aYear <= 1966) {
-            this.data.yearsTotals[aYear] = this.data.yearsTotals[aYear] || {whites: 0, nonwhite: 0};
+            this.data.yearsTotals[aYear] = this.data.yearsTotals[aYear] || {whites: 0, nonwhite: 0, unspecified: 0};
             this.data.yearsTotals[aYear].whites += whites;
             this.data.yearsTotals[aYear].nonwhite += nonwhite;
+            this.data.yearsTotals[aYear].unspecified += prForYear;
           }
 
           // aggregate total and year data for city
@@ -164,8 +166,8 @@ const CitiesStore = {
           }
           this.data.cities[r.city_id].yearsData[aYear].whites += whites;
           this.data.cities[r.city_id].yearsData[aYear].nonwhite += nonwhite;
-          this.data.cities[r.city_id].yearsData[aYear].totalFamilies += nonwhite + whites;
-          this.data.cities[r.city_id].yearsData[aYear].percentFamiliesOfColor = this.data.cities[r.city_id].yearsData[aYear].nonwhite /  this.data.cities[r.city_id].yearsData[aYear].totalFamilies;
+          this.data.cities[r.city_id].yearsData[aYear].totalFamilies += (this.data.cities[r.city_id].state !== 'pr' && this.data.cities[r.city_id].state !== 'vi') ? nonwhite + whites : prForYear;
+          this.data.cities[r.city_id].yearsData[aYear].percentFamiliesOfColor = (this.data.cities[r.city_id].state !== 'pr' && this.data.cities[r.city_id].state !== 'vi') ? this.data.cities[r.city_id].yearsData[aYear].nonwhite /  this.data.cities[r.city_id].yearsData[aYear].totalFamilies : null;
 
           this.data.cities[r.city_id].projects[r.project_id].yearsData[aYear] = (this.data.cities[r.city_id].projects[r.project_id].yearsData[aYear]) ? this.data.cities[r.city_id].projects[r.project_id].yearsData[aYear] : {};
           this.data.cities[r.city_id].projects[r.project_id].yearsData[aYear].whites = r.whites / duration;
@@ -177,6 +179,13 @@ const CitiesStore = {
           this.data.cities[r.city_id].maxDisplacmentsForYear = (this.data.cities[r.city_id].projects[r.project_id].yearsData[aYear].totalFamilies  > this.data.cities[r.city_id].maxDisplacmentsForYear) ? this.data.cities[r.city_id].projects[r.project_id].yearsData[aYear].totalFamilies : this.data.cities[r.city_id].maxDisplacmentsForYear;
         }
       }); 
+
+      // filter out cities without displacements
+      Object.keys(this.data.cities).forEach(id => {
+        if (this.data.cities[id].totalFamilies == 0) {
+          delete this.data.cities[id];
+        }
+      });
 
       // calculate max displacments in any city in a particular year
       this.data.maxDisplacementsInCityForYear = 0;
@@ -201,8 +210,26 @@ const CitiesStore = {
       this.data.loaded = true;
       this.data.yearsLoaded.push(year);
 
-      // var citiesForDorlingProcessing = Object.keys(this.data.cities).map(id=> { return {city_id: id, lat: this.data.cities[id].lat, lng: this.data.cities[id].lng, yearsData: this.data.cities[id].yearsData}; });
-      // console.log(citiesForDorlingProcessing);
+      // let projectNames = [];
+      // Object.keys(this.data.cities).forEach(id => {
+      //   Object.keys(this.data.cities[id].projects).forEach(projectId => {
+      //     projectNames.push(this.data.cities[id].projects[projectId].project);
+      //   });
+      // });
+      // console.log(projectNames);
+
+      var citiesForDorlingProcessing = Object.keys(this.data.cities).map(id=> { return {city_id: id, lat: this.data.cities[id].lat, lng: this.data.cities[id].lng, yearsData: this.data.cities[id].yearsData}; });
+      citiesForDorlingProcessing.forEach(cityData => {
+        cityData.yearsData['all'] = {
+          whites: this.data.cities[cityData.city_id].whites,
+          nonwhite: this.data.cities[cityData.city_id].nonwhite,
+          totalFamilies: this.data.cities[cityData.city_id].totalFamilies,
+          percentFamiliesOfColor: this.data.cities[cityData.city_id].percentFamiliesOfColor
+        };
+      });
+      console.log(citiesForDorlingProcessing);
+
+      console.log(this.data.cities[this.getCityIdFromSlug('sanjuanPR')]);
 
       this.emit(AppActionTypes.storeChanged);
     });
@@ -224,7 +251,7 @@ const CitiesStore = {
         format: 'JSON'
       },
       {
-        query: "select ST_asgeojson(the_geom, 4) as the_geojson, holc_grade from holc_polygons where ad_id in (select ad_id from holc_polygons join (select city_id, st_envelope(st_collect(the_geom)) as the_geom from urdr_id_key where city_id = " + city_id + " and the_geom is not null group by city_id) projects on st_intersects(projects.the_geom, holc_polygons.the_geom) group by ad_id)",
+        query: "select ST_asgeojson(the_geom, 4) as the_geojson, holc_grade, neighborhood_id from holc_polygons where ad_id in (select ad_id from holc_polygons join (select city_id, st_envelope(st_collect(the_geom)) as the_geom from urdr_id_key where city_id = " + city_id + " and the_geom is not null group by city_id) projects on st_intersects(projects.the_geom, holc_polygons.the_geom) group by ad_id)",
         format: 'JSON'
       },
       // full category data
@@ -249,7 +276,8 @@ const CitiesStore = {
       responses[2].forEach(response => {
         this.data.cities[city_id].holc_areas.push({
           the_geojson: JSON.parse(response.the_geojson),
-          grade: response.holc_grade
+          grade: response.holc_grade,
+          neighborhood_id: response.neighborhood_id
         });
       });
 
@@ -304,6 +332,25 @@ const CitiesStore = {
   },
 
   loadVisibleCities: function() {
+    // a couple utility functions from https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
+    const getDistanceFromLatLonInKm = function(lat1,lon1,lat2,lon2) {
+      var R = 6371; // Radius of the earth in km
+      var dLat = deg2rad(lat2-lat1);  // deg2rad below
+      var dLon = deg2rad(lon2-lon1); 
+      var a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2)
+        ; 
+      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+      var d = R * c; // Distance in km
+      return d;
+    };
+    const deg2rad = function(deg) {
+      return deg * (Math.PI/180);
+    };
+    const previousSelectedCity = this.data.setSelectedCity;
+
     // stop if the map just initialized but hasn't reloaded to city cooprdinate
     if (GeographyStore.getLatLngZoom().lat == 0) {
       return;
@@ -329,13 +376,31 @@ const CitiesStore = {
     if (this.data.visibleCitiesIds.length == 1 && this.data.selectedCity !== this.data.visibleCitiesIds[0]) {
       this.setSelectedCity(this.data.visibleCitiesIds[0]);
     }
+
+    // or reset if to the nearest city if the current selection has moved offscreen
+    else if (this.data.visibleCitiesIds.length > 0 && !this.data.visibleCitiesIds.includes(this.data.selectedCity)) {
+      this.setSelectedCity(this.data.visibleCitiesIds[0]);
+      const theCenter = (previousSelectedCity && this.getCityData[previousSelectedCity].lat) ? [this.getCityData[previousSelectedCity].lat, this.getCityData[previousSelectedCity].lng] : GeographyStore.getTheMap().getCenter(),
+        closestToCenterIndex = this.data.visibleCitiesIds
+          .reduce((smallestSoFar, cityId, i) => {
+            let dist = getDistanceFromLatLonInKm(theCenter.lat, theCenter.lng, this.getCityData(cityId).lat, this.getCityData(cityId).lng);
+            if (dist < Object.values(smallestSoFar)[0]) {
+              let iDist = {};
+              iDist[i] = dist;
+              return iDist;
+            } else {
+              return smallestSoFar;
+            }
+          }, {'-1': 1000000000});
+      this.setSelectedCity(this.data.visibleCitiesIds[Object.keys(closestToCenterIndex)[0]]);
+    }
   },
 
   assignDorlingXYs: function() {
     DorlingXYs.forEach(yearData => {
       this.data.dorlingXYs[yearData.year] = (!this.data.dorlingXYs[yearData.year]) ? {} : this.data.dorlingXYs[yearData.year];
       yearData.cities.forEach(cityData => {
-        this.data.dorlingXYs[yearData.year][cityData.city_id] = [ cityData.x * DimensionsStore.getMapScale() + DimensionsStore.getNationalMapWidth() / 2, cityData.y * DimensionsStore.getMapScale() + DimensionsStore.getNationalMapHeight() / 2 ];
+        this.data.dorlingXYs[yearData.year][cityData.city_id] = [ cityData.x * DimensionsStore.getMapScale() + DimensionsStore.getNationalMapWidth() / 2, cityData.y * DimensionsStore.getMapScale() + DimensionsStore.getNationalMapHeight() * 12.5/31 ];
       });
     });
     this.emit(AppActionTypes.storeChanged);
@@ -360,11 +425,9 @@ const CitiesStore = {
   },
 
   setInspectedProject: function(project_id) {
-    console.log(project_id);
     this.data.inspectedProject = project_id;
     if (project_id) {
       this.data.inspectedCity = this.getCityId(project_id);
-      console.log(this.data.inspectedCity);
     }
     this.emit(AppActionTypes.storeChanged);
   },
@@ -393,7 +456,9 @@ const CitiesStore = {
   setSelectedCity: function(city_id) {
     this.data.selectedCity = city_id;
     // you know it's visible, so set the data for initial rendering
-    this.data.visibleCitiesIds = [parseInt(city_id)];
+    if (!this.data.visibleCitiesIds.includes(parseInt(city_id))) {
+      this.data.visibleCitiesIds = [parseInt(city_id)];
+    }
     this.emit(AppActionTypes.storeChanged);
   },
 
@@ -718,7 +783,8 @@ const CitiesStore = {
       if (cd.city_geom) {
         visibleCitiesSpatialData.cities_geoms.push(cd.city_geom);
       }
-      visibleCitiesSpatialData.holc_areas = visibleCitiesSpatialData.holc_areas.concat(cd.holc_areas);
+      // the filter here removes duplicates for cities that overlap the same HOLC cities
+      visibleCitiesSpatialData.holc_areas = visibleCitiesSpatialData.holc_areas.concat(cd.holc_areas).filter((polygon, index, self) => self.findIndex(t => t.neighborhood_id === polygon.neighborhood_id) === index);
     });
 
     return visibleCitiesSpatialData;

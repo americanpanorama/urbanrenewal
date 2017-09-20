@@ -110,7 +110,7 @@ const GeographyStore = {
   getProjection: function() {
     return this.albersUsaPr()
       .scale(DimensionsStore.getMapScale())
-      .translate([DimensionsStore.getNationalMapWidth()/2, DimensionsStore.getNationalMapHeight()/2]);
+      .translate([DimensionsStore.getNationalMapWidth()/2, DimensionsStore.getNationalMapHeight()*(12.5/31)]);
   },
 
   getX: function() { return this.data.x; },
@@ -271,8 +271,8 @@ const GeographyStore = {
           .stream(pointStream).point;
 
       puertoRicoPoint = puertoRico
-          .translate([x + .150 * k, y + .224 * k])
-          .clipExtent([[x + .120 * k, y + .204 * k], [x + .180 * k, y + .234 * k]])
+          .translate([x + .350 * k, y + .224 * k])
+          .clipExtent([[x + .320 * k, y + .204 * k], [x + .380 * k, y + .234 * k]])
           .stream(pointStream).point;
 
       return albersUsa;

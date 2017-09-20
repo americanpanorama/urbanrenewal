@@ -16,6 +16,52 @@ export default class LegendProjectFootprint extends React.Component {
         height={height}
         className='footprint'
       >
+        { (this.props.selectedYear) ?
+          <g>
+            <line
+              x1={0}
+              x2={20}
+              y1={8}
+              y2={8}
+              strokeWidth={3}
+              stroke='black'
+            />
+
+            <text
+              x={ 24 }
+              y={ 0 }
+              textAnchor='start'
+              alignmentBaseline='hanging'
+              fill='grey'
+              fontStyle='italic'
+            >
+              { 'Active in ' + this.props.selectedYear }
+            </text>
+
+            <line
+              x1={0}
+              x2={20}
+              y1={25}
+              y2={25}
+              strokeWidth={3}
+              stroke='black'
+              strokeDasharray='5, 10'
+            />
+
+            <text
+              x={ 24 }
+              y={ 15 }
+              textAnchor='start'
+              alignmentBaseline='hanging'
+              fill='grey'
+              fontStyle='italic'
+            >
+              { 'Inactive in ' + this.props.selectedYear }
+            </text>
+          </g> : ''
+        }
+
+
         <path 
           stroke="#5B3000" 
           strokeWidth="3" 

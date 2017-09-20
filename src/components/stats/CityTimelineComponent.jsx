@@ -20,7 +20,7 @@ export default class Timeline extends React.Component {
       .filter(p => p.totalFamilies > 0)
       .sort((a,b)=> (a.project < b.project) ? -1 : (a.project > b.project) ? 1 : 0);
 
-    const theMax = sortedProjects.reduce((max,project) => Math.max(max, project.whites || 0, project.nonwhite || 0), 0),
+    const theMax = (this.props.state !== 'pr' && this.props.state !== 'vi' ) ? sortedProjects.reduce((max,project) => Math.max(max, project.whites || 0, project.nonwhite || 0), 0) : Math.max(...sortedProjects.map(project => project.totalFamilies)),
       height = (sortedProjects.length + 1) * 22;
 
     return (
@@ -82,47 +82,75 @@ export default class Timeline extends React.Component {
             >
               { p.project }
             </text>
-            <rect
-              x={DimensionsStore.getCityTimelineStyle().width * 0.75  - ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6}
-              y={i * 20}
-              width={ ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 }
-              height={14}
-              fillOpacity={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 1 : 0.25 }
-              className='poc'
-              id={ p.project_id  }
-            />
-            <text
-              x={ DimensionsStore.getCityTimelineStyle().width * 0.75  - ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 - 3}
-              y={ i * 20 + 1 }
-              fillOpacity={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 1 : 0.25 }
-              textAnchor='end'
-              alignmentBaseline='hanging'
-              fontSize={12}
-              fill='grey'
-            >
-              { formatNumber(p.nonwhite) }
-            </text>
-            <rect
-              x={DimensionsStore.getCityTimelineStyle().width * 0.75}
-              y={i * 20}
-              width={ ((p.whites || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 }
-              height={14}
-              fillOpacity={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 1 : 0.25 }
-              className='white'
-              id={ p.project_id  }
-            />
-            <text
-              x={ DimensionsStore.getCityTimelineStyle().width * 0.75 + ((p.whites || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 + 3}
-              y={ i * 20 + 1 }
-              fillOpacity={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 1 : 0.25 }
-              textAnchor='start'
-              alignmentBaseline='hanging'
-              fontSize={12}
-              fill='grey'
-              id={ p.project_id  }
-            >
-              { formatNumber(p.whites) }
-            </text>
+            { (p.nonwhite || p.whites) ?
+              <g>
+                <rect
+                  x={DimensionsStore.getCityTimelineStyle().width * 0.75  - ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6}
+                  y={i * 20}
+                  width={ ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 }
+                  height={14}
+                  fillOpacity={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 1 : 0.25 }
+                  className='poc'
+                  id={ p.project_id  }
+                />
+                <text
+                  x={ DimensionsStore.getCityTimelineStyle().width * 0.75  - ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 - 3}
+                  y={ i * 20 + 1 }
+                  fillOpacity={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 1 : 0.25 }
+                  textAnchor='end'
+                  alignmentBaseline='hanging'
+                  fontSize={12}
+                  fill='grey'
+                >
+                  { formatNumber(p.nonwhite) }
+                </text>
+                <rect
+                  x={DimensionsStore.getCityTimelineStyle().width * 0.75}
+                  y={i * 20}
+                  width={ ((p.whites || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 }
+                  height={14}
+                  fillOpacity={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 1 : 0.25 }
+                  className='white'
+                  id={ p.project_id  }
+                />
+                <text
+                  x={ DimensionsStore.getCityTimelineStyle().width * 0.75 + ((p.whites || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 + 3}
+                  y={ i * 20 + 1 }
+                  fillOpacity={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 1 : 0.25 }
+                  textAnchor='start'
+                  alignmentBaseline='hanging'
+                  fontSize={12}
+                  fill='grey'
+                  id={ p.project_id  }
+                >
+                  { formatNumber(p.whites) }
+                </text>
+              </g> : 
+
+              <g>
+                <rect
+                  x={DimensionsStore.getCityTimelineStyle().width * 0.5  }
+                  y={i * 20}
+                  width={ (p.totalFamilies / theMax) * DimensionsStore.getCityTimelineStyle().width / 3 }
+                  height={14}
+                  fillOpacity={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 1 : 0.25 }
+                  className='territory'
+                  id={ p.project_id  }
+                />
+                <text
+                  x={ DimensionsStore.getCityTimelineStyle().width * 0.5 + (p.totalFamilies / theMax) * DimensionsStore.getCityTimelineStyle().width / 3 + 3}
+                  y={ i * 20 + 1 }
+                  fillOpacity={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 1 : 0.25 }
+                  textAnchor='start'
+                  alignmentBaseline='hanging'
+                  fontSize={12}
+                  fill='grey'
+                  id={ p.project_id  }
+                >
+                  { formatNumber(p.totalFamilies) }
+                </text>
+              </g>
+            }
           </g>
         )} 
       

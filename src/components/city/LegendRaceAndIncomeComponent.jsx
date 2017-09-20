@@ -11,7 +11,7 @@ export default class LegendRaceAndIncome extends React.Component {
       <div 
         className='mapLegend demographics'
       >
-       <LegendProjectFootprint />
+       <LegendProjectFootprint selectedYear={ this.props.selectedYear } />
        <LegendCityNoFootprints />
 
         <span className='tooltip'>The poverty line in 1960 was approximately $3000 for average-sized families. Census tracts with no families below $3000 in annual income are full transparent, invisible. The deeper the color the higher percentage of families whose income was below the poverty line.</span>
@@ -47,7 +47,7 @@ export default class LegendRaceAndIncome extends React.Component {
             transform='rotate(270 0,57.5)'
             fill='black'
           >
-            GREATER POVERTY →
+            Greater Poverty →
           </text>
           <text
             x={113}
@@ -72,7 +72,7 @@ export default class LegendRaceAndIncome extends React.Component {
             alignmentBaseline='hanging'
             fill='black'
           >
-            RACE
+            Race
           </text>
           <text
             x={30 + 15/2}

@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg
+  version="1.1" 
+  xmlns="http://www.w3.org/2000/svg" 
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  width='250'
+  height='65'
+>
+  <style type="text/css">
+      @import url('https://fonts.googleapis.com/css?family=Oswald:200|Roboto+Condensed:400');
+   </style>
+
+
+
+    <rect
+      x='0'
+      y='0'
+      width='250'
+      height='65'
+      fill='#EEEEEA'
+    />
+
+    <line
+      x1='0'
+      x2='250'
+      y1='6'
+      y2='6'
+      stroke-width='2'
+      stroke='#DDDDDD'
+    />
+
+    <line
+      x1='0'
+      x2='250'
+      y1='19'
+      y2='19'
+      stroke-width='2'
+      stroke='#DDDDDD'
+    />
+
+    <line
+      x1='0'
+      x2='250'
+      y1='32'
+      y2='32'
+      stroke-width='2'
+      stroke='#DDDDDD'
+    />
+
+    <line
+      x1='0'
+      x2='250'
+      y1='45'
+      y2='45'
+      stroke-width='2'
+      stroke='#DDDDDD'
+    />
+
+
+
+    <line
+      x1='0'
+      x2='250'
+      y1='58'
+      y2='58'
+      stroke-width='2'
+      stroke='#DDDDDD'
+    />
+
+    <line
+      x1='25'
+      x2='25'
+      y1='0'
+      y2='65'
+      stroke-width='2'
+      stroke='#DDDDDD'
+    />
+
+    <line
+      x1='75'
+      x2='75'
+      y1='0'
+      y2='65'
+      stroke-width='2'
+      stroke='#DDDDDD'
+    />
+
+    <line
+      x1='125'
+      x2='125'
+      y1='0'
+      y2='65'
+      stroke-width='2'
+      stroke='#DDDDDD'
+    />
+
+    <line
+      x1='175'
+      x2='175'
+      y1='0'
+      y2='65'
+      stroke-width='2'
+      fill='white'
+      stroke='#DDDDDD'
+    />
+
+    <line
+      x1='225'
+      x2='225'
+      y1='0'
+      y2='65'
+      stroke-width='2'
+      stroke='#DDDDDD'
+    />
+
+    <line
+      x1='0'
+      x2='250'
+      y1='45'
+      y2='45'
+      stroke-width='3'
+      stroke='white'
+    />
+
+    <line
+      x1='0'
+      x2='250'
+      y1='43'
+      y2='43'
+      stroke-width='1'
+      stroke='#DDDDDD'
+    />
+
+    <line
+      x1='0'
+      x2='250'
+      y1='47'
+      y2='47'
+      stroke-width='1'
+      stroke='#DDDDDD'
+    />
+
+    <rect
+      x='25'
+      y='6'
+      width='100'
+      height='39'
+      fill='rgba(171, 148, 192, 0.5)'
+      stroke='#5B3000'
+      stroke-width='3'
+      stroke-linejoin="round"
+    />
+
+    <text
+      x='75'
+      y='23'
+      text-anchor="middle"
+      fill='black'
+      style='font-family: Oswald; font-size: 13px;'
+      stroke='white'
+      stroke-width='3'
+    >
+      University Project
+    </text>
+
+    <text
+      x='75'
+      y='23'
+      text-anchor="middle"
+      fill='black'
+      style='font-family: Oswald; font-size: 13px;'
+    >
+      University Project
+    </text>
+
+    <text
+      x='75'
+      y='39'
+      text-anchor="middle"
+      fill='#555'
+      style='font-family: Oswald; font-size: 13px;'
+      stroke='white'
+      stroke-width='3'
+    >
+      477
+    </text>
+
+    <text
+      x='75'
+      y='39'
+      text-anchor="middle"
+      fill='#555'
+      style='font-family: Oswald; font-size: 13px;'
+    >
+      477
+    </text>
+
+    <path 
+      d="M200 58 L75 58 L75 45 L125 45 L125 19 L225 19 L225 45 L200 45 Z" 
+      fill='rgba(173, 193, 173, 0.5)'
+      stroke='#5B3000'
+      stroke-width='3'
+      stroke-linejoin="round"
+    />
+
+    <text
+      x='155'
+      y='40'
+      text-anchor="middle"
+      fill='black'
+      style='font-family: Oswald; font-size: 13px;'
+      stroke='white'
+      stroke-width='3'
+    >
+      East Plaza Project
+    </text>
+
+    <text
+      x='155'
+      y='40'
+      text-anchor="middle"
+      fill='black'
+      style='font-family: Oswald; font-size: 13px;'
+    >
+      East Plaza Project
+    </text>
+
+    <text
+      x='155'
+      y='53'
+      text-anchor="middle"
+      fill='#555'
+      style='font-family: Oswald; font-size: 13px;'
+      stroke='white'
+      stroke-width='3'
+    >
+      34
+    </text>
+
+    <text
+      x='155'
+      y='53'
+      text-anchor="middle"
+      fill='#555'
+      style='font-family: Oswald; font-size: 13px;'
+    >
+      34
+    </text>
+
+
+
+
+
+
+
+</svg>

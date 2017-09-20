@@ -10,7 +10,7 @@ export default class LegendHOLC extends React.Component {
     return (
        <div className='mapLegend holc'>
 
-       <LegendProjectFootprint />
+       <LegendProjectFootprint selectedYear={ this.props.selectedYear }/>
        <LegendCityNoFootprints />
 
        <div className='redlining'>

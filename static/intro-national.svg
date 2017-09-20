@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg
+  version="1.1" 
+  xmlns="http://www.w3.org/2000/svg" 
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  width='250'
+  height='65'
+>
+  <style type="text/css">
+      @import url('https://fonts.googleapis.com/css?family=Oswald:200|Roboto+Condensed:400');
+   </style>
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color='rgb(163, 135, 190)' stop-opacity='1' />
+      <stop offset="50%" stop-color='rgb(200,200,200)' stop-opacity='1' />
+      <stop offset="100%" stop-color='rgb(44,160,44)' stop-opacity='1' />
+    </linearGradient>
+  </defs>
+
+
+    <circle
+      cx='164'
+      cy='25'
+      r='23'
+      fill='#BEB6C5'
+    />
+
+    <text
+      x='164'
+      y='25'
+      text-anchor="middle"
+      alignment-baseline="central"
+      fill='black'
+      style='font-family: Oswald; font-size: 12px;'
+    >
+      20K
+    </text>
+
+    <circle
+      cx='135'
+      cy='6'
+      r='6'
+      fill='#35A235'
+    />
+
+    <circle
+      cx='111'
+      cy='21'
+      r='18'
+      fill='#A387BE'
+    />
+
+    <text
+      x='111'
+      y='21'
+      text-anchor="middle"
+      alignment-baseline="central"
+      fill='black'
+      style='font-family: Oswald; font-size: 12px;'
+    >
+      12K
+    </text>
+
+    <circle
+      cx='73'
+      cy='30'
+      r='14'
+      fill='#C7C8C7'
+    />
+
+    <text
+      x='73'
+      y='30'
+      text-anchor="middle"
+      alignment-baseline="central"
+      fill='black'
+      style='font-family: Oswald; font-size: 12px;'
+    >
+      7.5K
+    </text>
+
+    <circle
+      cx='92'
+      cy='45'
+      r='5'
+      fill='#8FB98F'
+    />
+
+
+
+
+
+    <rect 
+      x='50'
+      y='55'
+      width='150'
+      height='10'
+      fill="url(#grad1)"
+    />
+
+    <text
+      x='25'
+      y='52'
+      text-anchor="middle"
+      fill='white'
+      style='font-family: Oswald; font-size: 13px;'
+    >
+      100%
+    </text>
+
+    <text
+      x='25'
+      y='65'
+      text-anchor="middle"
+      fill='white'
+      style='font-family: Oswald; font-size: 13px;'
+    >
+      of color
+    </text>
+
+    <text
+      x='225'
+      y='52'
+      text-anchor="middle"
+      fill='white'
+      style='font-family: Oswald; font-size: 13px;'
+    >
+      100%
+    </text>
+
+    <text
+      x='225'
+      y='65'
+      text-anchor="middle"
+      fill='white'
+      style='font-family: Oswald; font-size: 13px;'
+    >
+      white
+    </text>
+
+
+
+
+
+
+</svg>

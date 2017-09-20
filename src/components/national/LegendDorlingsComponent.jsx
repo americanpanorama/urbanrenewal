@@ -15,7 +15,7 @@ export default class LegendDorlings extends React.Component {
           <circle
             { ...DimensionsStore.getLegendDorlingsCircleDimensions(this.props.dorlingScale) }  
             r={ DimensionsStore.getDorlingRadius(this.props.dorlingIncrements[0]) }
-            fill='grey'
+            fill='transparent'
             transform={"scale(" + this.props.dorlingScale +")"}
           />
 

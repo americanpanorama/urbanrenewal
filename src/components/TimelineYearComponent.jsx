@@ -69,6 +69,12 @@ export default class Timeline extends React.Component {
                     onClick={ this.props.onClick }
                     id={ year }
                   />
+                 <rect
+                    { ...DimensionsStore.getMainTimelineBarAttrs(year, 'unspecified') }
+                    className={ (year == this.props.state.year && this.props.state.cat == 'families') ? 'territory bar selected' : 'territory bar' }
+                    onClick={ this.props.onClick }
+                    id={ year }
+                  />
                 </g>
               );
             }
