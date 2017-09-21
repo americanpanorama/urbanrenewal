@@ -285,7 +285,7 @@ export default class App extends React.Component {
             <div className='columns eight full-height'>
               <header style={ DimensionsStore.getHeaderStyle() }>
                 <h1>Renewing Inequality</h1>
-                <h2> Urban Renewal, Family Displacements, and Race 1955-1966</h2>
+                <h2>Family Displacements through Urban Renewal, 1955-1966</h2>
               </header>
 
               { (!this.state.showIntroModal) ?

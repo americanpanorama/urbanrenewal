@@ -51,14 +51,6 @@ export default class Timeline extends React.Component {
           Families Displaced
         </text>
 
-        <line
-          x1={ DimensionsStore.getCityTimelineStyle().width * 0.75 }
-          x2={ DimensionsStore.getCityTimelineStyle().width * 0.75 }
-          y1={20}
-          y2={height}
-          stroke='#aaa'
-          strokeWidth={0.5}
-        />
 
 
 
@@ -84,6 +76,16 @@ export default class Timeline extends React.Component {
             </text>
             { (p.nonwhite || p.whites) ?
               <g>
+
+                <line
+                  x1={ DimensionsStore.getCityTimelineStyle().width * 0.75 }
+                  x2={ DimensionsStore.getCityTimelineStyle().width * 0.75 }
+                  y1={i * 20}
+                  y2={20}
+                  stroke='#aaa'
+                  strokeWidth={0.5}
+                />
+
                 <rect
                   x={DimensionsStore.getCityTimelineStyle().width * 0.75  - ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6}
                   y={i * 20}

@@ -379,11 +379,16 @@ const DimensionsStore = {
   // SCATTERPLOT DIMENSIONS
 
   translateScatterplotPoint: function(point) {
-    const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4),
-      cx = this.getNationalMapWidth() / 2 - (Math.sqrt((point[0] * point[0]) / 2) -  Math.sqrt((point[1] * point[1]) / 2)),
-      cy = this.getNationalMapHeight() / 2 + shortside - Math.sqrt((point[0] * point[0]) / 2) -  Math.sqrt((point[1] * point[1]) / 2);
 
-    return [cx,cy];
+    const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4),
+      l = Math.sqrt(2*shortside*shortside);
+    if (point[1] == null) {
+      return [this.getNationalMapWidth() / 2 + Math.sqrt(l * l / 2), this.getNationalMapHeight() * 12.5/31 + Math.sqrt(l * l / 2) * 0.66];
+    } else {
+      const cx = this.getNationalMapWidth() / 2 - (Math.sqrt((point[0] * point[0]) / 2) -  Math.sqrt((point[1] * point[1]) / 2)),
+        cy = this.getNationalMapHeight() * 12.5 / 31 + shortside - Math.sqrt((point[0] * point[0]) / 2) -  Math.sqrt((point[1] * point[1]) / 2);
+      return [cx,cy];
+    }
   },
 
   getScatterplotLength: function() {
@@ -533,6 +538,7 @@ const DimensionsStore = {
       dx: this.getMainTimlineXOffset(1955),
       dy: this.getMainTimlineXOffset(1955),
       fontSize: this.getMainTimlineXOffset(1955) * 2,
+      className: 'timelineLabel',
       alignmentBaseline: 'hanging'
     };
   },
@@ -573,6 +579,26 @@ const DimensionsStore = {
     return {
       dx: this.getMainTimlineXOffset(1955) + this.getMainTimelineBarWidth() * 1.5 ,
       dy: this.getMainTimelineMaxBarHeight() * 0.33 + this.getMainTimelineBarWidth() * 2.5,
+      fontSize: this.getMainTimelineBarWidth(),
+    };
+  },
+
+  getMainTimelineLegendBoxPRVIAttrs() {
+    return {
+      x: this.getMainTimlineXOffset(1955),
+      y: this.getMainTimelineMaxBarHeight() * 0.33 + this.getMainTimelineBarWidth() * 3 ,
+      width: this.getMainTimelineBarWidth(),
+      height: this.getMainTimelineBarWidth(),
+      fill: '#E18942',
+      stroke: 'black',
+      strokeWidth: 0.5
+    };
+  },
+
+  getMainTimelineLegendLabelPRVIAttrs() {
+    return {
+      dx: this.getMainTimlineXOffset(1955) + this.getMainTimelineBarWidth() * 1.5 ,
+      dy: this.getMainTimelineMaxBarHeight() * 0.33 + this.getMainTimelineBarWidth() * 4,
       fontSize: this.getMainTimelineBarWidth(),
     };
   },

@@ -218,18 +218,16 @@ const CitiesStore = {
       // });
       // console.log(projectNames);
 
-      var citiesForDorlingProcessing = Object.keys(this.data.cities).map(id=> { return {city_id: id, lat: this.data.cities[id].lat, lng: this.data.cities[id].lng, yearsData: this.data.cities[id].yearsData}; });
-      citiesForDorlingProcessing.forEach(cityData => {
-        cityData.yearsData['all'] = {
-          whites: this.data.cities[cityData.city_id].whites,
-          nonwhite: this.data.cities[cityData.city_id].nonwhite,
-          totalFamilies: this.data.cities[cityData.city_id].totalFamilies,
-          percentFamiliesOfColor: this.data.cities[cityData.city_id].percentFamiliesOfColor
-        };
-      });
-      console.log(citiesForDorlingProcessing);
-
-      console.log(this.data.cities[this.getCityIdFromSlug('sanjuanPR')]);
+      // var citiesForDorlingProcessing = Object.keys(this.data.cities).map(id=> { return {city_id: id, lat: this.data.cities[id].lat, lng: this.data.cities[id].lng, yearsData: this.data.cities[id].yearsData}; });
+      // citiesForDorlingProcessing.forEach(cityData => {
+      //   cityData.yearsData['all'] = {
+      //     whites: this.data.cities[cityData.city_id].whites,
+      //     nonwhite: this.data.cities[cityData.city_id].nonwhite,
+      //     totalFamilies: this.data.cities[cityData.city_id].totalFamilies,
+      //     percentFamiliesOfColor: this.data.cities[cityData.city_id].percentFamiliesOfColor
+      //   };
+      // });
+      // console.log(citiesForDorlingProcessing);
 
       this.emit(AppActionTypes.storeChanged);
     });
@@ -587,14 +585,19 @@ const CitiesStore = {
       return (this.data && this.data.loaded) ?
         this.getCitiesList()
           //.filter(cityData => GeographyStore.projected([cityData.lng, cityData.lat]) !== null)
-          .filter(cityData => (this.data.selectedYear) ? cityData.yearsData[this.data.selectedYear] && cityData.yearsData[this.data.selectedYear]['totalFamilies'] > 0 && cityData.name !== 'hartford' : cityData.totalFamilies && cityData.totalFamilies > 0 && cityData.name !== 'hartford')
+          .filter(cityData => (this.data.selectedYear) ? cityData.yearsData[this.data.selectedYear] && cityData.yearsData[this.data.selectedYear]['totalFamilies'] > 0 && cityData.name !== 'hartford' : cityData.totalFamilies && cityData.totalFamilies > 0)
           .map(cityData => {
             let cx, cy;
             if (this.data.selectedView == 'scatterplot') {
               const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4),
                 l = Math.sqrt(2*shortside*shortside);
-              cx = (this.getCityData(cityData.city_id).pop_1960 && this.getCityData(cityData.city_id).nonwhite_1960) ? (this.getCityData(cityData.city_id).nonwhite_1960 / this.getCityData(cityData.city_id).pop_1960) * l : 0;
-              cy = (this.data.selectedYear) ? l - this.getCityData(cityData.city_id).yearsData[this.data.selectedYear].percentFamiliesOfColor * l : l - this.getCityData(cityData.city_id).percentFamiliesOfColor * l;
+              if (!this.getCityData(cityData.city_id).pop_1960 || !this.getCityData(cityData.city_id).nonwhite_1960 || this.getCityData(cityData.city_id).state == 'pr' || this.getCityData(cityData.city_id).state == 'vi') {
+                cx = (this.data.selectedYear) ? this.getCityData(cityData.city_id).yearsData[this.data.selectedYear].totalFamilies : this.getCityData(cityData.city_id).totalFamilies; // use this to calculate a small offset
+                cy = null; 
+              } else {
+                cx = this.getPercentNonWhitePop(cityData.city_id) * l;
+                cy = (this.data.selectedYear) ? l - this.getCityData(cityData.city_id).yearsData[this.data.selectedYear].percentFamiliesOfColor * l : l - this.getCityData(cityData.city_id).percentFamiliesOfColor * l;
+              }
               [cx, cy] = DimensionsStore.translateScatterplotPoint([cx, cy]);
             } else if (this.data.selectedView == 'cartogram') {
               [cx, cy] = this.getDorlingXY(cityData.city_id);
@@ -683,6 +686,16 @@ const CitiesStore = {
   getInspectedProject: function() { return this.data.inspectedProject; },
 
   getInspectedProjectStats: function() { return this.data.inspectedProjectStats; },
+
+  getPercentNonWhitePop: function(cityId) {
+    let nonwhitePercent = this.getCityData(cityId).nonwhite_1960 / this.getCityData(cityId).pop_1960;
+    if (this.data.selectedYear > 1960 && this.getCityData(cityId).nonwhite_1970 && this.getCityData(cityId).pop_1970) {
+      const nonwhitePercent1970 = (this.getCityData(cityId).nonwhite_1970 / this.getCityData(cityId).pop_1970),
+        estDiffPerYear = (nonwhitePercent1970 - nonwhitePercent) / 10;
+      nonwhitePercent = nonwhitePercent + estDiffPerYear * (this.data.selectedYear - 1960);
+    } 
+    return nonwhitePercent;
+  },
 
   getPOC: function() { return this.data.poc; },
 

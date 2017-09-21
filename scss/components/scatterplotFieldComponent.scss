@@ -17,6 +17,10 @@
 		fill: black;
 		text-anchor: middle;
 		alignment-baseline: hanging;
+
+    &.inadequate {
+      fill: grey;
+    }
 	}
 }
 

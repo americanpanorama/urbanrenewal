@@ -47,8 +47,8 @@ export default class MapField extends React.Component {
         className='nationalMap'
       >
         <defs>
-          <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="6 6" result="glow"/>
+          <filter id="glow" x="-50%" y="-10%" width="200%" height="160%">
+            <feGaussianBlur stdDeviation="10 10" result="glow"/>
           </filter>
         </defs>
 

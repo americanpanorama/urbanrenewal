@@ -29,7 +29,7 @@ export default class DorlingLabel extends React.Component {
   }
 
   render () {
-    const labelSize = (8 * this.props.r  / 15 < 8) ? 8 : (8 * this.props.r  / 15 > 18) ? 18 : 8 * this.props.r  / 15;
+    const labelSize = (8 * this.props.r  / 15 < 13) ? 13 : (8 * this.props.r  / 15 > 18) ? 18 : 8 * this.props.r  / 15;
     return (
       <g 
         className='dorlingLabel'
@@ -39,7 +39,7 @@ export default class DorlingLabel extends React.Component {
           x={ 0 }
           y={ 0 }
           textAnchor='middle'
-          alignmentBaseline='middle'
+          alignmentBaseline='bottom'
           fontSize={ labelSize }
           key={'cityLabelhalo' + this.props.city_id}
           className='multistroke'
@@ -55,7 +55,7 @@ export default class DorlingLabel extends React.Component {
           alignmentBaseline='bottom'
           fontSize={ labelSize / this.props.z }
           key={'cityLabel' + this.props.city_id}
-          fill={ (this.props.color !== 'transparent') ? '#000' : 'transparent'}
+          fill={ (this.props.color !== 'transparent') ? '#111' : 'transparent'}
         >
           {this.props.name.replace(/\w\S*/g, txt =>  txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())}
         </text> 

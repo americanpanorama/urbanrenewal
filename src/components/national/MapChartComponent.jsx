@@ -49,7 +49,8 @@ export default class USMap extends React.Component {
             selectedView={ this.props.selectedView }
             onCityHover={ this.props.onCityHover }
             onCityOut={ this.props.onCityOut }
-            percentWhitePop={ (CitiesStore.getHighlightedCities() && CitiesStore.getHighlightedCities().length == 1) ? CitiesStore.getCityData(CitiesStore.getHighlightedCities()[0]).white_1960 / CitiesStore.getCityData(CitiesStore.getHighlightedCities()[0]).pop_1960 : null}
+            popYear={ (CitiesStore.getSelectedYear() == null || CitiesStore.getSelectedYear() <= 1960) ? 1960 : CitiesStore.getSelectedYear() }
+            percentWhitePop={ (CitiesStore.getHighlightedCities() && CitiesStore.getHighlightedCities().length == 1) ? 1 - CitiesStore.getPercentNonWhitePop(CitiesStore.getHighlightedCities()[0]) : null}
             percentFamiliesOfColor={ (CitiesStore.getHighlightedCities() && CitiesStore.getHighlightedCities().length == 1 &&CitiesStore.getSelectedYear()) ? CitiesStore.getCityData(CitiesStore.getHighlightedCities()[0]).yearsData[CitiesStore.getSelectedYear()].percentFamiliesOfColor : (CitiesStore.getHighlightedCities() && CitiesStore.getHighlightedCities().length == 1 && !CitiesStore.getSelectedYear()) ? CitiesStore.getCityData(CitiesStore.getHighlightedCities()[0]).percentFamiliesOfColor : null }
             { ...GeographyStore.getXYZ() }
           />

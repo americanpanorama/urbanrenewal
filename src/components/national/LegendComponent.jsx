@@ -22,13 +22,14 @@ export default class LegendAndControls extends React.Component {
 
         <h3>{ 'FAMILIES DISPLACED, ' + this.props.selectedYear }</h3>
         
-        <LegendGradient
-          poc={ this.props.poc }
-          onDragUpdate={ this.props.onDragUpdate }
-        />
+
         <LegendDorlings 
           dorlingScale={ this.props.dorlingScale }
           dorlingIncrements={ this.props.dorlingIncrements }
+        />
+        <LegendGradient
+          poc={ this.props.poc }
+          onDragUpdate={ this.props.onDragUpdate }
         />
       </div> 
     );

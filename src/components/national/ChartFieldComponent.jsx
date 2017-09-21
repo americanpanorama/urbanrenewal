@@ -55,7 +55,7 @@ export default class ChartField extends React.Component {
 
   render() {
     const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4),
-      scatterplotMaxY = DimensionsStore.getNationalMapHeight()/2 + shortside;
+      scatterplotMaxY = DimensionsStore.getNationalMapHeight() * 12.5 / 31 + shortside;
     return (
       <g>
         <defs>
@@ -128,7 +128,7 @@ export default class ChartField extends React.Component {
               transform={'rotate(180 ' + DimensionsStore.getScatterplotLength() * 0.5 + ' ' + DimensionsStore.getScatterplotLength() * -0.12 + ')'}
               fontSize='1.5em'
             >
-              WHITE POPULATION OF CITY (1960)
+              {'PERCENTAGE OF THE CITY THAT WAS WHITE (' + this.props.popYear + ')'}
             </text>
 
             { [...Array(10).keys()].map(decile => {
@@ -241,6 +241,17 @@ export default class ChartField extends React.Component {
                 { ((this.props.percentFamiliesOfColor <= 0.5) ? 100 - Math.round(this.props.percentFamiliesOfColor * 1000)/10 + '% white' : 100 - Math.round((1-this.props.percentFamiliesOfColor) * 1000)/10 + '% of color') }
               </text> : ''
             }
+
+            <text
+              x={ DimensionsStore.getScatterplotLength() * -0.35 }
+              y={ DimensionsStore.getScatterplotLength() * 0.63 }
+              fontSize='0.8em'
+              className='inadequate'
+              transform={'rotate(135 ' + DimensionsStore.getScatterplotLength() * -0.35 + ' ' + DimensionsStore.getScatterplotLength()*0.63 + ')'}
+            >
+              insufficient data for some cities
+            </text>
+
           </g>
         </g>
 

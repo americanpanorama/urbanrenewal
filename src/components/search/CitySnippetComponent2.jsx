@@ -47,41 +47,76 @@ export default class CitySnippet extends React.Component {
             />
 
 
+            { (this.props.cityData.state !== 'pr' && this.props.cityData.state !== 'vi') ?
+              <g>
+                <rect
+                  x={DimensionsStore.getCityTimelineStyle().width * 0.75  - ((this.props.cityData.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6}
+                  y={6}
+                  width={ ((this.props.cityData.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 }
+                  height={14}
+                  className='poc'
+                />
+                <text
+                  x={ DimensionsStore.getCityTimelineStyle().width * 0.75  - ((this.props.cityData.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 - 3}
+                  y={ 7 }
+                  textAnchor='end'
+                  alignmentBaseline='hanging'
+                  fontSize={12}
+                  fill='grey'
+                >
+                  { formatNumber(this.props.cityData.nonwhite) }
+                </text>
+                <rect
+                  x={DimensionsStore.getCityTimelineStyle().width * 0.75}
+                  y={6}
+                  width={ ((this.props.cityData.whites || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 }
+                  height={14}
+                  className='white'
+                />
+                <text
+                  x={ DimensionsStore.getCityTimelineStyle().width * 0.75 + ((this.props.cityData.whites || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 + 3}
+                  y={ 7 }
+                  textAnchor='start'
+                  alignmentBaseline='hanging'
+                  fontSize={12}
+                  fill='grey'
+                >
+                  { formatNumber(this.props.cityData.whites) }
+                </text>
+              </g> :
+              <g>
+                <rect
+                  x={DimensionsStore.getCityTimelineStyle().width * 0.75 - (this.props.cityData.totalFamilies / theMax) * DimensionsStore.getCityTimelineStyle().width / 12}
+                  y={6} 
+                  width={ (this.props.cityData.totalFamilies / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 }
+                  height={14}
+                  className='territory'
+                />
+                <text
+                  x={ DimensionsStore.getCityTimelineStyle().width * 0.75 - (this.props.cityData.totalFamilies / theMax) * DimensionsStore.getCityTimelineStyle().width / 12- 3}
+                  y={ 7 }
+                  textAnchor='end'
+                  alignmentBaseline='hanging'
+                  fontSize={12}
+                  fill='grey'
+                >
+                  { formatNumber(this.props.cityData.totalFamilies) }
+                </text>
+                <text
+                  x={ DimensionsStore.getCityTimelineStyle().width * 0.75 + (this.props.cityData.totalFamilies / theMax) * DimensionsStore.getCityTimelineStyle().width / 12 + 3}
+                  y={ 7 }
+                  textAnchor='start'
+                  alignmentBaseline='hanging'
+                  fontSize={12}
+                  fill='grey'
+                >
+                  (no racial data collected)
+                </text>
+              </g>
 
-            <rect
-              x={DimensionsStore.getCityTimelineStyle().width * 0.75  - ((this.props.cityData.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6}
-              y={6}
-              width={ ((this.props.cityData.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 }
-              height={14}
-              className='poc'
-            />
-            <text
-              x={ DimensionsStore.getCityTimelineStyle().width * 0.75  - ((this.props.cityData.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 - 3}
-              y={ 7 }
-              textAnchor='end'
-              alignmentBaseline='hanging'
-              fontSize={12}
-              fill='grey'
-            >
-              { formatNumber(this.props.cityData.nonwhite) }
-            </text>
-            <rect
-              x={DimensionsStore.getCityTimelineStyle().width * 0.75}
-              y={6}
-              width={ ((this.props.cityData.whites || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 }
-              height={14}
-              className='white'
-            />
-            <text
-              x={ DimensionsStore.getCityTimelineStyle().width * 0.75 + ((this.props.cityData.whites || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 + 3}
-              y={ 7 }
-              textAnchor='start'
-              alignmentBaseline='hanging'
-              fontSize={12}
-              fill='grey'
-            >
-              { formatNumber(this.props.cityData.whites) }
-            </text>
+            }
+
+
         </svg>
       </div>
 

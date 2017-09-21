@@ -105,6 +105,8 @@ export default class Timeline extends React.Component {
         <rect { ...DimensionsStore.getMainTimelineLegendBoxWhiteAttrs() } />
         <text { ...DimensionsStore.getMainTimelineLegendLabelWhiteAttrs() }>Displaced white families</text>
 
+        <rect { ...DimensionsStore.getMainTimelineLegendBoxPRVIAttrs() } />
+        <text { ...DimensionsStore.getMainTimelineLegendLabelPRVIAttrs() }>Displaced families, US territories</text>
       </svg>
     );
   }
