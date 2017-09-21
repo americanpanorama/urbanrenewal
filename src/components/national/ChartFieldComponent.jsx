@@ -59,12 +59,10 @@ export default class ChartField extends React.Component {
     return (
       <g>
         <defs>
-          <linearGradient id="graphgradient2" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style={{stopColor:'rgb(163, 135, 190)', stopOpacity:0.5}} />
-            <stop offset="40%" style={{stopColor:'rgb(163, 135, 190)', stopOpacity:0.5}} />
-            <stop offset="50%" style={{stopColor:'rgb(128,128,128)', stopOpacity:0.5}} />
-            <stop offset="60%" style={{stopColor:'rgb(44,160,44)', stopOpacity:0.5}} />
-            <stop offset="100%" style={{stopColor:'rgb(44,160,44)', stopOpacity:0.5}} />
+          <linearGradient id="graphgradient2" x1="100%" y1="0%" x2="0%" y2="0%">
+            <stop offset="0%" style={{stopColor:'rgb(163, 135, 190)', stopOpacity:0.66}} />
+            <stop offset="50%" style={{stopColor:'rgb(200,200,200)', stopOpacity:0.66}} />
+            <stop offset="100%" style={{stopColor:'rgb(44,160,44)', stopOpacity:0.66}} />
           </linearGradient>
           <linearGradient id="maskgradient" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="75%" style={{stopColor:'rgb(209,213,215)', stopOpacity:1}} />
@@ -83,8 +81,8 @@ export default class ChartField extends React.Component {
             y={0}
             width={ DimensionsStore.getScatterplotLength() }
             height={ DimensionsStore.getScatterplotLength() }
-            //fill="url(#graphgradient2)"
-            fill='#F5F5F3'
+            fill="url(#graphgradient2)"
+            //fill='#F5F5F3'
           />
 
           { [...Array(11).keys()].map(decile => {
@@ -131,8 +129,8 @@ export default class ChartField extends React.Component {
               {'PERCENTAGE OF THE CITY THAT WAS WHITE (' + this.props.popYear + ')'}
             </text>
 
-            { [...Array(10).keys()].map(decile => {
-              let x = (decile + 1) * DimensionsStore.getScatterplotLength()/10,
+            { [...Array(11).keys()].map(decile => {
+              let x = (decile) * DimensionsStore.getScatterplotLength()/10,
                 y = DimensionsStore.getScatterplotLength() * -0.03;
               return (
                 <text
@@ -144,7 +142,7 @@ export default class ChartField extends React.Component {
                   key={ 'xLabel' + decile }
                   fillOpacity={ (!this.props.percentWhitePop) ? 1 : 0.1 }
                 >
-                  { 90 -decile * 10 + '%' }
+                  { 100 -decile * 10 + '%' }
                 </text>
               );
             }) }
@@ -158,7 +156,7 @@ export default class ChartField extends React.Component {
                 fontWeight='bold'
                 transform={'rotate(180 ' + (1-this.props.percentWhitePop) * DimensionsStore.getScatterplotLength() + ' ' + DimensionsStore.getScatterplotLength() * -0.03 + ')'}
               >
-                { Math.round(this.props.percentWhitePop * 1000)/10 + '% white' }
+                { Math.round(this.props.percentWhitePop * 100) + '% white/' + Math.round((1 -this.props.percentWhitePop) * 100) + '% of color'}
               </text> : ''
             }
           </g>
@@ -170,9 +168,10 @@ export default class ChartField extends React.Component {
               fontSize='1.5em'
               transform={'rotate(90 ' + DimensionsStore.getScatterplotLength() * -0.12 + ' ' + DimensionsStore.getScatterplotLength()*0.5 + ')'}
             >
-              RACE OF FAMILIES DISPLACED
+              PERCENTAGE OF FAMILIES DISPLACED WHO WERE WHITE
             </text>
 
+            {/* JSX Comment 
             <text
               x={ DimensionsStore.getScatterplotLength() * -0.07 }
               y={ DimensionsStore.getScatterplotLength() * 0.75 }
@@ -188,8 +187,9 @@ export default class ChartField extends React.Component {
             >
               % people of color
             </text>
+            */}
 
-            { [...Array(5).keys()].map(decile => {
+            { [...Array(0).keys()].map(decile => {
               let x = DimensionsStore.getScatterplotLength() * -0.03,
                 y = decile * DimensionsStore.getScatterplotLength()/10;
               return (
@@ -206,7 +206,7 @@ export default class ChartField extends React.Component {
             }) }
 
 
-            { [...Array(5).reverse().keys()].map(decile => {
+            { [...Array(11).reverse().keys()].map(decile => {
               let x = DimensionsStore.getScatterplotLength() * -0.03,
                 y = DimensionsStore.getScatterplotLength() - decile * DimensionsStore.getScatterplotLength()/10;
               return (
@@ -222,6 +222,7 @@ export default class ChartField extends React.Component {
               );
             }) }
 
+          {/* JSX Comment 
             <text
               x={ DimensionsStore.getScatterplotLength() * -0.03 }
               y={ DimensionsStore.getScatterplotLength()/2 }
@@ -229,7 +230,7 @@ export default class ChartField extends React.Component {
               fillOpacity={ (!this.props.percentFamiliesOfColor) ? 1 : 0.1 }
             >
               { 'even' }
-            </text>
+            </text> */}
 
             { (this.props.percentFamiliesOfColor) ?
               <text
@@ -238,7 +239,7 @@ export default class ChartField extends React.Component {
                 transform={'rotate(90 ' + DimensionsStore.getScatterplotLength() * -0.03 + ' ' + DimensionsStore.getScatterplotLength() * (1 - this.props.percentFamiliesOfColor) + ')'}
                 fontWeight='bold'
               >
-                { ((this.props.percentFamiliesOfColor <= 0.5) ? 100 - Math.round(this.props.percentFamiliesOfColor * 1000)/10 + '% white' : 100 - Math.round((1-this.props.percentFamiliesOfColor) * 1000)/10 + '% of color') }
+                { Math.round((1 -this.props.percentFamiliesOfColor) * 100) + '% white/' + (100 - Math.round((1-this.props.percentFamiliesOfColor) * 100)) + '% of color' }
               </text> : ''
             }
 
