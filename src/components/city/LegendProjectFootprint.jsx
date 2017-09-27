@@ -14,7 +14,7 @@ export default class LegendProjectFootprint extends React.Component {
       <svg
         width={width}
         height={height}
-        className='footprint'
+        className='projectFootprint'
       >
         { (this.props.selectedYear) ?
           <g>
@@ -23,17 +23,13 @@ export default class LegendProjectFootprint extends React.Component {
               x2={20}
               y1={8}
               y2={8}
-              strokeWidth={3}
-              stroke='black'
+              className='boundary'
             />
 
             <text
               x={ 24 }
-              y={ 0 }
-              textAnchor='start'
-              alignmentBaseline='hanging'
-              fill='grey'
-              fontStyle='italic'
+              y={ 12 }
+              className='note'
             >
               { 'Active in ' + this.props.selectedYear }
             </text>
@@ -43,18 +39,13 @@ export default class LegendProjectFootprint extends React.Component {
               x2={20}
               y1={25}
               y2={25}
-              strokeWidth={3}
-              stroke='black'
-              strokeDasharray='5, 10'
+              className='boundary inactive'
             />
 
             <text
               x={ 24 }
-              y={ 15 }
-              textAnchor='start'
-              alignmentBaseline='hanging'
-              fill='grey'
-              fontStyle='italic'
+              y={ 27 }
+              className='note'
             >
               { 'Inactive in ' + this.props.selectedYear }
             </text>
@@ -63,22 +54,16 @@ export default class LegendProjectFootprint extends React.Component {
 
 
         <path 
-          stroke="#5B3000" 
-          strokeWidth="3" 
-          strokeLinecap="round" 
-          strokeLinejoin="round" 
-          fill={getColorForRace(0.2)}
-          fillOpacity="0.2" 
           d="M20 60L0 20L45 -10L75 40z"
           transform='translate(22 50)'
+          fill={getColorForRace(0.2)}
+          className='boundary'
         />
 
         <text
           x={ centerX}
           y={ centerY - 10}
-          textAnchor='middle'
-          fill='black'
-          className='shadow'
+          className='shadow name'
         >
           Project
         </text>
@@ -86,10 +71,7 @@ export default class LegendProjectFootprint extends React.Component {
         <text
           x={ centerX}
           y={ centerY + 10}
-          textAnchor='middle'
-          fill='grey'
-          fontSize='smaller'
-          className='shadow'
+          className='shadow displacements'
         >
           # displacements
         </text>

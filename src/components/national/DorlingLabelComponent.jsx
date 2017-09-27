@@ -22,7 +22,7 @@ export default class DorlingLabel extends React.Component {
     if (this.props.cx !== nextProps.cx || this.props.cy !== nextProps.cy ) {
       d3.select(ReactDOM.findDOMNode(this))
         .transition()
-        .delay((this.props.selectedView == 'scatterplot') ? Math.min((DimenxsionsStore.getNationalMapHeight() * 0.9 - nextProps.cy) * 10, 5000) : 0)
+        .delay((this.props.selectedView == 'scatterplot') ? Math.min((DimensionsStore.getNationalMapHeight() * 0.9 - nextProps.cy) * 10, 5000) : 0)
         .duration(750)
         .attr('transform', 'translate(' + nextProps.cx + ' ' + nextProps.cy + ')');
     }
@@ -37,37 +37,20 @@ export default class DorlingLabel extends React.Component {
       >
         <text
           x={ 0 }
-          y={ 0 }
-          textAnchor='middle'
-          alignmentBaseline='bottom'
-          fontSize={ labelSize }
-          key={'cityLabelhalo' + this.props.city_id}
-          className='multistroke'
-          stroke={'transparent'}
-          fill='transparent'
-        >
-          {this.props.name.replace(/\w\S*/g, txt =>  txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())}
-        </text> 
-        <text
-          x={ 0 }
-          y={ 0 }
-          textAnchor='middle'
-          alignmentBaseline='bottom'
+          y={ -1 }
           fontSize={ labelSize / this.props.z }
           key={'cityLabel' + this.props.city_id}
-          fill={ (this.props.color !== 'transparent') ? '#111' : 'transparent'}
+          className={ (this.props.color == 'transparent') ? 'hidden' : ''}
         >
           {this.props.name.replace(/\w\S*/g, txt =>  txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())}
         </text> 
 
         <text
           x={ 0 }
-          y={ labelSize / this.props.z}
-          textAnchor='middle'
-          alignmentBaseline='top'
-          fontSize={ labelSize / this.props.z * 0.7 }
+          y={ 1 + labelSize / this.props.z * 0.8  }
+          fontSize={ labelSize / this.props.z * 0.8 }
           key={'cityNumsLabel' + this.props.city_id}
-          fill={ (this.props.color !== 'transparent') ? '#555' : 'transparent'}
+          className={ (this.props.color == 'transparent') ? 'hidden' : 'displacements'}
         >
           { formatNumber(this.props.value) }
         </text> 

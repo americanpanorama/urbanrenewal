@@ -6,13 +6,32 @@
 	svg {
 		display: inline-block;
 
+		&.demographics {
 
+			text {
+				fill: black;
+				text-anchor: middle;
+				font-size: 16px;
+
+				&.quantities {
+					fill: grey;
+					font-size: 14px;
+
+					&.y {
+						text-anchor: start;
+					}
+				}
+			}
+
+			rect {
+				stroke-width: 0.5;
+				stroke-opacity: 0.1;
+			}
+		}
 	}
 
-	.quantities {
-		fill: grey;
-		font-size: 0.9em;
-	}
+
+
 
 	.tooltip {
 	    visibility: hidden;

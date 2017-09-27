@@ -11,12 +11,9 @@ export default class ProjectStats extends React.Component {
       return (
         <text
           x={ x }
-          y={ 30 }
-          fontSize={14}
-          fill='white'
-          textAnchor='middle'
-          alignmentBaseline='middle'
+          y={ 37 }
           transform='translate(120)'
+          className='labelOnBar'
         >
           { Math.round(percent * 100) + '% ' + label }
         </text>
@@ -28,11 +25,8 @@ export default class ProjectStats extends React.Component {
         <g transform={ 'translate(' + (120 + x) + ' 30)'}>
           <text
             x={ 0 }
-            y={ 0 }
-            fontSize={14}
-            fill='white'
-            textAnchor='middle'
-            alignmentBaseline='middle'
+            y={ 7 }
+            className='labelOnBar'
           >
             { Math.round(percent * 100) + '%' }
           </text>
@@ -46,11 +40,7 @@ export default class ProjectStats extends React.Component {
           /> 
           <text
             x={ 0 }
-            y={ (tb == 'super') ? -25 : 25 }
-            fontSize={13}
-            fill='black'
-            textAnchor='middle'
-            alignmentBaseline='middle'
+            y={ (tb == 'super') ? -18.5 : 31.5 }
           >
             { label }
           </text>
@@ -98,31 +88,24 @@ export default class ProjectStats extends React.Component {
           { theProject.start_year +((theProject.end_year !== theProject.start_year) ? '-' + theProject.end_year : '') }
         </div>
 
-        { (theProject.funding_dispursed) ?
-          <div className='summary'>
-            <strong>${ theProject.funding_dispursed.toLocaleString() }</strong> in federal funding.
-          </div> : ''
-        }
-
         { (theProject.totalFamilies > 0) ?
           <svg
             { ...DimensionsStore.getProjectStatsOverallDimensions() }
+            className='projectStat'
           >
             <g transform='translate(50)'>
 
               <text 
                 x={50}
                 y={25}
-                fontWeight='bold'
-                textAnchor='middle'
-                fontSize='1.3em'
+                className='stat'
               >
                 {theProject.totalFamilies.toLocaleString()}
               </text>
               <text 
                 x={50}
                 y={45}
-                textAnchor='middle'
+                className='statLabel'
               >
                 families displaced
               </text>
@@ -154,21 +137,20 @@ export default class ProjectStats extends React.Component {
         { (houses > 0) ?
           <svg
             { ...DimensionsStore.getProjectStatsOverallDimensions() }
+            className='projectStat'
           >
             <g transform='translate(50)'>
               <text 
                 x={50}
                 y={25}
-                fontWeight='bold'
-                textAnchor='middle'
-                fontSize='1.3em'
+                className='stat'
               >
                 { houses.toLocaleString() }
               </text>
               <text 
                 x={50}
                 y={45}
-                textAnchor='middle'
+                className='statLabel'
               >
                 housing units razed
               </text>
@@ -200,21 +182,20 @@ export default class ProjectStats extends React.Component {
         { (acres > 0) ? 
           <svg
             { ...DimensionsStore.getProjectStatsOverallDimensions() }
+            className='projectStat'
           >
             <g transform='translate(50)'>
               <text 
                 x={50}
                 y={25}
-                fontWeight='bold'
-                textAnchor='middle'
-                fontSize='1.3em'
+                className='stat'
               >
                 { Math.round(acres * 10)/10 }
               </text>
               <text 
                 x={50}
                 y={45}
-                textAnchor='middle'
+                className='statLabel'
               >
                 acres redeveloped
               </text>
@@ -260,6 +241,30 @@ export default class ProjectStats extends React.Component {
               { this._label('public', theProject.reuse_public/acres, widths.residential + widths.commercial + widths.industrial + widths.public / 2) }
             </g>
           </svg> : ''
+        }
+
+        { (theProject.funding_dispursed) ?
+          <svg
+            { ...DimensionsStore.getProjectStatsOverallDimensions() }
+            className='projectStat'
+          >
+            <g transform='translate(50)'>
+              <text 
+                x={50}
+                y={25}
+                className='stat'
+              >
+                {'$' + theProject.funding_dispursed.toLocaleString()}
+              </text>
+              <text 
+                x={50}
+                y={45}
+                className='statLabel'
+              >
+                in federal funding
+              </text>
+            </g>
+          </svg>: ''
         }
       </div>
     );

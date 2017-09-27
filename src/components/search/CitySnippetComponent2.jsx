@@ -27,12 +27,8 @@ export default class CitySnippet extends React.Component {
         >
             <text
               x={ DimensionsStore.getCityTimelineStyle().width / 2 - 5}
-              y={ 6 }
-              fontSize={18}
-              fontWeight={ (this.props.cityData.hasProjectGeojson) ? 'bold' : '' }
-              fill='black'
-              textAnchor='end'
-              alignmentBaseline='hanging'
+              y={ 24 }
+              className={ (this.props.cityData.hasProjectGeojson) ? 'city hasProjectGeojson' : 'city' }
             >
               { this.props.cityData.city + ', ' +  this.props.cityData.state.toUpperCase() }
             </text>
@@ -42,8 +38,7 @@ export default class CitySnippet extends React.Component {
               x2={ DimensionsStore.getCityTimelineStyle().width * 0.75 }
               y1={0}
               y2={30}
-              stroke='#aaa'
-              strokeWidth={0.5}
+              className='divider'
             />
 
 
@@ -58,11 +53,8 @@ export default class CitySnippet extends React.Component {
                 />
                 <text
                   x={ DimensionsStore.getCityTimelineStyle().width * 0.75  - ((this.props.cityData.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 - 3}
-                  y={ 7 }
-                  textAnchor='end'
-                  alignmentBaseline='hanging'
-                  fontSize={12}
-                  fill='grey'
+                  y={ 19 }
+                  className='count poc'
                 >
                   { formatNumber(this.props.cityData.nonwhite) }
                 </text>
@@ -75,11 +67,8 @@ export default class CitySnippet extends React.Component {
                 />
                 <text
                   x={ DimensionsStore.getCityTimelineStyle().width * 0.75 + ((this.props.cityData.whites || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 + 3}
-                  y={ 7 }
-                  textAnchor='start'
-                  alignmentBaseline='hanging'
-                  fontSize={12}
-                  fill='grey'
+                  y={ `19` }
+                  className='count white'
                 >
                   { formatNumber(this.props.cityData.whites) }
                 </text>
@@ -94,21 +83,15 @@ export default class CitySnippet extends React.Component {
                 />
                 <text
                   x={ DimensionsStore.getCityTimelineStyle().width * 0.75 - (this.props.cityData.totalFamilies / theMax) * DimensionsStore.getCityTimelineStyle().width / 12- 3}
-                  y={ 7 }
-                  textAnchor='end'
-                  alignmentBaseline='hanging'
-                  fontSize={12}
-                  fill='grey'
+                  y={ 19 }
+                  className='count territory'
                 >
                   { formatNumber(this.props.cityData.totalFamilies) }
                 </text>
                 <text
                   x={ DimensionsStore.getCityTimelineStyle().width * 0.75 + (this.props.cityData.totalFamilies / theMax) * DimensionsStore.getCityTimelineStyle().width / 12 + 3}
-                  y={ 7 }
-                  textAnchor='start'
-                  alignmentBaseline='hanging'
-                  fontSize={12}
-                  fill='grey'
+                  y={ 19 }
+                  className='count'
                 >
                   (no racial data collected)
                 </text>

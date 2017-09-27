@@ -1,11 +1,58 @@
 .searchResults {
 	padding: 10px 0;
+
+	text {
+		fill: grey;
+		font-size: 14px;
+
+		&.label {
+			font-weight: 400;
+
+			&.displaced {
+				text-anchor: middle;
+			}
+		}
+
+		&.city,
+		&.sublabel.poc {
+			text-anchor: end;
+		}
+
+		&.note {
+			font-style: italic;
+		}
+
+	}
 }
 
 .searchResult {
 
 	svg {
 		pointer-events: none;
+
+		text.city {
+			font-size: 18px;
+			fill: #333;
+			text-anchor: end;
+
+			&.hasProjectGeojson {
+				font-weight: 400;
+			}
+		}
+
+		.divider {
+			stroke: #aaa;
+			strokeWidth: 0.5
+		}
+
+		text.count {
+			font-size: 12px;
+
+			&.poc,
+			&.territory {
+				text-anchor: end;
+			}
+		}
 	}
 
 	h3 {

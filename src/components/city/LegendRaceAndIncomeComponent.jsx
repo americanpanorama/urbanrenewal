@@ -18,6 +18,7 @@ export default class LegendRaceAndIncome extends React.Component {
         <svg
           width={150}
           height={130}
+          className='demographics'
         >
 
           { [0,1,2,3,4].map(income => {
@@ -32,82 +33,63 @@ export default class LegendRaceAndIncome extends React.Component {
                     fill={ getColorForRace(perc) }
                     fillOpacity={ (0.9 - 0.9 * (income * 2500 / 10000)) }
                     stroke={ getColorForRace(perc) }
-                    strokeWidth={0.5}
-                    strokeOpacity={0.1}
                   />
                 );
               })
             );
           })}
           <text
-            x={0}
-            y={57.5}
-            textAnchor='middle'
-            alignmentBaseline='hanging'
-            transform='rotate(270 0,57.5)'
+            x={16}
+            y={62.5}
+            transform='rotate(270 16,62.5)'
             fill='black'
           >
             Greater Poverty →
           </text>
           <text
             x={113}
-            y={20}
-            alignmentBaseline='hanging'
-            className='quantities'
+            y={39.5}
+            className='quantities y'
           >
             100%
           </text>
           <text
             x={113}
-            y={95}
-            alignmentBaseline='baseline'
-            className='quantities'
+            y={99.5}
+            className='quantities y'
           >
             0%
           </text>
           <text
             x={30 + (75/2)}
-            y={0}
-            textAnchor='middle'
-            alignmentBaseline='hanging'
-            fill='black'
+            y={16}
           >
             Race
           </text>
           <text
-            x={30 + 15/2}
-            y={20 + 77}
-            textAnchor='middle'
-            alignmentBaseline='hanging'
+            x={37.5}
+            y={112}
             className='quantities'
           >
             100%
           </text>
           <text
-            x={30 + 15/2}
-            y={20 + 77 + 12}
-            textAnchor='middle'
-            alignmentBaseline='hanging'
+            x={37.5}
+            y={124}
             className='quantities'
           >
             of color
           </text>
           <text
-            x={30
-             + 75 - 15/2}
-            y={20 + 77}
-            textAnchor='middle'
-            alignmentBaseline='hanging'
+            x={97.5}
+            y={112}
             className='quantities'
           >
             100%
           </text>
           <text
-            x={30
-             + 75 - 15/2}
-            y={20 + 77 + 12}
-            textAnchor='middle'
-            alignmentBaseline='hanging'
+            x={97.5}
+            y={124}
             className='quantities'
           >
             white

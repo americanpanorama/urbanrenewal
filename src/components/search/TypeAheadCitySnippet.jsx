@@ -24,21 +24,15 @@ export default class TypeAheadCitySnippet extends React.Component {
         >
           <text
             x={ DimensionsStore.getCityTimelineStyle().width / 2 - 5 }
-            y={ 0 }
-            fontWeight='bold'
-            textAnchor='end'
-            alignmentBaseline='hanging'
-            fill='grey'
+            y={ 14 }
+            className='city label'
           >
             City
           </text>
           <text
             x={  DimensionsStore.getCityTimelineStyle().width / 2 - 5  }
-            y={ 20 }
-            textAnchor='end'
-            alignmentBaseline='hanging'
-            fill='grey'
-            fontStyle='italic'
+            y={ 34 }
+            className='city note'
           >
             Bold have project footprints
           </text>
@@ -46,31 +40,23 @@ export default class TypeAheadCitySnippet extends React.Component {
 
           <text
             x={ DimensionsStore.getCityTimelineStyle().width * 0.75 }
-            y={ 0 }
-            fontWeight='bold'
-            textAnchor='middle'
-            alignmentBaseline='hanging'
-            fill='grey'
+            y={ 14 }
+            className='label displaced'
           >
             Families Displaced
           </text>
 
           <text
             x={ DimensionsStore.getCityTimelineStyle().width * 0.75 - 3 }
-            y={ 20 }
-            textAnchor='end'
-            alignmentBaseline='hanging'
-            fill='grey'
+            y={ 34 }
+            className='sublabel poc'
           >
             of color
           </text>
 
           <text
             x={ DimensionsStore.getCityTimelineStyle().width * 0.75 + 3 }
-            y={ 20 }
-            textAnchor='start'
-            alignmentBaseline='hanging'
-            fill='grey'
+            y={ 34 }
           >
             white
           </text>

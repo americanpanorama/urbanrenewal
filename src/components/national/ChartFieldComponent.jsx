@@ -82,7 +82,6 @@ export default class ChartField extends React.Component {
             width={ DimensionsStore.getScatterplotLength() }
             height={ DimensionsStore.getScatterplotLength() }
             fill="url(#graphgradient2)"
-            //fill='#F5F5F3'
           />
 
           { [...Array(11).keys()].map(decile => {
@@ -124,23 +123,21 @@ export default class ChartField extends React.Component {
               x={ DimensionsStore.getScatterplotLength() * 0.5}
               y={ DimensionsStore.getScatterplotLength() * -0.12 }
               transform={'rotate(180 ' + DimensionsStore.getScatterplotLength() * 0.5 + ' ' + DimensionsStore.getScatterplotLength() * -0.12 + ')'}
-              fontSize='1.5em'
+              className='label'
             >
               {'PERCENTAGE OF THE CITY THAT WAS WHITE (' + this.props.popYear + ')'}
             </text>
 
             { [...Array(11).keys()].map(decile => {
               let x = (decile) * DimensionsStore.getScatterplotLength()/10,
-                y = DimensionsStore.getScatterplotLength() * -0.03;
+                y = DimensionsStore.getScatterplotLength() * -0.03 - 16;
               return (
                 <text
                   x={ x }
                   y={ y }
-                  textAnchor='middle'
-                  alignmentBaseline='hanging'
                   transform={'rotate(180 ' + x + ' ' + y + ')'}
                   key={ 'xLabel' + decile }
-                  fillOpacity={ (!this.props.percentWhitePop) ? 1 : 0.1 }
+                  className={ (this.props.percentWhitePop) ? 'masked' : '' }
                 >
                   { 100 -decile * 10 + '%' }
                 </text>
@@ -150,11 +147,8 @@ export default class ChartField extends React.Component {
             { (this.props.percentWhitePop) ? 
               <text
                 x={ (1-this.props.percentWhitePop) * DimensionsStore.getScatterplotLength() }
-                y={ DimensionsStore.getScatterplotLength() * -0.03 }
-                textAnchor='middle'
-                alignmentBaseline='hanging'
-                fontWeight='bold'
-                transform={'rotate(180 ' + (1-this.props.percentWhitePop) * DimensionsStore.getScatterplotLength() + ' ' + DimensionsStore.getScatterplotLength() * -0.03 + ')'}
+                y={ DimensionsStore.getScatterplotLength() * -0.03 - 16 }
+                transform={'rotate(180 ' + (1-this.props.percentWhitePop) * DimensionsStore.getScatterplotLength() + ' ' + (DimensionsStore.getScatterplotLength() * -0.03 - 16 )+ ')'}
               >
                 { Math.round(this.props.percentWhitePop * 100) + '% white/' + Math.round((1 -this.props.percentWhitePop) * 100) + '% of color'}
               </text> : ''
@@ -165,49 +159,14 @@ export default class ChartField extends React.Component {
             <text
               x={ DimensionsStore.getScatterplotLength() * -0.12 }
               y={ DimensionsStore.getScatterplotLength() * 0.5 }
-              fontSize='1.5em'
+              className='label'
               transform={'rotate(90 ' + DimensionsStore.getScatterplotLength() * -0.12 + ' ' + DimensionsStore.getScatterplotLength()*0.5 + ')'}
             >
               PERCENTAGE OF FAMILIES DISPLACED WHO WERE WHITE
             </text>
 
-            {/* JSX Comment 
-            <text
-              x={ DimensionsStore.getScatterplotLength() * -0.07 }
-              y={ DimensionsStore.getScatterplotLength() * 0.75 }
-              transform={'rotate(90 ' + DimensionsStore.getScatterplotLength() * -0.07 + ' ' + DimensionsStore.getScatterplotLength()*0.75 + ')'}
-            >
-              % whites
-            </text>
-
-            <text
-              x={ DimensionsStore.getScatterplotLength() * -0.07 }
-              y={ DimensionsStore.getScatterplotLength() * 0.25 }
-              transform={'rotate(90 ' + DimensionsStore.getScatterplotLength() * -0.07 + ' ' + DimensionsStore.getScatterplotLength()*0.25 + ')'}
-            >
-              % people of color
-            </text>
-            */}
-
-            { [...Array(0).keys()].map(decile => {
-              let x = DimensionsStore.getScatterplotLength() * -0.03,
-                y = decile * DimensionsStore.getScatterplotLength()/10;
-              return (
-                <text
-                  x={ x }
-                  y={ y }
-                  transform={'rotate(90 ' + x + ' ' + y + ')'}
-                  fillOpacity={ (!this.props.percentFamiliesOfColor) ? 1 : 0.1 }
-                  key={ 'yLabelWhite' + decile }
-                >
-                  { 100 -decile * 10 + '%' }
-                </text>
-              );
-            }) }
-
-
             { [...Array(11).reverse().keys()].map(decile => {
-              let x = DimensionsStore.getScatterplotLength() * -0.03,
+              let x = DimensionsStore.getScatterplotLength() * -0.03 - 16,
                 y = DimensionsStore.getScatterplotLength() - decile * DimensionsStore.getScatterplotLength()/10;
               return (
                 <text
@@ -215,40 +174,28 @@ export default class ChartField extends React.Component {
                   y={ y }
                   transform={'rotate(90 ' + x + ' ' + y + ')'}
                   key={ 'yLabelPOC' + decile }
-                  fillOpacity={ (!this.props.percentFamiliesOfColor) ? 1 : 0.1 }
+                  className={ (this.props.percentFamiliesOfColor) ? 'masked' : '' }
                 >
                   { 100 - decile * 10 + '%' }
                 </text>
               );
             }) }
 
-          {/* JSX Comment 
-            <text
-              x={ DimensionsStore.getScatterplotLength() * -0.03 }
-              y={ DimensionsStore.getScatterplotLength()/2 }
-              transform={'rotate(90 ' + DimensionsStore.getScatterplotLength() * -0.03 + ' ' + DimensionsStore.getScatterplotLength()/2 + ')'}
-              fillOpacity={ (!this.props.percentFamiliesOfColor) ? 1 : 0.1 }
-            >
-              { 'even' }
-            </text> */}
-
             { (this.props.percentFamiliesOfColor) ?
               <text
-                x={ DimensionsStore.getScatterplotLength() * -0.03 }
+                x={ DimensionsStore.getScatterplotLength() * -0.03 - 16}
                 y={ DimensionsStore.getScatterplotLength() * (1 - this.props.percentFamiliesOfColor) }
-                transform={'rotate(90 ' + DimensionsStore.getScatterplotLength() * -0.03 + ' ' + DimensionsStore.getScatterplotLength() * (1 - this.props.percentFamiliesOfColor) + ')'}
-                fontWeight='bold'
+                transform={'rotate(90 ' + (DimensionsStore.getScatterplotLength() * -0.03 - 16) + ' ' + DimensionsStore.getScatterplotLength() * (1 - this.props.percentFamiliesOfColor) + ')'}
               >
                 { Math.round((1 -this.props.percentFamiliesOfColor) * 100) + '% white/' + (100 - Math.round((1-this.props.percentFamiliesOfColor) * 100)) + '% of color' }
               </text> : ''
             }
 
             <text
-              x={ DimensionsStore.getScatterplotLength() * -0.35 }
+              x={ DimensionsStore.getScatterplotLength() * -0.4 }
               y={ DimensionsStore.getScatterplotLength() * 0.63 }
-              fontSize='0.8em'
               className='inadequate'
-              transform={'rotate(135 ' + DimensionsStore.getScatterplotLength() * -0.35 + ' ' + DimensionsStore.getScatterplotLength()*0.63 + ')'}
+              transform={'rotate(135 ' + DimensionsStore.getScatterplotLength() * -0.4 + ' ' + (DimensionsStore.getScatterplotLength()*0.63)+ ')'}
             >
               insufficient data for some cities
             </text>

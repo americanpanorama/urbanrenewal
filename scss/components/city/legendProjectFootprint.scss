@@ -1,0 +1,24 @@
+.projectFootprint {
+	@extend .cityMapBubble;
+
+	text.note {
+		text-anchor: start;
+	}
+
+	line.boundary {
+		stroke: black;
+		stroke-width: 3;
+
+		&.inactive {
+			stroke-dasharray: 5, 10;
+		}
+	}
+
+	path.boundary {
+		stroke: #5B3000;
+		stroke-width: 3;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		fill-opacity: 0.2;
+	}
+}

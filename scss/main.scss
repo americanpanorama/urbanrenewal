@@ -24,8 +24,15 @@
 @import "components/national/vizControlsComponent";
 @import "components/national/chartFieldComponent";
 @import "components/national/mapFieldComponent";
-@import "components/national/legendRaceAndIncomeComponent";
+@import "components/national/dorlingLabel";
+
+@import "components/city/legendRaceAndIncomeComponent";
+@import "components/city/legendCityNoFootprints.scss";
+@import "components/city/legendProjectFootprint.scss";
+@import "components/city/legendHOLC.scss";
+
 
 @import "components/search/citySnippetComponent";
 
 @import "components/introModalComponent";
+@import "components/text.scss";

@@ -1,0 +1,23 @@
+.cityMapBubble {
+  paddingleft: 10px;
+  padding-right: 30px;
+
+  text {
+    text-anchor: middle;
+    font-size: 14px;
+    fill: black;
+
+    &.note {
+     fill: grey;
+     font-style: italic;
+    }
+
+    &.name {
+      font-size: 16px;
+    }
+
+    &.displacements {
+      fill: grey;
+    }
+  }
+}

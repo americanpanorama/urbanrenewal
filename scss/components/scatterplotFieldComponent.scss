@@ -16,10 +16,18 @@
 	text {
 		fill: black;
 		text-anchor: middle;
-		alignment-baseline: hanging;
+
+    &.label {
+      font-size: 1.5em;
+    }
 
     &.inadequate {
       fill: grey;
+      font-size: 0.8em;
+    }
+
+    &.masked {
+      fill-opacity: 0.1;
     }
 	}
 }

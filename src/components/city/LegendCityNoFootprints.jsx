@@ -17,22 +17,16 @@ export default class LegendCityNoFootprints extends React.Component {
       >
         <text
           x={ centerX }
-          y={ 0 }
-          textAnchor='middle'
-          alignmentBaseline='hanging'
-          fill='grey'
-          fontStyle='italic'
+          y={ 12 }
+          className='note'
         >
           No project maps yet 
         </text>
 
         <text
           x={ centerX }
-          y={ 15 }
-          textAnchor='middle'
-          alignmentBaseline='hanging'
-          fill='grey'
-          fontStyle='italic'
+          y={ 27 }
+          className='note'
         >
           available for these cities
         </text>
@@ -47,9 +41,7 @@ export default class LegendCityNoFootprints extends React.Component {
         <text
           x={ centerX }
           y={ centerY - 20}
-          textAnchor='middle'
-          fill='black'
-          className='shadow'
+          className='shadow name'
         >
           CITY
         </text>
@@ -57,10 +49,7 @@ export default class LegendCityNoFootprints extends React.Component {
         <text
           x={ centerX }
           y={ centerY }
-          textAnchor='middle'
-          fill='grey'
-          className='shadow'
-          fontSize='smaller'
+          className='shadow displacements'
         >
           # displacements
         </text>
@@ -68,8 +57,6 @@ export default class LegendCityNoFootprints extends React.Component {
         <text
           x={ centerX }
           y={ centerY + 20}
-          textAnchor='middle'
-          fill='black'
           className='shadow'
         >
           # projects

@@ -19,43 +19,7 @@
     text-shadow: -1px 0 #f5f5f3, 0 1px #f5f5f3, 1px 0 #f5f5f3, 0 -1px #f5f5f3;
   }
 
-  .cityMapBubble {
-    paddingleft: 10px;
-    padding-right: 30px;
-  }
 
-  &.holc {
-    .redlining {
-      display: inline-block;
-      width: 150px;
-    }
-
-    .colorkey {
-      width: 14px;
-      height: 14px;
-      display: inline-block;
-      margin-right: 14px;
-
-      &.A { 
-        background-color: #418e41;
-      }
-      &.B { 
-        background-color: #4a4ae4;
-      }
-      &.C { 
-        background-color: #ffdf00;
-      }
-      &.D { 
-        background-color: #eb3f3f;
-      }
-    }
-
-    .link {
-      pointer-events: auto;
-      font-style: italic;
-      line-height: 15px;
-    }
-  }
 
   .handle {
     pointer-events: auto;

@@ -1,0 +1,23 @@
+.dorlingLabel {
+	text {
+		pointer-events: none;
+		user-select: none;
+		text-anchor: middle;
+		fill: #222;
+		font-family: 'Roboto Condensed', sans-serif;
+
+		&.multistroke {
+			fill: transparent;
+			stroke-width: 3.5;
+			stroke-opacity: 0.7;
+		}
+
+		&.displacements {
+			fill: #555;
+		}
+
+		&.hidden {
+			fill: transparent;
+		}
+	}
+}

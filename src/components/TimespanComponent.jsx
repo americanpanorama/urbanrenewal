@@ -52,11 +52,10 @@ export default class Timespan extends React.Component {
         />
         <text
           dx={ this.props.width / 2 }
-          dy={ this.props.height / 2 + 3 }
+          dy={ this.props.height / 2 + 3 + 6}
           fill={ (this.props.inSelectedYear) ? 'silver' : '#445'}
           fontSize={ 12 }
           textAnchor='middle'
-          alignmentBaseline='middle'
           filter="url(#textBackground)"
         >
           { this.props.text }

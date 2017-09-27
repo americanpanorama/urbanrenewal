@@ -100,7 +100,7 @@ export default class IntroModal extends React.Component {
                 <li>
                   <div className='ordinal'>1</div>
                   <div className='item'>
-                    <p>Compare displacements across the country, with circles representing cities where size indicates displacments and color race.</p>
+                    <p>Circles represent cities where families were displaced by urban renewal. Size indicates the number of families displaced, color the proportion that were of color or white.</p>
                     <object data='./static/intro-national.svg' type="image/svg+xml" />
                   </div>
                 </li>

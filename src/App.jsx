@@ -1,12 +1,16 @@
 import * as React from 'react';
 import { Typeahead } from 'react-typeahead';
+import "babel-polyfill";
 
 // stores
 import CitiesStore from './stores/CitiesStore';
 import DimensionsStore from './stores/DimensionsStore';
 import GeographyStore from './stores/GeographyStore';
 import HighwaysStore from './stores/HighwaysStore';
+import TextsStore from './stores/TextsStore';
 import HashManager from './stores/HashManager';
+
+
 
 // components
   // national
@@ -48,13 +52,13 @@ export default class App extends React.Component {
       scatterplotExplanationVisible: true,
       searching: false,
       initialCityLoading: false,
-      showIntroModal: false // window.localStorage.getItem('hasViewedIntroModal-renewal') !== 'true',
+      showIntroModal: window.localStorage.getItem('hasViewedIntroModal-renewal') !== 'true',
     };
 
     this.coords = {};
 
     // bind handlers
-    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle', 'onProjectInspected', 'onProjectOut', 'onSearching', 'onProjectMapHover', 'onProjectSelected', 'onProjectMapUnhover','onSearchBlur','onCloseSearch','toggleScatterplotExplanationVisibility','onDismissIntroModal'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle', 'onProjectInspected', 'onProjectOut', 'onSearching', 'onProjectMapHover', 'onProjectSelected', 'onProjectMapUnhover','onSearchBlur','onCloseSearch','toggleScatterplotExplanationVisibility','onDismissIntroModal','onModalClick'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
 
     console.time('update');
@@ -75,6 +79,7 @@ export default class App extends React.Component {
     DimensionsStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
     GeographyStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
     HighwaysStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
+    TextsStore.addListener(AppActionTypes.storeChanged, this.storeChanged);
   }
 
   componentDidUpdate () { 
@@ -135,7 +140,7 @@ export default class App extends React.Component {
 
   onDismissIntroModal (persist) {
     if (persist) {
-      window.localStorage.setItem('hasViewedIntroModal-executiveabroad', 'true');
+      window.localStorage.setItem('hasViewedIntroModal-renewal', 'true');
     }
     this.setState({
       showIntroModal: false
@@ -143,6 +148,14 @@ export default class App extends React.Component {
   }
 
   onHOLCToggle() { AppActions.HOLCToggle(!CitiesStore.getHOLCSelected()); }
+
+  onModalClick (event) {
+    const subject = (event.target.id) ? (event.target.id) : null;
+    AppActions.onModalClick(subject);
+    this.setState({
+      contactUs: null
+    });
+  }
 
   onProjectInspected(event) { AppActions.projectInspected(event.target.id); }
 
@@ -264,7 +277,8 @@ export default class App extends React.Component {
       city: CitiesStore.getSlug(),
       viz: CitiesStore.getSelectedView(),
       holc: CitiesStore.getHOLCSelected() || null,
-      project: CitiesStore.getSelectedProject()
+      project: CitiesStore.getSelectedProject(),
+      text: TextsStore.getSubject(),
     };
     if (CitiesStore.getSelectedCity() && GeographyStore.getLatLngZoom().lat) {
       vizState.loc = { 
@@ -286,6 +300,10 @@ export default class App extends React.Component {
               <header style={ DimensionsStore.getHeaderStyle() }>
                 <h1>Renewing Inequality</h1>
                 <h2>Family Displacements through Urban Renewal, 1955-1966</h2>
+                <h4 onClick={ this.onModalClick } id={ 'intro' }>Introduction</h4>
+                <h4 onClick={ this.onModalClick } id={ 'bibliograph' }>Bibliographic Note & Bibliography</h4>
+                <h4 onClick={ this.onModalClick } id={ 'about' }>About</h4>
+                <h4 onClick={ this.onContactUsToggle }>Contact Us</h4>
               </header>
 
               { (!this.state.showIntroModal) ?
@@ -416,9 +434,22 @@ export default class App extends React.Component {
                       </div> : ''
                   }
 
+                  { (TextsStore.mainModalIsOpen()) ?
+                    <div className='longishform'>
+                      <button className='close' onClick={ this.onModalClick }><span>×</span></button>
+                      <div className='content' dangerouslySetInnerHTML={ TextsStore.getModalContent() } />
+                    </div> :
+                    null
+                  }
                 </div> : ''
+
               }
+
+
             </div> 
+
+
+
           </div>
 
         <aside

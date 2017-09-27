@@ -32,7 +32,7 @@ export default class Timespan extends React.Component {
           fill={ (this.props.inSelectedYear) ? 'silver' : '#445'}
           fontSize={ 13 }
           textAnchor='middle'
-          alignmentBaseline='middle'
+          dominantBaseline='middle'
           onMouseEnter={ this.props.onProjectInspected }
           onMouseLeave={ this.props.onProjectOut }
           id={ this.props.projectData.project_id }

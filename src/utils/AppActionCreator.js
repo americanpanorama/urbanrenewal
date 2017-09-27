@@ -20,6 +20,7 @@ export const AppActionTypes = {
   projectInspected: 'projectInspected',
   projectInspectedStats: 'projectInspectedStats',
   projectSelected: 'projectSelected',
+  onModalClick: 'onModalClick',
 
 };
 
@@ -152,6 +153,13 @@ export const AppActions = {
     AppDispatcher.dispatch({
       type: AppActionTypes.citiesHighlighted,
       value: ids
+    });
+  },
+
+  onModalClick: (subject) => {
+    AppDispatcher.dispatch({
+      type: AppActionTypes.onModalClick,
+      subject: subject
     });
   },
 

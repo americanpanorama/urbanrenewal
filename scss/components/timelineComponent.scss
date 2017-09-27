@@ -42,10 +42,15 @@
 
 
   text {
+    font-weight: 100;
       -webkit-user-select: none;
        -moz-user-select: none;
         -ms-user-select: none;
     user-select: none;
+
+    &.hasFootprint {
+      font-weight: 400;
+    }
   }
 
   .grid {

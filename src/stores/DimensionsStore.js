@@ -161,17 +161,15 @@ const DimensionsStore = {
       y: this.data.legendGradientHeightQuints,
       fontSize: this.data.dorlingsMaxRadius / 3,
       textAnchor: 'start',
-      alignmentBaseline: 'baseline'
     };
   },
 
   getLegendGradientNoRaceLabelAttrs: function() {
     return {
       x: this.getLegendGradientPercentX(1) + this.data.legendGradientHeightQuints + 5, 
-      y: this.data.legendGradientHeightQuints * 5,
+      y: this.data.legendGradientHeightQuints * 5 + this.data.dorlingsMaxRadius / 3,
       fontSize: this.data.dorlingsMaxRadius / 3,
       textAnchor: 'start',
-      alignmentBaseline: 'hanging'
     };
   },
 
@@ -183,7 +181,6 @@ const DimensionsStore = {
       y: this.data.legendGradientHeightQuints * 2,
       fontSize: this.data.dorlingsMaxRadius / 3,
       textAnchor: 'start',
-      alignmentBaseline: 'baseline'
     };
   },
 
@@ -193,17 +190,15 @@ const DimensionsStore = {
       y: this.data.legendGradientHeightQuints * 2,
       fontSize: this.data.dorlingsMaxRadius / 3,
       textAnchor: 'end',
-      alignmentBaseline: 'baseline'
     };
   },
 
   getLegendGradientWhitesLabelAttrs: function() {
     return {
       x: this.getLegendGradientPercentX(0), 
-      y: this.data.legendGradientHeightQuints * 4,
+      y: this.data.legendGradientHeightQuints * 4 + this.data.dorlingsMaxRadius / 3,
       fontSize: this.data.dorlingsMaxRadius / 3,
       textAnchor: 'end',
-      alignmentBaseline: 'hanging'
     };
   },
 
@@ -219,30 +214,27 @@ const DimensionsStore = {
   getLegendGradientPercentAttrs: function(perc, race) {
     return {
       x: this.getLegendGradientPercentX((race == 'poc') ? perc : 1-perc), 
-      y: (race == 'poc') ? this.data.legendGradientHeightQuints * 2 : this.data.legendGradientHeightQuints * 3,
+      y: (race == 'poc') ? this.data.legendGradientHeightQuints * 2 : this.data.legendGradientHeightQuints * 3 + this.data.dorlingsMaxRadius / 3,
       fontSize: this.data.dorlingsMaxRadius / 3,
       textAnchor: 'middle',
-      alignmentBaseline: (race == 'poc') ? 'baseline' : 'hanging'
     };
   },
 
   getLegendGradientWhites0Attrs: function() {
     return {
       x: this.getLegendGradientPercentX(1), 
-      y: this.data.legendGradientHeightQuints * 3,
+      y: this.data.legendGradientHeightQuints * 3 + this.data.dorlingsMaxRadius / 3,
       fontSize: this.data.dorlingsMaxRadius / 3,
       textAnchor: 'end',
-      alignmentBaseline: 'hanging'
     };
   },
 
   getLegendGradientWhites100Attrs: function() {
     return {
       x: this.getLegendGradientPercentX(0), 
-      y: this.data.legendGradientHeightQuints * 3,
+      y: this.data.legendGradientHeightQuints * 3 + this.data.dorlingsMaxRadius / 3,
       fontSize: this.data.dorlingsMaxRadius / 3,
       textAnchor: 'start',
-      alignmentBaseline: 'hanging'
     };
   },
 
@@ -367,7 +359,7 @@ const DimensionsStore = {
   getDorlingsMaxRadius: function() { return this.data.dorlingsMaxRadius; },
 
   dorlingHasLabel: function(city_id, visibleRadius) { 
-    const radiusThreshold = (this.isRetina() ? 12 : 20);
+    const radiusThreshold = (this.isRetina() ? 17 : 20);
     return (city_id == CitiesStore.getHighlightedCity() || (CitiesStore.getSelectedView() == 'cartogram' && visibleRadius >= radiusThreshold && !CitiesStore.getHighlightedCity())); 
   },
 
@@ -536,10 +528,9 @@ const DimensionsStore = {
   getMainTimelineYearLabelAttrs: function() {
     return {
       dx: this.getMainTimlineXOffset(1955),
-      dy: this.getMainTimlineXOffset(1955),
+      dy: this.getMainTimlineXOffset(1955) + this.getMainTimlineXOffset(1955) * 2,
       fontSize: this.getMainTimlineXOffset(1955) * 2,
       className: 'timelineLabel',
-      alignmentBaseline: 'hanging'
     };
   },
 
@@ -637,14 +628,14 @@ const DimensionsStore = {
   },
 
   getTimelineXDorlingLabelAttrs: function(year, families) {
+    const fontSize = (8 * this.getDorlingRadius(families, {useYear: true}) / 15 < 12) ? 12 : (8 * this.getDorlingRadius(families, {useYear: true}) / 15 > 18) ? 18 : 8 * this.getDorlingRadius(families, {useYear: true})  / 15;
     return {
       x: this.getMainTimelineLabelXOffset(year), 
-      y: this.getDorlingRadius(CitiesStore.getMaxDisplacementsInCityForYear(), {useYear: true}),
+      y: this.getDorlingRadius(CitiesStore.getMaxDisplacementsInCityForYear(), {useYear: true}) + fontSize/2,
       fill: (year == CitiesStore.getSelectedYear() || CitiesStore.getSelectedYear() == null) ? 'black' : 'grey',
       textAnchor: 'middle',
-      alignmentBaseline: 'middle',
       pointerEvents: 'none',
-      fontSize: (8 * this.getDorlingRadius(families, {useYear: true}) / 15 < 12) ? 12 : (8 * this.getDorlingRadius(families, {useYear: true}) / 15 > 18) ? 18 : 8 * this.getDorlingRadius(families, {useYear: true})  / 15,
+      fontSize: fontSize,
       key: 'xdorlinglabel' + year
     };
   },
@@ -652,8 +643,7 @@ const DimensionsStore = {
   getTimelineXAxisAttrs: function(year) {
     return {
       dx: this.getMainTimelineLabelXOffset(year), 
-      dy: 0,
-      alignmentBaseline: 'hanging',
+      dy: this.getMainTimelineFontSize(),
       textAnchor: 'middle',
       fill: (year == CitiesStore.getSelectedYear() || CitiesStore.getSelectedYear() == null) ? 'black' : 'grey',
       stroke: 'transparent',
@@ -668,7 +658,7 @@ const DimensionsStore = {
   getProjectStatsOverallDimensions: function() {
     return {
       width: this.data.sidebarWidth - this.data.containerPadding,
-      height: 60
+      height: 70
     };
   },
 

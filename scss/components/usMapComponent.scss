@@ -6,12 +6,6 @@
 .dorlings {
 	text {
 		pointer-events: none;
-
-		&.multistroke {
-			fill: transparent;
-			stroke-width: 3.5;
-			stroke-opacity: 0.7;
-		}
 	}
 }
 
@@ -73,12 +67,7 @@
 
 
 
-.dorlingLabel {
-	text {
-		pointer-events: none;
-		user-select: none;
-	}
-}
+
 
 .projectLabel,
 .cityMapCityLabel {

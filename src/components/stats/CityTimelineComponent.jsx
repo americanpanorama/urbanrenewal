@@ -27,31 +27,23 @@ export default class Timeline extends React.Component {
       <svg 
         { ...DimensionsStore.getCityTimelineStyle() }
         height={ height }
-        id='timeline'
+        className='project'
       >
 
         <text
           x={ DimensionsStore.getCityTimelineStyle().width / 2 - 5 }
-          y={ 0 }
-          fontWeight='bold'
-          textAnchor='end'
-          alignmentBaseline='hanging'
-          fill='grey'
+          y={ 14 }
+          className='label projects'
         >
           Renewal Projects
         </text>
         <text
           x={ DimensionsStore.getCityTimelineStyle().width * 0.75 }
-          y={ 0 }
-          fontWeight='bold'
-          textAnchor='middle'
-          alignmentBaseline='hanging'
-          fill='grey'
+          y={ 14 }
+          className='label displacements'
         >
           Families Displaced
         </text>
-
-
 
 
         { sortedProjects.map((p, i) => 
@@ -65,11 +57,8 @@ export default class Timeline extends React.Component {
           >
             <text
               x={ DimensionsStore.getCityTimelineStyle().width / 2 - 5}
-              y={ i * 20 }
-              fontWeight={ (p.the_geojson) ? 'bold' : '' }
-              fill={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 'black' : '#aaa' }
-              textAnchor='end'
-              alignmentBaseline='hanging'
+              y={ i * 20 + 14}
+              className={ 'project' + ((p.the_geojson) ? ' hasFootprint' : '') + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '') }
               id={ p.project_id  }
             >
               { p.project }
@@ -82,8 +71,7 @@ export default class Timeline extends React.Component {
                   x2={ DimensionsStore.getCityTimelineStyle().width * 0.75 }
                   y1={i * 20}
                   y2={20}
-                  stroke='#aaa'
-                  strokeWidth={0.5}
+                  className='divider'
                 />
 
                 <rect
@@ -91,18 +79,13 @@ export default class Timeline extends React.Component {
                   y={i * 20}
                   width={ ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 }
                   height={14}
-                  fillOpacity={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 1 : 0.25 }
-                  className='poc'
+                  className={ 'poc' + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '') }
                   id={ p.project_id  }
                 />
                 <text
                   x={ DimensionsStore.getCityTimelineStyle().width * 0.75  - ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 - 3}
-                  y={ i * 20 + 1 }
-                  fillOpacity={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 1 : 0.25 }
-                  textAnchor='end'
-                  alignmentBaseline='hanging'
-                  fontSize={12}
-                  fill='grey'
+                  y={ i * 20 + 13}
+                  className={'count poc' + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '')}
                 >
                   { formatNumber(p.nonwhite) }
                 </text>
@@ -111,18 +94,13 @@ export default class Timeline extends React.Component {
                   y={i * 20}
                   width={ ((p.whites || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 }
                   height={14}
-                  fillOpacity={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 1 : 0.25 }
-                  className='white'
+                  className={'white' + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '')}
                   id={ p.project_id  }
                 />
                 <text
                   x={ DimensionsStore.getCityTimelineStyle().width * 0.75 + ((p.whites || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 + 3}
-                  y={ i * 20 + 1 }
-                  fillOpacity={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 1 : 0.25 }
-                  textAnchor='start'
-                  alignmentBaseline='hanging'
-                  fontSize={12}
-                  fill='grey'
+                  y={ i * 20 + 13 }
+                  className={'count white' + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '')}
                   id={ p.project_id  }
                 >
                   { formatNumber(p.whites) }
@@ -135,18 +113,13 @@ export default class Timeline extends React.Component {
                   y={i * 20}
                   width={ (p.totalFamilies / theMax) * DimensionsStore.getCityTimelineStyle().width / 3 }
                   height={14}
-                  fillOpacity={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 1 : 0.25 }
-                  className='territory'
+                  className={'territory' + + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '')}
                   id={ p.project_id  }
                 />
                 <text
                   x={ DimensionsStore.getCityTimelineStyle().width * 0.5 + (p.totalFamilies / theMax) * DimensionsStore.getCityTimelineStyle().width / 3 + 3}
                   y={ i * 20 + 1 }
-                  fillOpacity={ (!this.props.inspectedProject || this.props.inspectedProject == p.project_id) ? 1 : 0.25 }
-                  textAnchor='start'
-                  alignmentBaseline='hanging'
-                  fontSize={12}
-                  fill='grey'
+                  className={'count territory' + + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '')}
                   id={ p.project_id  }
                 >
                   { formatNumber(p.totalFamilies) }

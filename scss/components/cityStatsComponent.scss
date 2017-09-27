@@ -30,6 +30,7 @@
   }
 
   .summary, .duration {
+    font-family: 'Roboto Condensed', sans-serif;
     text-align: center;
     font-size: 1.1em;
     margin: 20px auto;
@@ -41,6 +42,92 @@
       text-transform: uppercase;
     }
   }
+
+  svg.project {
+
+    text {
+      font-size: 14px;
+      font-weight: 100;
+        -webkit-user-select: none;
+         -moz-user-select: none;
+          -ms-user-select: none;
+      user-select: none;
+      fill: grey;
+
+      &.label {
+        font-weight: 400;
+        
+        &.projects {
+          text-anchor: end;
+        }
+
+        &.displacements,
+        &.duration {
+          text-anchor: middle;
+        }
+      }
+
+      &.project {
+        text-anchor: end;
+        fill: #222;
+        &.hasFootprint {
+          font-weight: 400;
+        }
+      }
+
+      &.count {
+        font-size: 12px;
+
+        &.poc,
+        &.territory {
+          text-anchor: end;
+        }
+      }
+
+      &.notInspected {
+        fill: #aaa !important;
+      }
+
+      &.startYear {
+        font-size: 12px;
+        text-anchor: end;
+      }
+
+      &.endYear {
+        font-size: 12px;
+      }
+    }
+
+    .divider {
+      stroke: #aaa;
+      strokeWidth: 0.5
+    }
+
+    rect {
+      &.notInspected {
+        fill-opacity: 0.25;
+      }
+    }
+
+    line.duration {
+      stroke: grey;
+
+      &.notInspected {
+        stroke-opacity: 0.25;
+      }
+    }
+
+    circle.duration {
+      fill: grey;
+      &.notInspected {
+        fill-opacity: 0.25;
+      }
+    }
+
+
+  }
+
+
 
   .population-stat {
     color: #0c789a;
@@ -75,10 +162,74 @@
     color: grey;
     margin: 8px auto;
     line-height: 1.05;
+    font-family: 'Roboto Condensed', sans-serif;
     font-size: 0.9em;
     font-style: italic;
     text-align: center;
   }
 
+  rect {
+    &.nonwhite {
+      fill: rgba(163, 135, 190, 1);
+    }
 
+    &.white {
+      fill: rgba(44, 160, 44, 1);
+    }
+  }
+
+  .timelineLabel {
+    font-family: 'Roboto Condensed', sans-serif;
+  }
+
+  .xAxis {
+    text {
+      alignment-baseline: baseline;
+      text-anchor: middle;
+
+      &.all {
+        text-anchor: end;
+      }
+    }
+  }
+
+  .yAxis {
+    text {
+      alignment-baseline: middle;
+      text-anchor: start;
+    }
+  }
+
+  .baseline {
+    height: 1px;
+  }
+
+
+
+
+
+
+
+}
+
+.projectStat {      
+  text {
+    text-anchor: middle;
+
+    &.stat {
+      font-size: 1.5em;
+      font-weight: 400;
+    }
+
+
+    &.labelOnBar {
+      fill: white;
+      font-size: 14px;
+    }
+
+    &.labelOffset {
+      fill: black;
+      font-size: 11px;
+    }
+  }
 }

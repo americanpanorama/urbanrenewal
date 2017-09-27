@@ -33,16 +33,28 @@ header {
   font-family: 'Roboto Condensed', sans-serif;
   text-align: center;
   * {
-    display: inline-block;
+    
     margin: 0;
   }
   h1 {
-    padding-right: 10px;
     font-size: 2em;
-    margin-top: 20px;
+    margin: 2px 0;
+    display: inline-block;
   }
   h2 {
     font-size: 1.5em;
+  }
+
+  h4 {
+    cursor: pointer;
+    display: inline-block;
+    padding: 0 10px;
+    letter-spacing: .02em;
+    font-size: 1em;
+  }
+
+  h4:hover {
+    color: #111;
   }
 
 }
