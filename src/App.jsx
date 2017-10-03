@@ -18,6 +18,7 @@ import MapChart from './components/national/MapChartComponent.jsx';
 import Legend from  './components/national/LegendComponent.jsx';
 import VizControls from './components/national/VizControlsComponent.jsx';
 import ZoomControls from './components/national/ZoomControlsComponent.jsx';
+import NationalStats from './components/national/NationalStats.jsx';
 
   // city
 import CityMap from './components/city/CityMap.jsx';
@@ -293,6 +294,7 @@ export default class App extends React.Component {
   }
 
   render () {
+
     return (
         <div className='container full-height'>
           <div className='row full-height'>
@@ -483,6 +485,13 @@ export default class App extends React.Component {
               onProjectOut={ this.onProjectOut }
               onYearClick={ this.onYearClicked }
               resetView={ this.resetView }
+            /> : ''
+          }
+
+          { (!CitiesStore.getHighlightedProject() && !CitiesStore.getHighlightedCity()) ? 
+            <NationalStats 
+              { ...CitiesStore.getYearTotals(CitiesStore.getSelectedYear()) }
+              selectedYear={ CitiesStore.getSelectedYear() }
             /> : ''
           }
         </aside>

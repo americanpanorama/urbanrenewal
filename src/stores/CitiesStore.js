@@ -61,7 +61,11 @@ const CitiesStore = {
         format: 'JSON'
       },
       // data for projects: duration, displacments, etc.
-      { query: "select projects.city_id, projects.project_id, projects.project, st_asgeojson(projects.the_geom) as the_geojson, round(st_xmin(st_envelope(projects.the_geom))::numeric, 3) as bbxmin, round(st_ymin(st_envelope(projects.the_geom))::numeric, 3) as bbymin, round(st_xmax(st_envelope(projects.the_geom))::numeric, 3) as bbxmax, round(st_ymax(st_envelope(projects.the_geom))::numeric, 3) as bbymax, round(st_y(st_centroid(projects.the_geom))::numeric, 3) as centerlat, round(st_x(st_centroid(projects.the_geom))::numeric, 3) as centerlng, duration.start_year, duration.end_year, whites.value as whites, nonwhites.value as nonwhite, pr.value as pr_total from urdr_id_key projects left join (SELECT project_id, min(year) as start_year, max(year) as end_year FROM combined_dire_char_raw group by project_id, city_id) duration on projects.project_id = duration.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 71 order by project_id, year desc) whites on whites.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 72 order by project_id, year desc) nonwhites on nonwhites.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 80 order by project_id, year desc) pr on pr.project_id = projects.project_id",
+      { query: "select projects.city_id, projects.project_id, projects.project, st_asgeojson(projects.the_geom) as the_geojson, round(st_xmin(st_envelope(projects.the_geom))::numeric, 3) as bbxmin, round(st_ymin(st_envelope(projects.the_geom))::numeric, 3) as bbymin, round(st_xmax(st_envelope(projects.the_geom))::numeric, 3) as bbxmax, round(st_ymax(st_envelope(projects.the_geom))::numeric, 3) as bbymax, round(st_y(st_centroid(projects.the_geom))::numeric, 3) as centerlat, round(st_x(st_centroid(projects.the_geom))::numeric, 3) as centerlng, duration.start_year, duration.end_year, whites.value as whites, nonwhites.value as nonwhite, pr.value as pr_total, substandard.value as substandard, standard.value as standard from urdr_id_key projects left join (SELECT project_id, min(year) as start_year, max(year) as end_year FROM combined_dire_char_raw group by project_id, city_id) duration on projects.project_id = duration.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 71 order by project_id, year desc) whites on whites.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 72 order by project_id, year desc) nonwhites on nonwhites.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 80 order by project_id, year desc) pr on pr.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 69 order by project_id, year desc) substandard on substandard.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 70 order by project_id, year desc) standard on standard.project_id = projects.project_id",
+        format: 'JSON'
+      },
+      // national stats
+      { query: "SELECT year, value, assessed_category FROM urdr_national_data join urdr_category_id_key on nat_id = category_id where year >= 1955 and year <= 1966",
         format: 'JSON'
       }
     ]).then((responses) => {
@@ -146,14 +150,18 @@ const CitiesStore = {
           const duration = 1 + Math.min(r.end_year, 1966) - Math.max(r.start_year, 1955),
             whites = r.whites / duration,
             nonwhite = r.nonwhite / duration,
-            prForYear = r.pr_total / duration;
+            prForYear = r.pr_total / duration,
+            substandard = r.substandard / duration,
+            standard = r.standard / duration;
 
           // total up year data
           if (aYear >= 1955 && aYear <= 1966) {
-            this.data.yearsTotals[aYear] = this.data.yearsTotals[aYear] || {whites: 0, nonwhite: 0, unspecified: 0};
+            this.data.yearsTotals[aYear] = this.data.yearsTotals[aYear] || {whites: 0, nonwhite: 0, unspecified: 0, houses_sub_standard: 0, houses_standard: 0};
             this.data.yearsTotals[aYear].whites += whites;
             this.data.yearsTotals[aYear].nonwhite += nonwhite;
             this.data.yearsTotals[aYear].unspecified += prForYear;
+            this.data.yearsTotals[aYear].houses_sub_standard += substandard;
+            this.data.yearsTotals[aYear].houses_standard += standard;
           }
 
           // aggregate total and year data for city
@@ -179,6 +187,23 @@ const CitiesStore = {
           this.data.cities[r.city_id].maxDisplacmentsForYear = (this.data.cities[r.city_id].projects[r.project_id].yearsData[aYear].totalFamilies  > this.data.cities[r.city_id].maxDisplacmentsForYear) ? this.data.cities[r.city_id].projects[r.project_id].yearsData[aYear].totalFamilies : this.data.cities[r.city_id].maxDisplacmentsForYear;
         }
       }); 
+
+      responses[3].forEach(r => this.data.yearsTotals[r.year][r.assessed_category.replace(/ /g,"_")] = r.value);
+
+      // calculate additional years total values 
+      this.data.yearsTotals.all = Object.keys(this.data.yearsTotals).reduce((aggregating, aYear) => {
+        return {
+          whites: aggregating.whites + this.data.yearsTotals[aYear].whites,
+          nonwhite: aggregating.nonwhite + this.data.yearsTotals[aYear].nonwhite,
+          unspecified: aggregating.unspecified + this.data.yearsTotals[aYear].unspecified,
+          houses_sub_standard: aggregating.houses_sub_standard + this.data.yearsTotals[aYear].houses_sub_standard,
+          houses_standard: aggregating.houses_standard + this.data.yearsTotals[aYear].houses_standard
+        };
+      }, {whites: 0, nonwhite: 0, unspecified: 0, houses_sub_standard: 0, houses_standard: 0});
+      Object.keys(this.data.yearsTotals).forEach(aYear => {
+        this.data.yearsTotals[aYear].totalFamilies = this.data.yearsTotals[aYear].nonwhite + this.data.yearsTotals[aYear].whites;
+        this.data.yearsTotals[aYear].percentFamiliesOfColor = this.data.yearsTotals[aYear].nonwhite / (this.data.yearsTotals[aYear].nonwhite + this.data.yearsTotals[aYear].whites);
+      });
 
       // filter out cities without displacements
       Object.keys(this.data.cities).forEach(id => {
@@ -871,11 +896,14 @@ const CitiesStore = {
 
   getYearsTotals: function() { return this.data.yearsTotals; },
 
-  getYearTotals: function(year) { return this.data.yearsTotals[year]; },
+  getYearTotals: function(year) { 
+    year = year || 'all';
+    return this.data.yearsTotals[year]; 
+  },
 
   getYearsTotalsMax: function() { return Math.max(...Object.keys(this.data.yearsTotals).map(year => this.data.yearsTotals[year].whites + this.data.yearsTotals[year].nonwhite)); },
 
-  getYearsTotalsMaxRace: function() { return (this.data.loaded) ? Math.max(...Object.keys(this.data.yearsTotals).map(year => this.data.yearsTotals[year].nonwhite).concat(Object.keys(this.data.yearsTotals).map(year => this.data.yearsTotals[year].whites))) : 4000; },
+  getYearsTotalsMaxRace: function() { return (this.data.loaded) ? Math.max(...Object.keys(this.data.yearsTotals).map(year => (year !== 'all') ? this.data.yearsTotals[year].nonwhite : 0).concat(Object.keys(this.data.yearsTotals).map(year => (year !== 'all') ? this.data.yearsTotals[year].whites : 0))) : 4000; },
 
   getMaxDisplacementsInCityForYear: function() { return this.data.maxDisplacementsInCityForYear; },
 
