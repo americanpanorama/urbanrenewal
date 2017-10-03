@@ -95,18 +95,16 @@ export default class Timeline extends React.Component {
         />
 
         {/* label for year */}
-        <text { ...DimensionsStore.getMainTimelineYearLabelAttrs() }>
-          { (this.props.selectedYear) ? this.props.selectedYear : 'All Years' }
-        </text>
+        <text { ...DimensionsStore.getMainTimelineYearLabelAttrs() }>Family Displacements by Race</text>
 
         <rect { ...DimensionsStore.getMainTimelineLegendBoxPOCAttrs() } />
-        <text { ...DimensionsStore.getMainTimelineLegendLabelPOCAttrs() }>Displaced families of color</text>
+        <text { ...DimensionsStore.getMainTimelineLegendLabelPOCAttrs() }>of color</text>
 
         <rect { ...DimensionsStore.getMainTimelineLegendBoxWhiteAttrs() } />
-        <text { ...DimensionsStore.getMainTimelineLegendLabelWhiteAttrs() }>Displaced white families</text>
+        <text { ...DimensionsStore.getMainTimelineLegendLabelWhiteAttrs() }>white</text>
 
         <rect { ...DimensionsStore.getMainTimelineLegendBoxPRVIAttrs() } />
-        <text { ...DimensionsStore.getMainTimelineLegendLabelPRVIAttrs() }>Displaced families, US territories</text>
+        <text { ...DimensionsStore.getMainTimelineLegendLabelPRVIAttrs() }>unspecified (US territories)</text>
       </svg>
     );
   }

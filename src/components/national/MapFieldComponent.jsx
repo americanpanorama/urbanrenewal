@@ -46,11 +46,9 @@ export default class MapField extends React.Component {
         opacity={this.state.opacity}
         className='nationalMap'
       >
-        <defs>
-          <filter id="glow" x="-50%" y="-10%" width="200%" height="160%">
-            <feGaussianBlur stdDeviation="10 10" result="glow"/>
-          </filter>
-        </defs>
+        <filter id="glow" x="-50%" y="-10%" width="200%" height="160%">
+          <feGaussianBlur stdDeviation="10" result="glow"/>
+        </filter>
 
       {/* JSX Comment 
         <text
@@ -71,6 +69,7 @@ export default class MapField extends React.Component {
               d={ GeographyStore.getPath(polygon.geometry) }
               strokeWidth={ (this.props.selectedView == 'cartogram') ? 0.1 / this.props.z : 1 / this.props.z }
               className={ this.props.selectedView }
+              filter={ (this.props.selectedView == 'cartogram') ? 'url(#glow)' : '' }
             />
           );
         }) }

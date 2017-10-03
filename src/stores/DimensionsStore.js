@@ -44,7 +44,7 @@ const DimensionsStore = {
     this.data.sidebarTitleHeight = (document.getElementsByClassName('sidebarTitle').length > 0) ? document.getElementsByClassName('sidebarTitle')[0].offsetHeight: 30;
     this.data.nationalMapHeight = this.data.mainPaneHeight - this.data.containerPadding * 2;
     this.data.nationalMapWidth = this.data.mainPaneWidth - this.data.containerPadding * 2;
-    this.data.dorlingsMaxRadius= this.data.nationalMapWidth / 25;
+    this.data.dorlingsMaxRadius= (this.getNationalMapWidth()/960 < this.getNationalMapHeight()/500) ? this.data.nationalMapWidth / 28 : this.getNationalMapHeight() / 15;
 
     this.data.legendRight = this.data.nationalMapWidth * 0.077 + this.data.containerPadding; // lines up roughly with the western edge of Maine on full size map
     
@@ -98,7 +98,7 @@ const DimensionsStore = {
 
   getNationalMapWidth: function() { return this.data.nationalMapWidth; },
 
-  getMapScale: function() { return Math.min(1.2 * this.getNationalMapWidth(), 2 * this.getNationalMapHeight()); }, // I calculated these with trial and error--sure there's a more precise way as this will be fragile if the width changes 
+  getMapScale: function() { return Math.min(this.getNationalMapWidth()/960* 1000, this.getNationalMapHeight()/500 * 1000); }, // I calculated these with trial and error--sure there's a more precise way as this will be fragile if the width changes 
 
   getMainStyle: function() {
     return {
@@ -528,68 +528,68 @@ const DimensionsStore = {
   getMainTimelineYearLabelAttrs: function() {
     return {
       dx: this.getMainTimlineXOffset(1955),
-      dy: this.getMainTimlineXOffset(1955) + this.getMainTimlineXOffset(1955) * 2,
-      fontSize: this.getMainTimlineXOffset(1955) * 2,
+      dy: 18,
+      fontSize: 18,
       className: 'timelineLabel',
     };
   },
 
   getMainTimelineLegendBoxPOCAttrs() {
     return {
-      x: this.getMainTimlineXOffset(1955),
-      y: this.getMainTimelineMaxBarHeight() * 0.33,
+      x: this.getMainTimlineXOffset(1955) * 1.5,
+      y: 27,
       width: this.getMainTimelineBarWidth(),
       height: this.getMainTimelineBarWidth(),
       fill: '#a387be',
-      stroke: 'black',
-      strokeWidth: 0.5
+      stroke: '#444',
+      strokeWidth: 0
     };
   },
 
   getMainTimelineLegendLabelPOCAttrs() {
     return {
-      dx: this.getMainTimlineXOffset(1955) + this.getMainTimelineBarWidth() * 1.5 ,
-      dy: this.getMainTimelineMaxBarHeight() * 0.33 + this.getMainTimelineBarWidth() ,
+      dx: this.getMainTimlineXOffset(1955) * 1.5 + this.getMainTimelineBarWidth() * 1.5 ,
+      dy: 27 + this.getMainTimelineBarWidth() ,
       fontSize: this.getMainTimelineBarWidth(),
     };
   },
 
   getMainTimelineLegendBoxWhiteAttrs() {
     return {
-      x: this.getMainTimlineXOffset(1955),
-      y: this.getMainTimelineMaxBarHeight() * 0.33 + this.getMainTimelineBarWidth() * 1.5 ,
+      x: this.getMainTimlineXOffset(1955) * 1.5,
+      y: 27 + this.getMainTimelineBarWidth() * 1.5 ,
       width: this.getMainTimelineBarWidth(),
       height: this.getMainTimelineBarWidth(),
       fill: '#2ca02c',
-      stroke: 'black',
-      strokeWidth: 0.5
+      stroke: '#444',
+      strokeWidth: 0
     };
   },
 
   getMainTimelineLegendLabelWhiteAttrs() {
     return {
-      dx: this.getMainTimlineXOffset(1955) + this.getMainTimelineBarWidth() * 1.5 ,
-      dy: this.getMainTimelineMaxBarHeight() * 0.33 + this.getMainTimelineBarWidth() * 2.5,
+      dx: this.getMainTimlineXOffset(1955) * 1.5 + this.getMainTimelineBarWidth() * 1.5 ,
+      dy: 27 + this.getMainTimelineBarWidth() * 2.5,
       fontSize: this.getMainTimelineBarWidth(),
     };
   },
 
   getMainTimelineLegendBoxPRVIAttrs() {
     return {
-      x: this.getMainTimlineXOffset(1955),
-      y: this.getMainTimelineMaxBarHeight() * 0.33 + this.getMainTimelineBarWidth() * 3 ,
+      x: this.getMainTimlineXOffset(1955) * 1.5,
+      y: 27 + this.getMainTimelineBarWidth() * 3 ,
       width: this.getMainTimelineBarWidth(),
       height: this.getMainTimelineBarWidth(),
       fill: '#E18942',
-      stroke: 'black',
-      strokeWidth: 0.5
+      stroke: '#444',
+      strokeWidth: 0
     };
   },
 
   getMainTimelineLegendLabelPRVIAttrs() {
     return {
-      dx: this.getMainTimlineXOffset(1955) + this.getMainTimelineBarWidth() * 1.5 ,
-      dy: this.getMainTimelineMaxBarHeight() * 0.33 + this.getMainTimelineBarWidth() * 4,
+      dx: this.getMainTimlineXOffset(1955) * 1.5 + this.getMainTimelineBarWidth() * 1.5 ,
+      dy: 27 + this.getMainTimelineBarWidth() * 4,
       fontSize: this.getMainTimelineBarWidth(),
     };
   },

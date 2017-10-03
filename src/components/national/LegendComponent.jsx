@@ -20,7 +20,7 @@ export default class LegendAndControls extends React.Component {
         style={ DimensionsStore.getLegendDimensions() }
       >
 
-        <h3>{ 'FAMILIES DISPLACED, ' + this.props.selectedYear }</h3>
+        <h3>{ 'Family Displacements by City, ' + this.props.selectedYear }</h3>
         
 
         <LegendDorlings 

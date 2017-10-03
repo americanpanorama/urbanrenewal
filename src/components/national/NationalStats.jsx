@@ -60,8 +60,9 @@ export default class NationalStats extends React.Component {
         open_land: DimensionsStore.getProjectStatProportionWidth(this.props.open_land/this.props.total_projects) || 0,
         disaster_area: DimensionsStore.getProjectStatProportionWidth(this.props.disaster_area/this.props.total_projects) || 0,
         university_or_college_area: DimensionsStore.getProjectStatProportionWidth(this.props.university_or_college_area/this.props.total_projects) || 0,
-        familiesOfColor: DimensionsStore.getProjectStatProportionWidth(this.props.percentFamiliesOfColor) || 0,
-        whiteFamilies: DimensionsStore.getProjectStatProportionWidth(1 - this.props.percentFamiliesOfColor) || 0,
+        familiesOfColor: DimensionsStore.getProjectStatProportionWidth(this.props.nonwhite/(this.props.nonwhite + this.props.whites + this.props.unspecified)) || 0,
+        whiteFamilies: DimensionsStore.getProjectStatProportionWidth(this.props.whites/(this.props.nonwhite + this.props.whites + this.props.unspecified)) || 0,
+        territoriesFamilies: DimensionsStore.getProjectStatProportionWidth(this.props.unspecified/(this.props.nonwhite + this.props.whites + this.props.unspecified)) || 0,
         substandard: DimensionsStore.getProjectStatProportionWidth(this.props.houses_sub_standard/(this.props.houses_sub_standard + this.props.houses_standard)) || 0,
         standard: DimensionsStore.getProjectStatProportionWidth(this.props.houses_standard/(this.props.houses_sub_standard + this.props.houses_standard)) || 0,
         residential: DimensionsStore.getProjectStatProportionWidth(this.props.reuse_residential/acres) || 0,
@@ -192,7 +193,7 @@ export default class NationalStats extends React.Component {
                 fill='#a387be'
                 transform='translate(120)'
               />
-              { this._label('of color', this.props.percentFamiliesOfColor, widths.familiesOfColor / 2)}
+              { this._label('of color', this.props.nonwhite/(this.props.nonwhite + this.props.whites + this.props.unspecified), widths.familiesOfColor / 2)}
 
               <rect
                 width={ widths.whiteFamilies }
@@ -202,7 +203,17 @@ export default class NationalStats extends React.Component {
                 fill='#2ca02c'
                 transform='translate(120)'
               />
-              { this._label('white', (1-this.props.percentFamiliesOfColor), widths.familiesOfColor + widths.whiteFamilies / 2) }
+              { this._label('white', this.props.whites/(this.props.nonwhite + this.props.whites + this.props.unspecified), widths.familiesOfColor + widths.whiteFamilies / 2) }
+
+              <rect
+                width={ widths.territoriesFamilies }
+                height={20}
+                x={ widths.familiesOfColor + widths.whiteFamilies }
+                y={20}
+                fill='#E18942'
+                transform='translate(120)'
+              />
+              { this._label('unspecified', this.props.unspecified/(this.props.nonwhite + this.props.whites + this.props.unspecified), widths.familiesOfColor + widths.whiteFamilies + widths.territoriesFamilies / 2) }
             </g>
           </svg> : ''
         }
