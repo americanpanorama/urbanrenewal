@@ -37,6 +37,7 @@ import TypeAheadCitySnippet from './components/search/TypeAheadCitySnippet.jsx';
 import TimelineYearComponent from './components/TimelineYearComponent.jsx';
 
 import IntroModal from './components/IntroModalComponent.jsx';
+import ContactUs from './components/ContactUs.jsx';
 
 // utils
 import { AppActions, AppActionTypes } from './utils/AppActionCreator';
@@ -53,13 +54,14 @@ export default class App extends React.Component {
       scatterplotExplanationVisible: true,
       searching: false,
       initialCityLoading: false,
+      contactUs: false,
       showIntroModal: window.localStorage.getItem('hasViewedIntroModal-renewal') !== 'true',
     };
 
     this.coords = {};
 
     // bind handlers
-    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle', 'onProjectInspected', 'onProjectOut', 'onSearching', 'onProjectMapHover', 'onProjectSelected', 'onProjectMapUnhover','onSearchBlur','onCloseSearch','toggleScatterplotExplanationVisibility','onDismissIntroModal','onModalClick'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle', 'onProjectInspected', 'onProjectOut', 'onSearching', 'onProjectMapHover', 'onProjectSelected', 'onProjectMapUnhover','onSearchBlur','onCloseSearch','toggleScatterplotExplanationVisibility','onDismissIntroModal','onModalClick','onContactUsToggle'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
 
     console.time('update');
@@ -137,6 +139,13 @@ export default class App extends React.Component {
     this.refs.typeahead.setEntryText('');
     this.setState({ searching: false });
     AppActions.citiesHighlighted([]);
+  }
+
+  onContactUsToggle () {
+    this.setState({
+      contactUs: !this.state.contactUs
+    });
+    AppActions.onModalClick(null);
   }
 
   onDismissIntroModal (persist) {
@@ -444,6 +453,8 @@ export default class App extends React.Component {
                     </div> :
                     null
                   }
+
+                  { (this.state.contactUs) ? <ContactUs onContactUsToggle={ this.onContactUsToggle }/> : '' }
                 </div> : ''
 
               }
