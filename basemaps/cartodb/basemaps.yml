@@ -1,7 +1,18 @@
 name: PanoramaBasemap
-minzoom: 2
+minzoom: 21
 maxzoom: 9
 
 layers:
-  - unified_basemap_layers:
-  - canal_towns:
+  - interstates_55:
+  - interstates_56:
+  - interstates_57:
+  - interstates_58:
+  - interstates_59:
+  - interstates_60:
+  - interstates_61:
+  - interstates_62:
+  - interstates_63:
+  - interstates_64:
+  - interstates_65:
+  - interstates_66:
+

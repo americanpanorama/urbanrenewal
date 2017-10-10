@@ -43,6 +43,30 @@ export const formatNumber = function(num, decimal) {
   return Math.round(num);
 };
 
+export const getMedian = function(args) {
+  if (!args.length) {return 0;};
+  var numbers = args.slice(0).sort((a,b) => a - b);
+  var middle = Math.floor(numbers.length / 2);
+  var isEven = numbers.length % 2 === 0;
+  return isEven ? (numbers[middle] + numbers[middle - 1]) / 2 : numbers[middle];
+};
+
+export const getBottomQuartile = function(args) {
+  if (!args.length) {return 0;};
+  var numbers = args.slice(0).sort((a,b) => a - b);
+  var quart = Math.floor(numbers.length * 0.25);
+  var isEven = numbers.length % 2 === 0;
+  return isEven ? (numbers[quart] + numbers[quart - 1]) / 2 : numbers[quart];
+};
+
+export const getTopQuartile = function(args) {
+  if (!args.length) {return 0;};
+  var numbers = args.slice(0).sort((a,b) => a - b);
+  var quart = Math.floor(numbers.length * 0.75);
+  var isEven = numbers.length % 2 === 0;
+  return isEven ? (numbers[quart] + numbers[quart - 1]) / 2 : numbers[quart];
+};
+
 export const calculateDorlingsPosition = function() {
   let years = [null, 1955, 1956, 1957, 1958, 1959, 1960, 1961, 1962, 1963, 1964, 1965, 1966],
     positions = [];

@@ -19,14 +19,13 @@
 
 	p, ul {
 		@extend %lato-light;
-		font-size: 1.5em;
+		font-size: 1.3em;
 		text-align: initial;
 		margin-bottom: .8em;
 		word-spacing: 4px;
 	}
 
 	h1, h2, h3, h4, h5, h6 {
-		@extend %merriweather-light !optional;
 		text-transform: uppercase;
 		letter-spacing: 1px;
 	}

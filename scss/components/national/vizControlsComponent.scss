@@ -45,13 +45,14 @@
 		border-right: 1px silver solid;
 		border-bottom: 1px silver solid;
 		text-transform: uppercase;
+		cursor: pointer;
 
 		.tooltip {
-			font-family: Oswald, sans-serif;
+			font-size: 14px;
 			text-transform: none;
 		    visibility: hidden;
 		    width: 240px;
-		    background-color: white;
+		    background-color: #eee;
 		    color: black;
 		    text-align: center;
 		    border-radius: 6px;
@@ -61,7 +62,7 @@
 		    /* Position the tooltip */
 		    position: absolute;
 		    left: -80px;
-		    top: 60px;
+		    top: 45px;
 		    z-index: 1;
 		}
 

@@ -7,7 +7,8 @@ const HighwaysStore = {
 
   data: {
     loaded: false,
-    highways: {}
+    highways: [],
+    highways_detailed: []
   },
 
   dataLoader: CartoDBLoader,
@@ -17,11 +18,16 @@ const HighwaysStore = {
       {
         query: "SELECT * FROM interstate_lines",
         format: 'GEOJSON'
+      },
+      {
+        query: "SELECT * FROM interstate_detailed where year_open >= 1955 and year_open <= 1966",
+        format: 'GEOJSON'
       }
     ]).then((responses) => {
       responses.forEach(response => {
         if (responses.length > 0) {
           this.data.highways = responses[0];
+          this.data.highways_detailed = responses[1];
 
           this.data.loaded = true;
           this.emit(AppActionTypes.storeChanged);
@@ -31,7 +37,7 @@ const HighwaysStore = {
   },
 
   getHighwayForYear: function(year) {
-    return (this.data.loaded) ? this.data.highways.filter(highway => highway.properties.year_open <= year) : {};
+    return (this.data.loaded) ? this.data.highways.filter(highway => highway.properties.year_open <= year) : [];
   },
 
   getHighways: function() {
@@ -50,7 +56,7 @@ Object.assign(HighwaysStore, EventEmitter.prototype);
 HighwaysStore.dispatchToken = AppDispatcher.register((action) => {
   switch (action.type) {
   case AppActionTypes.loadInitialData:
-    //HighwaysStore.loadInitialData(action.state);
+    HighwaysStore.loadInitialData(action.state);
     break;
   }
   return true;

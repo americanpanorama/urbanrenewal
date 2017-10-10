@@ -8,6 +8,12 @@
   pointer-events: none;
   z-index: 10000;
   padding: 20px 0 20px 20px;
+  font-weight: 200;
+
+  text {
+    fill: #111;
+    stroke: transparent;
+  }
 
   h3 {
     text-align: center;
@@ -23,6 +29,7 @@
 
   .handle {
     pointer-events: auto;
+    cursor: ew-resize;
   }
 }
 
@@ -35,4 +42,5 @@
   z-index: 10001;
   pointer-events: auto;
   color: grey;
+  cursor: pointer;
 }

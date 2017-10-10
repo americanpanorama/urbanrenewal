@@ -29,6 +29,11 @@ aside {
   padding: 10px;
 }
 
+.container.full-height {
+  background-image: url('./static/ri-bg-image.png');
+  background-repeat: no-repeat;
+}
+
 header {
   font-family: 'Roboto Condensed', sans-serif;
   text-align: center;
@@ -40,10 +45,21 @@ header {
     font-size: 2em;
     margin: 2px 0;
     display: inline-block;
+    border: 1px solid grey;
+    font-height: 1.2;
+    padding-left: 3px;
+
+    .dark {
+      display: inline-block;
+      color: #ddd;
+      background-color: grey;
+      padding: 0 3px;
+    }
   }
   h2 {
     font-size: 1.5em;
   }
+
 
   h4 {
     cursor: pointer;

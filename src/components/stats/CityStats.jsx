@@ -27,7 +27,7 @@ export default class CityStats extends React.Component {
           An estimated <strong>{ Math.round(this.props.totalFamilies).toLocaleString() + ' '}</strong> families were displaced,<br /><strong>{' ' + Math.round(this.props.percentFamiliesOfColor * 100) + '% '}</strong> of which were families of color.
         </p>
 
-        <p className='footprintExplanation'>Project footprints are available for project in bold below.<br /> Hover over to highlight on map.</p>
+        <p className='footprintExplanation'>Project footprints are available for project in bold below.<br /> Hover over to highlight on map, click to select.</p>
 
         <CityTimelineComponent {...this.props } />
 

@@ -1,3 +1,10 @@
+.projectStats {
+  text-align: center;
+  svg {
+    display: inline-block;
+  }
+}
+
 .cityStats, .projectStats {
   h2 {
     margin: 0 auto 10px;
@@ -9,6 +16,19 @@
     text-transform: uppercase;
     text-align: center;
     font-size: 1.4em;
+  }
+
+  .legend {
+    text-align: left;
+    max-width: 200px;
+    margin: 0 auto;
+  }
+
+  svg {
+    .yTickLabel {
+      text-anchor: end;
+      font-size: 14;
+    }
   }
 
 
@@ -53,6 +73,7 @@
           -ms-user-select: none;
       user-select: none;
       fill: grey;
+      cursor: pointer;
 
       &.label {
         font-weight: 400;
@@ -217,8 +238,9 @@
     text-anchor: middle;
 
     &.stat {
-      font-size: 1.5em;
+      font-size: 20px;
       font-weight: 400;
+      text-anchor: middle;
     }
 
 

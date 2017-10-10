@@ -5,6 +5,7 @@
 #timeline {
 
   rect {
+    cursor: pointer;
     &.nonwhite {
       fill: rgba(163, 135, 190, 1);
     }
@@ -22,6 +23,7 @@
     text {
       alignment-baseline: baseline;
       text-anchor: middle;
+      cursor: pointer;
 
       &.all {
         text-anchor: end;
@@ -33,6 +35,7 @@
     text {
       alignment-baseline: middle;
       text-anchor: start;
+      cursor: pointer;
     }
   }
 

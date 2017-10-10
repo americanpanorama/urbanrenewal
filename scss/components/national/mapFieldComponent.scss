@@ -1,15 +1,16 @@
 .nationalMap {
   path {
-    pointerEvents: none;
+    pointer-events: none;
+    cursor: move;
 
     fill: white;
     stroke: #D1D2D1;
-    fillOpacity: 1;
+    fill-opacity: 1;
 
     &.cartogram {
       fill: white;
       stroke: #aaa;
-      fillOpacity: 1;
+      fill-opacity: 1;
     }
   }
 }

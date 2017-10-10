@@ -36,7 +36,7 @@
 	.tooltip {
 	    visibility: hidden;
 	    width: 240px;
-	    background-color: white;
+	    background-color: #eee;
 	    color: black;
 	    text-align: center;
 	    border-radius: 6px;
@@ -46,7 +46,7 @@
 	    /* Position the tooltip */
 	    position: absolute;
 	    right: 0px;
-	    top: -60px;
+	    top: -160px;
 	}
 
 	&:hover {
@@ -58,5 +58,5 @@
 
 .shadow {
 	font-family: 'Roboto Condensed';
-	text-shadow: -2px 0 1px #f5f5f3, 0 2px 1px #f5f5f3, 2px 0 1px #f5f5f3, 0 -2px 1px #f5f5f3;
+	text-shadow: -3px 0 1px #f5f5f3, 0 3px 1px #f5f5f3, 3px 0 1px #f5f5f3, 0 -3px 1px #f5f5f3;
 }

@@ -348,8 +348,23 @@ GeographyStore.dispatchToken = AppDispatcher.register((action) => {
     }
     break;
 
-  case AppActionTypes.projectInspected:
   case AppActionTypes.projectSelected:
+    // if the project city isn't loaded, load it
+    const city_id = CitiesStore.getCityId(action.value);
+    if (city_id && CitiesStore.getSelectedCity() !== city_id) {
+      const waitingId = setInterval(() => {
+        if (GeographyStore.getTheMap()) {
+          clearInterval(waitingId);
+          GeographyStore.setViewFromBounds(city_id);
+          // only reset the map if it's not already on the map
+          // if (!GeographyStore.getTheMap().getBounds().contains([CitiesStore.getCityData(action.value).lat, CitiesStore.getCityData(action.value).lng])) {
+          //   GeographyStore.setViewFromBounds(action.value);
+          // }
+        }
+      }, 500);
+    }
+    // NO BREAK HERE AS YOU NEED TO EXECUTE THE FOLLOWING
+  case AppActionTypes.projectInspected:
     if (GeographyStore.getTheMap() !== null && action.value !== null) {
       const bb = CitiesStore.getProjectBoundingBox(action.value);
       if (bb && !GeographyStore.getTheMap().getBounds().contains(bb)) {

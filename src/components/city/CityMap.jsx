@@ -7,6 +7,10 @@ import { getColorForRace, formatNumber } from '../../utils/HelperFunctions';
 import DimensionsStore from '../../stores/DimensionsStore';
 import GeographyStore from '../../stores/GeographyStore';
 
+import CartoDBTileLayer from '../CartoDBTileLayer.jsx';
+import cartodbConfig from '../../../basemaps/cartodb/config.json';
+import cartodbLayers from '../../../basemaps/cartodb/basemaps.json';
+
 // components
 import { Map, TileLayer, GeoJSON, Tooltip, LayerGroup, Marker, CircleMarker, Rectangle} from 'react-leaflet';
 import UrbanRenewalPolygon from './UrbanRenewalPolygon.jsx';
@@ -164,6 +168,16 @@ export default class CityMap extends React.Component {
 
           {/* base map */}
           <TileLayer url={ (DimensionsStore.isRetina()) ? 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}@2x.png' : 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png' } />
+
+          <CartoDBTileLayer
+            key={ 'highway' + this.props.selectedYear }
+            userId={ cartodbConfig.userId }
+            sql={ "SELECT * FROM interstate_detailed where year_open <= " + ((this.props.selectedYear) ? this.props.selectedYear : 1966) + "\n"}
+            cartocss="#layer {  line-color: #E4D96F;  line-width: 3;  line-opacity: 1;}"
+            zIndex={1000}
+            maxZoom={ 22 }
+            url=''
+          />
 
           {/* city outlines */}
           { this.props.cities_geoms.map((city_geom, i) =>

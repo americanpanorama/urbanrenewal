@@ -48,7 +48,7 @@ const DimensionsStore = {
 
     this.data.legendRight = this.data.nationalMapWidth * 0.077 + this.data.containerPadding; // lines up roughly with the western edge of Maine on full size map
     
-    this.data.legendHeight = 2 * this.data.dorlingsMaxRadius + this.data.legendVerticalGutter * 2;
+    this.data.legendHeight = Math.max(2 * this.data.dorlingsMaxRadius, 18 * 5) + this.data.legendVerticalGutter * 2;
 
     this.data.legendDorlingWidth =  3 * this.data.dorlingsMaxRadius + this.data.legendVerticalGutter * 2; // I'm estimating the labels take half the width as the diameter + 3 for gutters on either side
     this.data.legendDorlingHeight = 2 * this.data.dorlingsMaxRadius + this.data.legendVerticalGutter * 2; // 10 for gutters on either side
@@ -129,6 +129,8 @@ const DimensionsStore = {
 
   getLegendWidth: function() { return this.data.legendWidth; },
 
+  getLegendFontSize: function() { return Math.max(this.data.dorlingsMaxRadius / 3, 14); },
+
   getLegendDimensions: function() { 
     return {
       width: this.data.legendWidth,
@@ -159,7 +161,7 @@ const DimensionsStore = {
     return {
       x: this.getLegendGradientPercentX(1), 
       y: this.data.legendGradientHeightQuints,
-      fontSize: this.data.dorlingsMaxRadius / 3,
+      fontSize: this.getLegendFontSize() + 2,
       textAnchor: 'start',
     };
   },
@@ -167,8 +169,8 @@ const DimensionsStore = {
   getLegendGradientNoRaceLabelAttrs: function() {
     return {
       x: this.getLegendGradientPercentX(1) + this.data.legendGradientHeightQuints + 5, 
-      y: this.data.legendGradientHeightQuints * 5 + this.data.dorlingsMaxRadius / 3,
-      fontSize: this.data.dorlingsMaxRadius / 3,
+      y: this.data.legendGradientHeightQuints * 5 + this.getLegendFontSize() + 2,
+      fontSize: this.getLegendFontSize() + 2,
       textAnchor: 'start',
     };
   },
@@ -179,7 +181,7 @@ const DimensionsStore = {
     return {
       x: this.getLegendGradientPercentX(0), 
       y: this.data.legendGradientHeightQuints * 2,
-      fontSize: this.data.dorlingsMaxRadius / 3,
+      fontSize: this.getLegendFontSize(),
       textAnchor: 'start',
     };
   },
@@ -188,7 +190,7 @@ const DimensionsStore = {
     return {
       x: this.getLegendGradientPercentX(1), 
       y: this.data.legendGradientHeightQuints * 2,
-      fontSize: this.data.dorlingsMaxRadius / 3,
+      fontSize: this.getLegendFontSize(),
       textAnchor: 'end',
     };
   },
@@ -196,8 +198,8 @@ const DimensionsStore = {
   getLegendGradientWhitesLabelAttrs: function() {
     return {
       x: this.getLegendGradientPercentX(0), 
-      y: this.data.legendGradientHeightQuints * 4 + this.data.dorlingsMaxRadius / 3,
-      fontSize: this.data.dorlingsMaxRadius / 3,
+      y: this.data.legendGradientHeightQuints * 4 + this.getLegendFontSize() + 2,
+      fontSize: this.getLegendFontSize() + 2,
       textAnchor: 'end',
     };
   },
@@ -206,16 +208,16 @@ const DimensionsStore = {
     return {
       x: DimensionsStore.getLegendGradientPercentX(1),
       y: this.data.legendGradientHeightQuints * 5,
-      width: this.data.legendGradientHeightQuints,
-      height: this.data.legendGradientHeightQuints
+      width: this.getLegendFontSize() + 2,
+      height: this.getLegendFontSize() + 2
     };
   },
 
   getLegendGradientPercentAttrs: function(perc, race) {
     return {
       x: this.getLegendGradientPercentX((race == 'poc') ? perc : 1-perc), 
-      y: (race == 'poc') ? this.data.legendGradientHeightQuints * 2 : this.data.legendGradientHeightQuints * 3 + this.data.dorlingsMaxRadius / 3,
-      fontSize: this.data.dorlingsMaxRadius / 3,
+      y: (race == 'poc') ? this.data.legendGradientHeightQuints * 2 - 1 : this.data.legendGradientHeightQuints * 3 + this.getLegendFontSize(),
+      fontSize: this.getLegendFontSize(),
       textAnchor: 'middle',
     };
   },
@@ -223,8 +225,8 @@ const DimensionsStore = {
   getLegendGradientWhites0Attrs: function() {
     return {
       x: this.getLegendGradientPercentX(1), 
-      y: this.data.legendGradientHeightQuints * 3 + this.data.dorlingsMaxRadius / 3,
-      fontSize: this.data.dorlingsMaxRadius / 3,
+      y: this.data.legendGradientHeightQuints * 3 + this.getLegendFontSize(),
+      fontSize: this.getLegendFontSize(),
       textAnchor: 'end',
     };
   },
@@ -232,8 +234,8 @@ const DimensionsStore = {
   getLegendGradientWhites100Attrs: function() {
     return {
       x: this.getLegendGradientPercentX(0), 
-      y: this.data.legendGradientHeightQuints * 3 + this.data.dorlingsMaxRadius / 3,
-      fontSize: this.data.dorlingsMaxRadius / 3,
+      y: this.data.legendGradientHeightQuints * 3 + this.getLegendFontSize(),
+      fontSize: this.getLegendFontSize(),
       textAnchor: 'start',
     };
   },
@@ -285,7 +287,7 @@ const DimensionsStore = {
     return {
       x: (this.getLegendDorlingsCircleDimensions(scale).cx - this.data.dorlingsMaxRadius/scale),
       y: (this.getLegendDorlingsCircleDimensions(scale).cy + this.getDorlingRadius(this.getLegendDimensionsIntervals()[0]) - this.getDorlingRadius(v) - this.getDorlingRadius(v)),
-      fontSize: this.data.dorlingsMaxRadius / 3 / scale
+      fontSize: this.getLegendFontSize() / scale
     };
   },
 

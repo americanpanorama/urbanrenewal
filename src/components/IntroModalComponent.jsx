@@ -100,7 +100,7 @@ export default class IntroModal extends React.Component {
                 <li>
                   <div className='ordinal'>1</div>
                   <div className='item'>
-                    <p>Circles represent cities where families were displaced by urban renewal. Size indicates the number of families displaced, color the proportion that were of color or white.</p>
+                    <p className='no-margin'>Circles represent cities where families were displaced by urban renewal. Size indicates the number of families displaced, color the proportion that were of color or white.</p>
                     <object data='./static/intro-national.svg' type="image/svg+xml" />
                   </div>
                 </li>
@@ -114,7 +114,7 @@ export default class IntroModal extends React.Component {
                 <li>
                   <div className='ordinal descender'>3</div>
                   <div className='item'>
-                    <p>The barchart can be used to select a particular year.</p>
+                    <p className='no-margin'>The barchart can be used to select a particular year.</p>
                     <object data='./static/intro-timeline.svg' type="image/svg+xml" />
                   </div>
                 </li>

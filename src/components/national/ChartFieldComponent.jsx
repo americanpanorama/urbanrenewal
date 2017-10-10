@@ -82,6 +82,7 @@ export default class ChartField extends React.Component {
             width={ DimensionsStore.getScatterplotLength() }
             height={ DimensionsStore.getScatterplotLength() }
             fill="url(#graphgradient2)"
+            className='scatterplotFieldBg'
           />
 
           { [...Array(11).keys()].map(decile => {
@@ -121,11 +122,11 @@ export default class ChartField extends React.Component {
           <g>
             <text
               x={ DimensionsStore.getScatterplotLength() * 0.5}
-              y={ DimensionsStore.getScatterplotLength() * -0.12 }
+              y={ DimensionsStore.getScatterplotLength() * -0.06 - 32 }
               transform={'rotate(180 ' + DimensionsStore.getScatterplotLength() * 0.5 + ' ' + DimensionsStore.getScatterplotLength() * -0.12 + ')'}
               className='label'
             >
-              {'PERCENTAGE OF THE CITY THAT WAS WHITE (' + this.props.popYear + ')'}
+              {'percentage of the city that was white (' + this.props.popYear + ')'}
             </text>
 
             { [...Array(11).keys()].map(decile => {
@@ -157,12 +158,12 @@ export default class ChartField extends React.Component {
 
           <g>
             <text
-              x={ DimensionsStore.getScatterplotLength() * -0.12 }
+              x={ DimensionsStore.getScatterplotLength() * -0.06 - 32 }
               y={ DimensionsStore.getScatterplotLength() * 0.5 }
               className='label'
               transform={'rotate(90 ' + DimensionsStore.getScatterplotLength() * -0.12 + ' ' + DimensionsStore.getScatterplotLength()*0.5 + ')'}
             >
-              PERCENTAGE OF FAMILIES DISPLACED WHO WERE WHITE
+              percentage of families displaced who were white
             </text>
 
             { [...Array(11).reverse().keys()].map(decile => {

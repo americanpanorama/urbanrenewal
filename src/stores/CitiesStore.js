@@ -4,7 +4,7 @@ import { AppActionTypes } from '../utils/AppActionCreator';
 import CartoDBLoader from '../utils/CartoDBLoader';
 import GeographyStore from './GeographyStore';
 import DimensionsStore from './DimensionsStore';
-import { getColorForRace, calculateDorlingsPosition, calculateDorlingsPositionUnprojected } from '../utils/HelperFunctions';
+import { getColorForRace, calculateDorlingsPosition, calculateDorlingsPositionUnprojected, getMedian, getBottomQuartile, getTopQuartile } from '../utils/HelperFunctions';
 import StateAbbrs from '../../data/stateAbbrs.json';
 import DorlingLocations from '../../data/dorlingLngLats.json';
 import DorlingXYs from '../../data/dorlingXYs.json';
@@ -33,6 +33,15 @@ const CitiesStore = {
       'percentFamiliesOfColor': {category: 'Percent families of color'}
     },
     yearsTotals: {},
+    stats: {
+      '10000': {displacements: [], percentsFamiliesOfColor: [], projects: [] },
+      '25000': {displacements: [], percentsFamiliesOfColor: [], projects: [] },
+      '50000': {displacements: [], percentsFamiliesOfColor: [], projects: [] },
+      '100000': {displacements: [], percentsFamiliesOfColor: [], projects: [] },
+      '250000': {displacements: [], percentsFamiliesOfColor: [], projects: [] },
+      '500000': {displacements: [], percentsFamiliesOfColor: [], projects: [] },
+      '500000+': {displacements: [], percentsFamiliesOfColor: [], projects: [] }
+    },
     dorlingXYs: {},
     maxDisplacementsInCityForYear: 5139,
 
@@ -61,7 +70,7 @@ const CitiesStore = {
         format: 'JSON'
       },
       // data for projects: duration, displacments, etc.
-      { query: "select projects.city_id, projects.project_id, projects.project, st_asgeojson(projects.the_geom) as the_geojson, round(st_xmin(st_envelope(projects.the_geom))::numeric, 3) as bbxmin, round(st_ymin(st_envelope(projects.the_geom))::numeric, 3) as bbymin, round(st_xmax(st_envelope(projects.the_geom))::numeric, 3) as bbxmax, round(st_ymax(st_envelope(projects.the_geom))::numeric, 3) as bbymax, round(st_y(st_centroid(projects.the_geom))::numeric, 3) as centerlat, round(st_x(st_centroid(projects.the_geom))::numeric, 3) as centerlng, duration.start_year, duration.end_year, whites.value as whites, nonwhites.value as nonwhite, pr.value as pr_total, substandard.value as substandard, standard.value as standard from urdr_id_key projects left join (SELECT project_id, min(year) as start_year, max(year) as end_year FROM combined_dire_char_raw group by project_id, city_id) duration on projects.project_id = duration.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 71 order by project_id, year desc) whites on whites.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 72 order by project_id, year desc) nonwhites on nonwhites.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 80 order by project_id, year desc) pr on pr.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 69 order by project_id, year desc) substandard on substandard.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 70 order by project_id, year desc) standard on standard.project_id = projects.project_id",
+      { query: "select projects.city_id, projects.project_id, projects.project, st_asgeojson(projects.the_geom) as the_geojson, round(st_xmin(st_envelope(projects.the_geom))::numeric, 3) as bbxmin, round(st_ymin(st_envelope(projects.the_geom))::numeric, 3) as bbymin, round(st_xmax(st_envelope(projects.the_geom))::numeric, 3) as bbxmax, round(st_ymax(st_envelope(projects.the_geom))::numeric, 3) as bbymax, round(st_y(st_centroid(projects.the_geom))::numeric, 3) as centerlat, round(st_x(st_centroid(projects.the_geom))::numeric, 3) as centerlng, duration.start_year, duration.end_year, whites.value as whites, nonwhites.value as nonwhite, pr.value as pr_total, substandard.value as substandard, standard.value as standard, funding.value as funding from urdr_id_key projects left join (SELECT project_id, min(year) as start_year, max(year) as end_year FROM combined_dire_char_raw group by project_id, city_id) duration on projects.project_id = duration.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 71 order by project_id, year desc) whites on whites.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 72 order by project_id, year desc) nonwhites on nonwhites.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 80 order by project_id, year desc) pr on pr.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 69 order by project_id, year desc) substandard on substandard.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 70 order by project_id, year desc) standard on standard.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 68 order by project_id, year desc) funding on funding.project_id = projects.project_id",
         format: 'JSON'
       },
       // national stats
@@ -223,6 +232,64 @@ const CitiesStore = {
       });
 
       this.data.maxDisplacementInCity = Math.max(...Object.keys(this.data.cities).map(id => this.data.cities[id].totalFamilies));
+
+      Object.keys(this.data.cities).forEach(id => {
+        if (this.data.cities[id].pop_1960 && this.data.cities[id].state !== 'pr') {
+          let displacements_in_city = [],
+            percents_in_city = [],
+            projects = [],
+            theKey = this.getPopKey(this.data.cities[id].pop_1960);
+
+          if (theKey) {
+            Object.keys(this.data.cities[id].projects).forEach(project_id => {
+              if (this.data.cities[id].projects[project_id].totalFamilies > 0) {
+                displacements_in_city.push(this.data.cities[id].projects[project_id].totalFamilies);
+                percents_in_city.push(this.data.cities[id].projects[project_id].percentFamiliesOfColor);
+                projects.push( {
+                  project_id: project_id,
+                  project: this.data.cities[id].projects[project_id].project,
+                  city: this.data.cities[id].city,
+                  city_id: id,
+                  state: this.data.cities[id].state,
+                  totalFamilies: this.data.cities[id].projects[project_id].totalFamilies,
+                  percentFamiliesOfColor: this.data.cities[id].projects[project_id].percentFamiliesOfColor,
+                  funding: this.data.cities[id].projects[project_id].funding,
+                });
+              }
+            });
+
+            this.data.stats[theKey].displacements.push(...displacements_in_city);
+            this.data.stats[theKey].percentsFamiliesOfColor.push(...percents_in_city);
+            this.data.stats[theKey].projects.push(...projects);
+          }
+        }
+      });
+
+      Object.keys(this.data.stats).forEach(pop => {
+        this.data.stats[pop].displacements.sort((a,b) =>a-b);
+        this.data.stats[pop].projects.sort((a,b) =>a.totalFamilies-b.totalFamilies);
+        const displacements = this.data.stats[pop].projects.map(p => p.totalFamilies);
+        this.data.stats[pop].avgDisplacements = displacements.reduce((a,b) =>a+b) / displacements.length;
+        this.data.stats[pop].medianDisplacements = getMedian(displacements);
+        this.data.stats[pop].bottomQuartileDisplacements = getBottomQuartile(displacements);
+        this.data.stats[pop].topQuartileDisplacements = getTopQuartile(displacements);
+        this.data.stats[pop].medianDisplacements = getMedian(displacements);
+
+        const percentsFamiliesOfColor = this.data.stats[pop].projects.map(p => p.percentFamiliesOfColor).sort((a,b) =>a-b);
+        this.data.stats[pop].avgPercentsFamiliesOfColor = percentsFamiliesOfColor.reduce((a,b) =>a+b) / percentsFamiliesOfColor.length;
+        this.data.stats[pop].medianPercentsFamiliesOfColor = getMedian(percentsFamiliesOfColor);
+        this.data.stats[pop].bottomQuartilePercentsFamiliesOfColor = getBottomQuartile(percentsFamiliesOfColor);
+        this.data.stats[pop].topQuartilePercentsFamiliesOfColor = getTopQuartile(percentsFamiliesOfColor);
+        this.data.stats[pop].medianPercentsFamiliesOfColor = getMedian(percentsFamiliesOfColor);
+
+        const funding = this.data.stats[pop].projects.map(p => p.funding).filter(f => f).sort((a,b) =>a-b);
+        this.data.stats[pop].avgFunding = funding.reduce((a,b) =>a+b) / funding.length;
+        this.data.stats[pop].medianFunding = getMedian(funding);
+        this.data.stats[pop].bottomQuartileFunding = getBottomQuartile(funding);
+        this.data.stats[pop].topQuartileFunding = getTopQuartile(funding);
+        this.data.stats[pop].medianFunding = getMedian(funding);
+        
+      });
       
       if (selectedCategory) {
         this.setSelectedCategory(selectedCategory);
@@ -556,7 +623,7 @@ const CitiesStore = {
 
   getCityData: function(city_id) { return (this.data && this.data.loaded && this.data.cities[city_id]) ? this.data.cities[city_id] : {}; },
   
-  getCityId: function(project_id) { return Object.keys(this.data.cities).filter(city_id => this.data.cities[city_id].projects.hasOwnProperty(project_id))[0]; },
+  getCityId: function(project_id) { return (project_id) ? Object.keys(this.data.cities).filter(city_id => this.data.cities[city_id].projects.hasOwnProperty(project_id))[0] : null; },
 
   getCityIdFromSlug: function(slug) { return (this.data.cities) ? Object.keys(this.data.cities).filter(cityId => (this.data.cities[cityId].slug == slug))[0] : null; },
 
@@ -728,6 +795,34 @@ const CitiesStore = {
 
   getPOCTop: function() { return this.data.poc[1]; },
 
+  getPopKey(pop) {
+    if (!pop) {
+      return;
+    }
+    if (pop > 500000) {
+      return '500000+';
+    }
+
+    return [10000,25000,50000,100000,250000,500000].find(popTest => {
+      if (pop <= popTest) {
+        return popTest;
+      }
+    });
+  },
+
+  getPopCatDescription(project_id) {
+    const city_id = this.getCityId(project_id),
+      cat = this.getPopKey(this.data.cities[city_id].pop_1960);
+
+    return (cat == 10000) ? '< 10K' :
+      (cat == 25000) ? '10-25K' :
+      (cat == 50000) ? '25-50K' :
+      (cat == 100000) ? '50-100K' :
+      (cat == 250000) ? '100-250K' :
+      (cat == 500000) ? '250-500K' :
+      (cat == '500000+') ? '> 500K' : '';
+  },
+
   getProjectBoundingBox: function (id) { return (this.data.cities[this.getHighlightedCity()].projects[id]) ? this.data.cities[this.getHighlightedCity()].projects[id].boundingBox : null; },
 
   getProjectCenter: function (id) { return (this.data.cities[this.getHighlightedCity()].projects[id]) ? this.data.cities[this.getHighlightedCity()].projects[id].center : null; },
@@ -804,6 +899,19 @@ const CitiesStore = {
   getSelectedYear: function() { return this.data.selectedYear; },
 
   getSlug: function() { return (this.data.cities[this.getSelectedCity()] && this.data.cities[this.getSelectedCity()].slug) ? this.data.cities[this.getSelectedCity()].slug : null; },
+
+  getStats: function(pop) { 
+    const theKey = this.getPopKey(pop);
+    if (theKey) {
+      return this.data.stats[theKey];
+    }
+  },
+
+  getStatsByProject: function(project_id) {
+    const city_id = this.getCityId(project_id),
+      pop = this.getCityData(city_id).pop_1960;
+    return this.getStats(pop);
+  },
 
   getVisibleCities: function() {
     const cityIds = this.getVisibleCityIds();
@@ -969,6 +1077,8 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
       }, 100);
     }
     CitiesStore.setInspectedCity(null);
+    CitiesStore.setInspectedProject(null);
+    CitiesStore.setSelectedProject(null);
     CitiesStore.setHighlightedCities([]);
     break;
 
@@ -989,7 +1099,33 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
     break;
 
   case AppActionTypes.projectSelected:
-    CitiesStore.setSelectedProject(action.value);
+    console.log(action.value);
+    const city_id = CitiesStore.getCityId(action.value);
+    console.log(city_id, action.value);
+    if (!action.value) {
+      CitiesStore.setSelectedProject(null);
+    } else if (city_id && CitiesStore.getSelectedCity() !== city_id) {
+      if (CitiesStore.cityLoaded(city_id)) {
+        CitiesStore.setSelectedCity(city_id);
+        CitiesStore.setSelectedProject(action.value);
+      } else {
+        CitiesStore.loadCityData(city_id);
+        let waitingId = setInterval(() => {
+          if (CitiesStore.cityLoaded(city_id)) {
+            clearInterval(waitingId);
+            CitiesStore.setSelectedCity(city_id);
+            CitiesStore.setSelectedProject(action.value);
+            CitiesStore.setInspectedCity(null);
+            CitiesStore.setInspectedProject(null);
+          }
+        }, 100);
+      }
+    } else {
+      CitiesStore.setSelectedProject(action.value);
+      CitiesStore.setInspectedCity(null);
+      CitiesStore.setInspectedProject(null);
+    }
+
     break;
 
   case AppActionTypes.viewSelected:

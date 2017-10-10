@@ -22,6 +22,26 @@ export default class LegendAndControls extends React.Component {
 
         <h3>{ 'Family Displacements by City, ' + this.props.selectedYear }</h3>
         
+        { (this.props.selectedView == 'map') ?
+          <svg
+            height={20}
+            width={ DimensionsStore.getLegendDorlingsDimensions().width }
+            style={{ position: 'absolute', left: 25, bottom: 18 }}
+          >
+            <line
+              x1={0}
+              x2={30}
+              y1={(DimensionsStore.getLegendFontSize()+ 2)/2}
+              y2={(DimensionsStore.getLegendFontSize()+ 2)/2}
+              strokeWidth={2 }
+              stroke='#E4D96F'
+            />
+
+            <text x={33} y={DimensionsStore.getLegendFontSize()+ 2} fontSize={DimensionsStore.getLegendFontSize()+ 2}>interstates</text>
+
+          </svg>
+          : ''
+        }
 
         <LegendDorlings 
           dorlingScale={ this.props.dorlingScale }

@@ -77,6 +77,11 @@
 				height: 391px;	// avoid collapsing while loading image
 			}
 		}
+		p {
+			font-size: 16px;
+			font-family: "Roboto Condensed", sans-serif;
+			width: 500px;
+		}
 	}
 
 	.p1 {
@@ -95,6 +100,7 @@
 			color: $text-color;
 			text-transform: uppercase;
 			margin: 0;
+			color: #ccc;
 		}
 
 		h3 {
@@ -103,6 +109,7 @@
 			color: $text-color;
 			text-transform: uppercase;
 			margin: 0;
+			color: #ccc;
 		}
 
 		.content {
@@ -161,6 +168,10 @@
 					margin: 0 0 18px 0;
 
 					font-size: 15px;
+
+					&.no-margin {
+						margin: 0;
+					}
 				}
 
 				img {

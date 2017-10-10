@@ -39,6 +39,7 @@ import TimelineYearComponent from './components/TimelineYearComponent.jsx';
 import IntroModal from './components/IntroModalComponent.jsx';
 import ContactUs from './components/ContactUs.jsx';
 
+
 // utils
 import { AppActions, AppActionTypes } from './utils/AppActionCreator';
 import AppDispatcher from './utils/AppDispatcher';
@@ -309,7 +310,7 @@ export default class App extends React.Component {
           <div className='row full-height'>
             <div className='columns eight full-height'>
               <header style={ DimensionsStore.getHeaderStyle() }>
-                <h1>Renewing Inequality</h1>
+                <h1>Renewing <span className='dark'>Inequality</span></h1>
                 <h2>Family Displacements through Urban Renewal, 1955-1966</h2>
                 <h4 onClick={ this.onModalClick } id={ 'intro' }>Introduction</h4>
                 <h4 onClick={ this.onModalClick } id={ 'sources' }>Sources & Method</h4>
@@ -402,7 +403,7 @@ export default class App extends React.Component {
                         { (CitiesStore.getSelectedView() == 'scatterplot') ?
                             <div className='scatterplotExplanation'>
                               { (this.state.scatterplotExplanationVisible) ?
-                                <p><a href='https://www.youtube.com/watch?v=T8Abhj17kYU' target='_blank'>James Baldwin famously indicted urban renewal as "Negro removal."</a> While it certainly lacks Baldwin's eloquence, this chart largely makes the same point. Most cities fall below the orange line because they displaced families of color disproportionately relative to their overall population. Expressed another way visually, cities with purple backgrounds against the green part of the background are cities that had white majorities that largely displaced people of color through their urban renewal projects. For example, the bottom left of the graph shows cities like <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('cincinnatiOH')}>Cincinnati</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('norfolkVA')}>Norfolk</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('clevelandOH')}>Cleveland</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('saintlouisMO')}>St. Louis</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('philadelphiaPA')}>Philadelphia</span>, and <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('detroitMI')}>Detroit</span> where people of color were 20% to 30% of the overall population but made up two-thirds or more of those displaced. On the far right are usually smaller white cities with tiny populations of color. With people of color being less than 10% of those cities populations, though the majority of families displaced were white, racial disparities still characterized urban renewal in most of these cities as well. For example, while 96% of the families displaced in <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('scrantonPA')}>Scranton</span> were white, more than 99% of the population was white.
+                                <p><a href='https://www.youtube.com/watch?v=T8Abhj17kYU' target='_blank'>James Baldwin famously indicted urban renewal as "Negro removal."</a> While it certainly lacks Baldwin's eloquence, this chart largely makes the same point. Most cities fall below the yellow line because they displaced families of color disproportionately relative to their overall population. Expressed another way visually, cities with purple backgrounds against the green part of the background are cities that had white majorities that largely displaced people of color through their urban renewal projects. For example, the bottom left of the graph shows cities like <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('cincinnatiOH')}>Cincinnati</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('norfolkVA')}>Norfolk</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('clevelandOH')}>Cleveland</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('saintlouisMO')}>St. Louis</span>, <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('philadelphiaPA')}>Philadelphia</span>, and <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('detroitMI')}>Detroit</span> where people of color were 20% to 30% of the overall population but made up two-thirds or more of those displaced. On the far right are usually smaller white cities with tiny populations of color. With people of color being less than 10% of those cities populations, though the majority of families displaced were white, racial disparities still characterized urban renewal in most of these cities as well. For example, while 96% of the families displaced in <span onMouseEnter={ this.onCityInspected } onMouseLeave={ this.onCityOut } id={ CitiesStore.getCityIdFromSlug('scrantonPA')}>Scranton</span> were white, more than 99% of the population was white.
                                 </p> : ''
                               }
                               <div 
@@ -431,6 +432,7 @@ export default class App extends React.Component {
                           <Legend
                             poc={ CitiesStore.getPOC() }
                             selectedYear={ CitiesStore.getSelectedYear() || '1955-1966' }
+                            selectedView={ CitiesStore.getSelectedView() }
                             dorlingScale={ (CitiesStore.getSelectedView() == 'cartogram') ? GeographyStore.getZ() : 1 }
                             dorlingIncrements={ DimensionsStore.getLegendDimensionsIntervals() }
                             onDragUpdate={ this.onDragUpdate }
@@ -474,10 +476,13 @@ export default class App extends React.Component {
             <ProjectStats 
               { ...CitiesStore.getCityData(CitiesStore.getHighlightedCity()) }
               project_id={ CitiesStore.getHighlightedProject() }
+              stats={ CitiesStore.getStatsByProject(CitiesStore.getHighlightedProject()) }
+              cityCat={ CitiesStore.getPopCatDescription(CitiesStore.getHighlightedProject()) }
               categories={ CitiesStore.getCategories() }
               year={ this.state.year }
               resetView={ this.resetView }
               onProjectClick={ this.onProjectSelected }
+              onProjectInspected={ this.onProjectInspected }
               selected={ CitiesStore.getHighlightedProject() == CitiesStore.getSelectedProject() }
             /> : ''
           }

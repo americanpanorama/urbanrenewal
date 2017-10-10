@@ -61,6 +61,19 @@ export default class USMap extends React.Component {
             selectedYear={ CitiesStore.getSelectedYear() || '1955-1966' }
           />
 
+          { (this.props.selectedView == 'map') ? 
+            <g>
+              { HighwaysStore.getHighwayForYear(CitiesStore.getSelectedYear() || 1966).map(section => 
+                <path
+                  d={GeographyStore.getPath(section)}
+                  stroke='#E4D96F'
+                  strokeWidth='1.5'
+                  fill='transparent'
+                />
+              )}
+            </g> : ''
+          }
+
           { CitiesStore.getDorlingsForce().map((cityData, i) => {
             return (
               <Dorlings
