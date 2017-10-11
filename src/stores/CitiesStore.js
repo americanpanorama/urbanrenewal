@@ -246,14 +246,15 @@ const CitiesStore = {
                 displacements_in_city.push(this.data.cities[id].projects[project_id].totalFamilies);
                 percents_in_city.push(this.data.cities[id].projects[project_id].percentFamiliesOfColor);
                 projects.push( {
-                  project_id: project_id,
+                  project_id: parseInt(project_id),
                   project: this.data.cities[id].projects[project_id].project,
                   city: this.data.cities[id].city,
-                  city_id: id,
+                  city_id: parseInt(id),
                   state: this.data.cities[id].state,
                   totalFamilies: this.data.cities[id].projects[project_id].totalFamilies,
                   percentFamiliesOfColor: this.data.cities[id].projects[project_id].percentFamiliesOfColor,
                   funding: this.data.cities[id].projects[project_id].funding,
+                  hasProjectGeojson: !!this.data.cities[id].projects[project_id].the_geojson,
                 });
               }
             });
@@ -1099,9 +1100,7 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
     break;
 
   case AppActionTypes.projectSelected:
-    console.log(action.value);
     const city_id = CitiesStore.getCityId(action.value);
-    console.log(city_id, action.value);
     if (!action.value) {
       CitiesStore.setSelectedProject(null);
     } else if (city_id && CitiesStore.getSelectedCity() !== city_id) {

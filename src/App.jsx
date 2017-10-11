@@ -483,6 +483,7 @@ export default class App extends React.Component {
               resetView={ this.resetView }
               onProjectClick={ this.onProjectSelected }
               onProjectInspected={ this.onProjectInspected }
+              onProjectOut={ this.onProjectOut }
               selected={ CitiesStore.getHighlightedProject() == CitiesStore.getSelectedProject() }
             /> : ''
           }

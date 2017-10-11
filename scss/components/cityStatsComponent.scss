@@ -3,6 +3,7 @@
   svg {
     display: inline-block;
   }
+
 }
 
 .cityStats, .projectStats {
@@ -13,21 +14,40 @@
   }
 
   h3 {
-    text-transform: uppercase;
     text-align: center;
-    font-size: 1.4em;
+    font-size: 1.5em;
+    font-weight: 400;
+    font-family: 'Roboto Condensed', sans-serif;
   }
 
   .legend {
     text-align: left;
-    max-width: 200px;
+    max-width: 300px;
     margin: 0 auto;
+    font-size: 18px;
   }
 
   svg {
+    .tickLabel {
+      fill: grey;
+      font-size: 12;
+
+      &.right {
+        text-anchor: end;
+      }
+
+      &.left {
+        text-anchor: start;
+      }
+    }
+
     .yTickLabel {
       text-anchor: end;
-      font-size: 14;
+    }
+
+    line.tick {
+      stroke: #bbb;
+      stroke-width: 0.5;
     }
   }
 
@@ -234,14 +254,18 @@
 }
 
 .projectStat {      
+
+  .strong {
+    font-weight: 400;
+  }
+
   text {
     text-anchor: middle;
 
     &.stat {
       font-size: 20px;
-      font-weight: 400;
-      text-anchor: middle;
     }
+
 
 
     &.labelOnBar {

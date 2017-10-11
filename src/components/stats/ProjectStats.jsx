@@ -60,28 +60,28 @@ export default class ProjectStats extends React.Component {
   }
 
   onProjectHover(e) {
+    if (this.props.stats.projects.find(p => p.project_id == e.target.id).city_id == this.props.projects[this.props.project_id].city_id) {
+      this.props.onProjectInspected(e);
+    }
     this.setState({
       hoverProject: e.target.id
     });
   }
 
   onProjectOut(e) {
+    if (this.props.stats.projects.find(p => p.project_id == e.target.id).city_id == this.props.projects[this.props.project_id].city_id) {
+      this.props.onProjectOut();
+    }
     this.setState({
       hoverProject: null
     });
   }
 
-  onProjectHoverAndInspect(e) {
-    console.log(e.target.id);
-    this.props.onProjectInspected(e.target.id);
-    
-  }
-
   render() {  
     let theProject = this.props.projects[this.props.project_id] || {},
       houses = (theProject && theProject.houses_sub_standard && theProject.houses_standard) ?  theProject.houses_sub_standard + theProject.houses_standard : 0,
-      acres = (theProject && theProject.reuse_residential && theProject.reuse_commercial && theProject.reuse_industrial && theProject.reuse_public) ? theProject.reuse_residential + theProject.reuse_commercial + theProject.reuse_industrial + theProject.reuse_public : 0,
-      inspectedProject = this.props.stats.projects.find(p => p.project_id == this.state.hoverProject);
+      acres = (theProject && theProject.reuse_residential && theProject.reuse_commercial && theProject.reuse_industrial && theProject.reuse_public) ? theProject.reuse_residential + theProject.reuse_commercial + theProject.reuse_industrial + theProject.reuse_public : 0;
+
 
       // widths = {
       //   familiesOfColor: DimensionsStore.getProjectStatProportionWidth(theProject.percentFamiliesOfColor),
@@ -94,7 +94,7 @@ export default class ProjectStats extends React.Component {
       //   public: DimensionsStore.getProjectStatProportionWidth(theProject.reuse_public/acres)
       // };
 
-    const funding = this.props.stats.projects.filter(f => f),
+    const funding = [{funding: this.props.stats.medianFunding, project_id: 'median'}].concat(this.props.stats.projects.filter(f => f)),
       maxFunding = Math.max(...funding.map(p => p.funding)),
       fundingTicks = (maxFunding <= 10000000) ? [1000000, 2000000, 3000000, 4000000, 5000000, 6000000, 7000000, 8000000, 9000000, 10000000] : [1000000,10000000,20000000,30000000,40000000,50000000,60000000];
 
@@ -109,6 +109,9 @@ export default class ProjectStats extends React.Component {
       .arrange();    
 
     const fundingMid = swarm.reduce((max,p) => Math.max(Math.abs(p.x), max), 0);
+
+    const inspectedProject = (this.state.hoverProject) ? this.props.stats.projects.find(p => p.project_id == this.state.hoverProject) : [],
+      inspectedProjectHover = (this.state.hoverProject) ? swarm.find(p => p.datum.project_id == this.state.hoverProject) : [];
 
 
     return (
@@ -128,16 +131,12 @@ export default class ProjectStats extends React.Component {
         }
 
 
-        <h3>{ theProject.project }</h3>
-
-        <div className='duration'>
-          { theProject.start_year +((theProject.end_year !== theProject.start_year) ? '-' + theProject.end_year : '') }
-        </div>
+        <h3>{ theProject.project + ' — ' + theProject.start_year + ((theProject.end_year !== theProject.start_year) ? '-' + theProject.end_year : '') + ''}</h3>
 
         <div className='legend'>
-          <svg width={20} height={12}><circle cx={6} cy={6} r={5} stroke='black' fill='grey' /></svg>{ theProject.project}.<br />
-          <svg width={20} height={12}><circle cx={6} cy={6} r={2.5} stroke='black' fill='grey' /></svg>Other projects in { this.props.city }<br />
-          <svg width={20} height={12}><circle cx={6} cy={6} r={2.5} stroke='grey' fill='transparent' /></svg>Other projects in comparably sized cities (populations of {this.props.cityCat})<br />
+          <svg width={20} height={12}><circle cx={6} cy={6} r={5} stroke='black' fill='#aaa' /></svg>{ theProject.project}<br />
+          <svg width={20} height={12}><circle cx={6} cy={6} r={2.5} stroke='black' strokeWidth={1.5} fill='#aaa' /></svg>Other projects in { this.props.city }<br />
+          <svg width={20} height={12}><circle cx={6} cy={6} r={2.5} stroke='grey' fill='transparent' /></svg>Projects in comparably sized cities (populations of {this.props.cityCat})<br />
           <svg width={20} height={12}>
             <line x1={2} y1={2} x2={10} y2={10} stroke='maroon' />
             <line x1={10} y1={2} x2={2} y2={10} stroke='maroon' />
@@ -147,41 +146,45 @@ export default class ProjectStats extends React.Component {
         { (theProject.totalFamilies > 0) ?
           <svg
             { ...DimensionsStore.getProjectStatsOverallDimensions() }
-            width={270}
+            width={198}
             height={300}
             className='projectStat'
           >
 
-            <g transform='translate(60, 5)'>
+            <g transform='translate(45, 5)'>
               <text 
                 x={75}
                 y={ 20 }
                 className='stat'
-                fill='black'
               >
-                {theProject.totalFamilies.toLocaleString() + ' families displaced'}
+                <tspan className='strong'>{theProject.totalFamilies.toLocaleString()}</tspan> families displaced
               </text>
 
               <text 
                 x={ 75}
                 y={ 40 }
-                fill='black'
                 fontWeight={200}
               >
-                { Math.round((1-theProject.percentFamiliesOfColor) * 100) +'% white/' + Math.round(theProject.percentFamiliesOfColor * 100) +'% of color'}
+                <tspan className='strong'>{ (Math.round((1-theProject.percentFamiliesOfColor) * 100)) + '%'}</tspan> white/<tspan  className='strong'>{ (Math.round(theProject.percentFamiliesOfColor * 100)) +'%'}</tspan> of color
               </text>
 
 
 
               <g transform='translate(0, 50)'>
+                <rect 
+                  x={0}
+                  y={0}
+                  width={150}
+                  height={ 200 }
+                  fill='#eee'
+                />
                 { [...Array(5).keys()].map(quarter =>
                   <line
                     x1={quarter * 150/4}
                     x2={quarter * 150/4}
                     y1={0}
                     y2={200}
-                    stroke='#bbb'
-                    strokeWidth={0.5}
+                    className='tick'
                     key={ 'xtick' + quarter }
                   />
                 )}
@@ -195,15 +198,14 @@ export default class ProjectStats extends React.Component {
                           x2={150}
                           y1={(this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies - tick) / this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies * 200}
                           y2={(this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies - tick) / this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies * 200}
-                          stroke='#bbb'
-                          strokeWidth={0.5}
+                          className='tick'
                           
                         />
 
                         <text
                           x={-5}
                           y={(this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies - tick) / this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies * 200 + 6}
-                          className='yTickLabel'
+                          className='tickLabel yTickLabel'
                         >
                           { tick }
                         </text>
@@ -212,6 +214,7 @@ export default class ProjectStats extends React.Component {
                   }
                 })}
 
+              {/* JSX Comment 
                 <text
                   x={-45}
                   y={100}
@@ -222,7 +225,7 @@ export default class ProjectStats extends React.Component {
 
 
 
-              {/* JSX Comment 
+              
                 <line
                   x1={ theProject.percentFamiliesOfColor * 150}
                   y1={ (this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies - theProject.totalFamilies) / this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies * 200 }
@@ -252,7 +255,7 @@ export default class ProjectStats extends React.Component {
                 })}
 
                 { this.props.stats.projects.map(pr => {
-                  if (pr.city_id == theProject.city_id) {
+                  if (pr.city_id == theProject.city_id && pr.project_id !== theProject.project_id) {
                     return (
                       <circle
                         cx={ pr.percentFamiliesOfColor * 150}
@@ -261,14 +264,27 @@ export default class ProjectStats extends React.Component {
                         fill={ getColorForRace(pr.percentFamiliesOfColor) }
                         fillOpacity={ (!this.state.hoverProject || pr.project_id == this.state.hoverProject) ? 1 : 0.3 }
                         stroke='#111'
+                        strokeWidth={1.5}
                         strokeOpacity={ (!this.state.hoverProject || pr.project_id == this.state.hoverProject) ? 1 : 0.3 }
                         key={ 'projectGraph' + pr.project_id }
-                        onMouseEnter={ this.props.onProjectInspected }
+                        onMouseEnter={ this.onProjectHover }
+                        onMouseLeave={ this.onProjectOut }
+                        onClick={ this.props.onProjectClick }
                         id={ pr.project_id }
                       />
                     );
                   }
                 })}
+
+                <circle
+                  cx={ theProject.percentFamiliesOfColor * 150}
+                  cy={ (this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies - theProject.totalFamilies) / this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies * 200 }
+                  r={7}
+                  fill={ getColorForRace(theProject.percentFamiliesOfColor) }
+                  fillOpacity={ (!this.state.hoverProject || theProject.project_id == this.state.hoverProject) ? 1 : 0.3 }
+                  stroke={ '#111' }
+                  strokeOpacity={ (!this.state.hoverProject || theProject.project_id == this.state.hoverProject) ? 1 : 0.3 }
+                />
 
               {/* JSX Comment 
                 <line
@@ -287,23 +303,8 @@ export default class ProjectStats extends React.Component {
                   stroke='#111'
                 /> */}
 
-                <circle
-                  cx={ theProject.percentFamiliesOfColor * 150}
-                  cy={ (this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies - theProject.totalFamilies) / this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies * 200 }
-                  r={2.5}
-                  fill={ getColorForRace(theProject.percentFamiliesOfColor) }
-                  fillOpacity={ 1 }
-                  stroke={ '#111' }
-                />
 
-                <circle
-                  cx={ theProject.percentFamiliesOfColor * 150}
-                  cy={ (this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies - theProject.totalFamilies) / this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies * 200 }
-                  r={5}
-                  fill={ getColorForRace(theProject.percentFamiliesOfColor) }
-                  fillOpacity={ 1 }
-                  stroke={ '#111' }
-                />
+
 
                 <line
                   x1={ this.props.stats.medianPercentsFamiliesOfColor * 150 - 4 }
@@ -324,22 +325,38 @@ export default class ProjectStats extends React.Component {
                 <text 
                   x={0}
                   y={ 220 }
-                  fill='black'
+                  className='tickLabel left'
                 >
-                  100% white
+                  100%
+                </text>
+
+                <text 
+                  x={0}
+                  y={ 235 }
+                  className='tickLabel left'
+                >
+                  white
                 </text>
 
                 <text 
                   x={150}
                   y={ 220 }
-                  fill='black'
+                  className='tickLabel right'
                 >
-                  100% of color
+                  100%
+                </text>
+
+                <text 
+                  x={150}
+                  y={ 235 }
+                  className='tickLabel right'
+                >
+                  of color
                 </text>
 
                 <text 
                   x={75}
-                  y={ 240 }
+                  y={ 228 }
                   fill='black'
                 >
                   race
@@ -350,8 +367,10 @@ export default class ProjectStats extends React.Component {
                     <text
                       x={inspectedProject.percentFamiliesOfColor * 150 }
                       y={((this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies - inspectedProject.totalFamilies) / this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies * 200 > 100) ? (this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies - inspectedProject.totalFamilies) / this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies * 200 - 21 : (this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies - inspectedProject.totalFamilies) / this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies * 200 + 29 }
+                      className='shadow'
                       style={{
-                        textAnchor: (inspectedProject.percentFamiliesOfColor < 0.33) ? 'start' : (inspectedProject.percentFamiliesOfColor > 0.66) ? 'end' : 'middle' 
+                        textAnchor: (inspectedProject.percentFamiliesOfColor < 0.33) ? 'start' : (inspectedProject.percentFamiliesOfColor > 0.66) ? 'end' : 'middle' ,
+                        fontWeight: (inspectedProject.hasProjectGeojson) ? 400 : 200
                       }}
                     >
                       { inspectedProject.project}
@@ -359,6 +378,7 @@ export default class ProjectStats extends React.Component {
                     <text
                       x={inspectedProject.percentFamiliesOfColor * 150 }
                       y={((this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies - inspectedProject.totalFamilies) / this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies * 200 > 100) ? (this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies - inspectedProject.totalFamilies) / this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies * 200 - 5 : (this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies - inspectedProject.totalFamilies) / this.props.stats.projects[this.props.stats.projects.length-1].totalFamilies * 200 + 45 }
+                      className='shadow'
                       style={{
                         textAnchor: (inspectedProject.percentFamiliesOfColor < 0.33) ? 'start' : (inspectedProject.percentFamiliesOfColor > 0.66) ? 'end' : 'middle' 
                       }}
@@ -574,7 +594,7 @@ export default class ProjectStats extends React.Component {
         { (theProject.funding_dispursed) ?
           <svg
             { ...DimensionsStore.getProjectStatsOverallDimensions() }
-            width={Math.max(270, fundingMid * 2 + 120)}
+            width={fundingMid * 2 + 60}
             height={300}
             className='projectStat'
           >
@@ -583,8 +603,7 @@ export default class ProjectStats extends React.Component {
               <text 
                 x={fundingMid}
                 y={ 20 }
-                className='stat'
-                fill='black'
+                className='stat strong'
               >
                 {'$' + theProject.funding_dispursed.toLocaleString()}
               </text>
@@ -598,6 +617,14 @@ export default class ProjectStats extends React.Component {
                 in federal funding
               </text>
 
+              <rect 
+                x={0}
+                y={50}
+                width={fundingMid * 2 }
+                height={ 200 }
+                fill='#eee'
+              />
+
               { fundingTicks.map(tick => {
                 if ((maxFunding - tick) / maxFunding * 200 > 0) {
                   return (
@@ -610,14 +637,13 @@ export default class ProjectStats extends React.Component {
                         x2={fundingMid * 2}
                         y1={(maxFunding - tick) / maxFunding * 200}
                         y2={(maxFunding - tick) / maxFunding * 200}
-                        stroke='#bbb'
-                        strokeWidth={0.5}
+                        className='tick'
                       />
 
                       <text
                         x={-5}
                         y={(maxFunding - tick) / maxFunding * 200 + 6}
-                        className='yTickLabel'
+                        className='tickLabel yTickLabel'
                       >
                         { '$' + (tick/1000000) + 'M' }
                       </text>
@@ -628,16 +654,21 @@ export default class ProjectStats extends React.Component {
 
               <g transform={'translate(' + fundingMid + ' 50)'}>
                 { swarm.map(p => {
-                  if (p.datum.city_id !== theProject.city_id) {
+                  if (p.datum.city_id !== theProject.city_id && p.datum.project_id !== 'median') {
                     return (
                       <circle
                         cx={p.x}
                         cy={p.y}
-                        r={2}
-                        fill='transparent'
-                        stroke='steelblue'
+                        r={ ( p.datum.project_id == this.state.hoverProject) ? 5 : 2 }
                         key={ 'funding' + p.datum.project_id }
-
+                        fill='steelblue'
+                        fillOpacity={ ( p.datum.project_id == this.state.hoverProject) ? 1 : 0 }
+                        stroke={ ( p.datum.project_id == this.state.hoverProject) ? '#111' : 'steelblue'}
+                        strokeOpacity={ (!this.state.hoverProject || p.datum.project_id == this.state.hoverProject) ? 1 : 0.3 }
+                        onMouseEnter={ this.onProjectHover }
+                        onMouseLeave={ this.onProjectOut }
+                        onClick={ this.props.onProjectClick }
+                        id={ p.datum.project_id }
                       />
                     );
                   }
@@ -649,17 +680,47 @@ export default class ProjectStats extends React.Component {
                       <circle
                         cx={p.x}
                         cy={p.y}
-                        r={2}
+                        r={ ( p.datum.project_id == this.state.hoverProject) ? 5 : 2 }
                         fill='steelblue'
-                        stroke='black'
+                        fillOpacity={ (!this.state.hoverProject || p.datum.project_id == this.state.hoverProject) ? 1 : 0.3 }
+                        stroke='#111'
+                        strokeOpacity={ (!this.state.hoverProject || p.datum.project_id == this.state.hoverProject) ? 1 : 0.3 }
                         key={ 'funding' + p.datum.project_id }
+                        onMouseEnter={ this.onProjectHover }
+                        onMouseLeave={ this.onProjectOut }
+                        onClick={ this.props.onProjectClick }
+                        id={ p.datum.project_id }
                       />
                     );
                   }
                 })}
 
                 { swarm.map(p => {
-                  if (p.datum.city_id == theProject.city_id && p.datum.project_id == theProject.project_id ) {
+                  if (p.datum.project_id == 'median' ) {
+                    return (
+                      <g key={ 'fundingMedian'  }>
+                        <line
+                          x1={ p.x - 4 }
+                          x2={ p.x + 4 }
+                          y1={ p.y - 4 }
+                          y2={ p.y + 4 }
+                          stroke={ 'maroon' }
+                        />
+
+                        <line
+                          x1={ p.x + 4 }
+                          x2={ p.x - 4 }
+                          y1={ p.y - 4 }
+                          y2={ p.y + 4 }
+                          stroke={ 'maroon' }
+                        />
+                      </g>
+                    );
+                  }
+                })}
+
+                { swarm.map(p => {
+                  if (p.datum.project_id == theProject.project_id ) {
                     return (
                       <circle
                         cx={p.x}
@@ -672,6 +733,32 @@ export default class ProjectStats extends React.Component {
                     );
                   }
                 })}
+
+                { (this.state.hoverProject) ? 
+                  <g>
+                    <text
+                      x={inspectedProjectHover.x }
+                      y={ (inspectedProjectHover.y > 100) ? inspectedProjectHover.y - 21 : inspectedProjectHover.y + 29 }
+                      className='shadow'
+                      style={{
+                        textAnchor: (inspectedProjectHover.x < fundingMid * -1/3)  ? 'start' : (inspectedProjectHover.x > fundingMid * 1/3) ? 'end' : 'middle',
+                        fontWeight: (inspectedProjectHover.datum.hasProjectGeojson) ? 400 : 200
+                      }}
+                    >
+                      { inspectedProjectHover.datum.project}
+                    </text> 
+                    <text
+                      x={inspectedProjectHover.x }
+                      y={ (inspectedProjectHover.y > 100) ? inspectedProjectHover.y - 5 : inspectedProjectHover.y + 45 }
+                      className='shadow'
+                      style={{
+                        textAnchor: (inspectedProjectHover.x < fundingMid * -1/3)  ? 'start' : (inspectedProjectHover.x > fundingMid * 1/3) ? 'end' : 'middle' 
+                      }}
+                    >
+                      { inspectedProjectHover.datum.city + ', ' + inspectedProjectHover.datum.state.toUpperCase() }
+                    </text> 
+                  </g>: ''
+                }
               </g>
             </g>
           </svg>: ''
