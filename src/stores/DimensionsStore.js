@@ -464,7 +464,7 @@ const DimensionsStore = {
   getMainTimelineYAxisAttrs: function(value) {
     return {
       dx: this.getMainTimelineBarFieldWidth() + 3,
-      dy: this.data.containerPadding + this.getMainTimelineMaxBarHeight() - (value / CitiesStore.getYearsTotalsMaxRace() * this.getMainTimelineMaxBarHeight()),
+      dy: this.data.containerPadding + this.getMainTimelineMaxBarHeight() - (value / CitiesStore.getYearsTotalsMaxRace() * this.getMainTimelineMaxBarHeight()) + this.getMainTimelineFontSize() / 2,
       fontSize: this.getMainTimelineFontSize(),
       key: 'yAxisLabel' + value
     };
@@ -582,7 +582,7 @@ const DimensionsStore = {
       y: 27 + this.getMainTimelineBarWidth() * 3 ,
       width: this.getMainTimelineBarWidth(),
       height: this.getMainTimelineBarWidth(),
-      fill: '#E18942',
+      fill: '#909EAC',
       stroke: '#444',
       strokeWidth: 0
     };

@@ -15,7 +15,7 @@ import HighwaysStore from '../../stores/HighwaysStore';
 import DimensionsStore from '../../stores/DimensionsStore';
 import HelperFunctions from '../../utils/HelperFunctions.js';
 
-export default class USMap extends React.Component {
+export default class MapChartField extends React.Component {
 
   constructor (props) { 
     super(props); 
@@ -63,12 +63,13 @@ export default class USMap extends React.Component {
 
           { (this.props.selectedView == 'map') ? 
             <g>
-              { HighwaysStore.getHighwayForYear(CitiesStore.getSelectedYear() || 1966).map(section => 
+              { HighwaysStore.getHighwayForYear(CitiesStore.getSelectedYear() || 1966).map((section, i) => 
                 <path
                   d={GeographyStore.getPath(section)}
                   stroke='#E4D96F'
                   strokeWidth='1.5'
                   fill='transparent'
+                  key={'highway' + i}
                 />
               )}
             </g> : ''

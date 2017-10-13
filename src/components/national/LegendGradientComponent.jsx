@@ -86,7 +86,7 @@ export default class LegendGradient extends React.Component {
 
             <rect 
               { ...DimensionsStore.getLegendGradientNoRaceBoxAttrs() }
-              fill='#E18942'
+              fill='#909EAC'
             />
 
             {/* top and bottom handles */}

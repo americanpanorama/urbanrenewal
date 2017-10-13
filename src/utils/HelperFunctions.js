@@ -7,7 +7,7 @@ import DorlingLocations from '../../data/dorlingLngLats.json';
 
 export const getColorForRace =  function(weight) {
   if (isNaN(weight) || weight == null) {
-    return '#E18942';
+    return '#909EAC';
   }
   if (weight >= 0.5) {
     var color1 = [163, 135, 190],

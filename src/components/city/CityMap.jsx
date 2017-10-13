@@ -297,8 +297,8 @@ export default class CityMap extends React.Component {
                       id={ projectId }
                       style={ {
                         weight: 3,
-                        color: ((this.props.highlightedCity && this.props.highlightedCity == this.props.projects[projectId].city_id) &&  (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId || (this.props.inspectedProject == null && this.props.inspectedProjectStats == null))) ?  '#5B3000' : 'grey',
-                        dashArray: (!this.props.selectedYear || (this.props.projects[projectId].start_year <= this.props.selectedYear && this.props.projects[projectId].end_year >= this.props.selectedYear)) ? 'none' : (this.props.projects[projectId].start_year <= this.props.selectedYear) ? '2, 2' : '5, 10',
+                        color: (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId) ? 'black' : ((this.props.highlightedCity && this.props.highlightedCity == this.props.projects[projectId].city_id) &&  (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId || (this.props.inspectedProject == null && this.props.inspectedProjectStats == null))) ?  '#DF894A' : '#aaa',
+                        dashArray: (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId || !this.props.selectedYear || (this.props.projects[projectId].start_year <= this.props.selectedYear && this.props.projects[projectId].end_year >= this.props.selectedYear)) ? 'none' : (this.props.projects[projectId].start_year <= this.props.selectedYear) ? '2, 2' : '5, 10',
                         fillColor: (this.props.projects[projectId].totalFamilies) ?getColorForRace(this.props.projects[projectId].percentFamiliesOfColor) : '#eee',
                         fillOpacity: (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId) ? 1 : 0,
                       } }
@@ -317,8 +317,8 @@ export default class CityMap extends React.Component {
                             onClick={ this.props.onProjectHover }
                             id={ projectId }
                             style={ {
-                              color: ((this.props.highlightedCity && this.props.highlightedCity == this.props.projects[projectId].city_id) &&  (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId || (this.props.inspectedProject == null && this.props.inspectedProjectStats == null))) ?  'black' : 'grey',
-                              opacity: (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId || (this.props.inspectedProject == null && this.props.inspectedProjectStats == null)) ? 1 : 0.5
+                              color: ((this.props.highlightedCity && this.props.highlightedCity == this.props.projects[projectId].city_id) &&  (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId || (this.props.inspectedProject == null && this.props.inspectedProjectStats == null))) ?  'black' : '#666',
+                              opacity: (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId || (this.props.inspectedProject == null && this.props.inspectedProjectStats == null)) ? 1 : 0.7
                             } }
                           >
                             {this.props.projects[projectId].project.replace(/\b\w/g, l => l.toUpperCase())}

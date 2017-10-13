@@ -242,7 +242,7 @@ const CitiesStore = {
 
           if (theKey) {
             Object.keys(this.data.cities[id].projects).forEach(project_id => {
-              if (this.data.cities[id].projects[project_id].totalFamilies > 0) {
+              if (this.data.cities[id].projects[project_id].totalFamilies > 0 || (this.data.cities[id].projects[project_id].funding > 0 && this.data.cities[id].projects[project_id].funding < 80000000 && this.data.cities[id].projects[project_id].project !== 'Neighborhood Dev Program')) {
                 displacements_in_city.push(this.data.cities[id].projects[project_id].totalFamilies);
                 percents_in_city.push(this.data.cities[id].projects[project_id].percentFamiliesOfColor);
                 projects.push( {
@@ -269,14 +269,14 @@ const CitiesStore = {
       Object.keys(this.data.stats).forEach(pop => {
         this.data.stats[pop].displacements.sort((a,b) =>a-b);
         this.data.stats[pop].projects.sort((a,b) =>a.totalFamilies-b.totalFamilies);
-        const displacements = this.data.stats[pop].projects.map(p => p.totalFamilies);
+        const displacements = this.data.stats[pop].projects.filter(p => p.totalFamilies > 0).map(p => p.totalFamilies);
         this.data.stats[pop].avgDisplacements = displacements.reduce((a,b) =>a+b) / displacements.length;
         this.data.stats[pop].medianDisplacements = getMedian(displacements);
         this.data.stats[pop].bottomQuartileDisplacements = getBottomQuartile(displacements);
         this.data.stats[pop].topQuartileDisplacements = getTopQuartile(displacements);
         this.data.stats[pop].medianDisplacements = getMedian(displacements);
 
-        const percentsFamiliesOfColor = this.data.stats[pop].projects.map(p => p.percentFamiliesOfColor).sort((a,b) =>a-b);
+        const percentsFamiliesOfColor = this.data.stats[pop].projects.filter(p => p.totalFamilies > 0).map(p => p.percentFamiliesOfColor).sort((a,b) =>a-b);
         this.data.stats[pop].avgPercentsFamiliesOfColor = percentsFamiliesOfColor.reduce((a,b) =>a+b) / percentsFamiliesOfColor.length;
         this.data.stats[pop].medianPercentsFamiliesOfColor = getMedian(percentsFamiliesOfColor);
         this.data.stats[pop].bottomQuartilePercentsFamiliesOfColor = getBottomQuartile(percentsFamiliesOfColor);
@@ -466,11 +466,12 @@ const CitiesStore = {
     // reset selected city if there's only one and it's not the current selected
     if (this.data.visibleCitiesIds.length == 1 && this.data.selectedCity !== this.data.visibleCitiesIds[0]) {
       this.setSelectedCity(this.data.visibleCitiesIds[0]);
+      this.setSelectedProject(null);
     }
 
     // or reset if to the nearest city if the current selection has moved offscreen
     else if (this.data.visibleCitiesIds.length > 0 && !this.data.visibleCitiesIds.includes(this.data.selectedCity)) {
-      this.setSelectedCity(this.data.visibleCitiesIds[0]);
+      //this.setSelectedCity(this.data.visibleCitiesIds[0]);
       const theCenter = (previousSelectedCity && this.getCityData[previousSelectedCity].lat) ? [this.getCityData[previousSelectedCity].lat, this.getCityData[previousSelectedCity].lng] : GeographyStore.getTheMap().getCenter(),
         closestToCenterIndex = this.data.visibleCitiesIds
           .reduce((smallestSoFar, cityId, i) => {
@@ -484,6 +485,7 @@ const CitiesStore = {
             }
           }, {'-1': 1000000000});
       this.setSelectedCity(this.data.visibleCitiesIds[Object.keys(closestToCenterIndex)[0]]);
+      this.setSelectedProject(null);
     }
   },
 
@@ -545,7 +547,7 @@ const CitiesStore = {
   },
 
   setSelectedCity: function(city_id) {
-    this.data.selectedCity = city_id;
+    this.data.selectedCity = parseInt(city_id);
     // you know it's visible, so set the data for initial rendering
     if (!this.data.visibleCitiesIds.includes(parseInt(city_id))) {
       this.data.visibleCitiesIds = [parseInt(city_id)];
@@ -1010,9 +1012,24 @@ const CitiesStore = {
     return this.data.yearsTotals[year]; 
   },
 
+  getYearTotalsForCity: function(year, city_id) {
+    if (!this.cityLoaded(city_id)) {
+      return null;
+    }
+    year = year || 'all';
+    console.log(this.data.cities[city_id]);
+    console.log(this.data.cities[city_id].yearsData[year]);
+    return this.data.cities[city_id].yearsData[year];
+  },
+
   getYearsTotalsMax: function() { return Math.max(...Object.keys(this.data.yearsTotals).map(year => this.data.yearsTotals[year].whites + this.data.yearsTotals[year].nonwhite)); },
 
+
+  getYearsTotalsMaxForCity: function(city_id) { return Math.max(...Object.keys(this.data.cities[city_id].yearsData).map(year => this.data.cities[city_id].yearsData[year].whites + this.data.cities[city_id].yearsData[year].nonwhite)); },
+
   getYearsTotalsMaxRace: function() { return (this.data.loaded) ? Math.max(...Object.keys(this.data.yearsTotals).map(year => (year !== 'all') ? this.data.yearsTotals[year].nonwhite : 0).concat(Object.keys(this.data.yearsTotals).map(year => (year !== 'all') ? this.data.yearsTotals[year].whites : 0))) : 4000; },
+
+  getYearsTotalsMaxRaceForCity: function(city_id) { return (this.cityLoaded(city_id)) ? Math.max(...Object.keys(this.data.cities[city_id].yearsData).map(year => (year !== 'all') ? this.data.cities[city_id].yearsData[year].nonwhite : 0).concat(Object.keys(this.data.cities[city_id].yearsData).map(year => (year !== 'all') ? this.data.cities[city_id].yearsData[year].whites : 0))) : 4000; },
 
   getMaxDisplacementsInCityForYear: function() { return this.data.maxDisplacementsInCityForYear; },
 

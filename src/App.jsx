@@ -310,8 +310,8 @@ export default class App extends React.Component {
           <div className='row full-height'>
             <div className='columns eight full-height'>
               <header style={ DimensionsStore.getHeaderStyle() }>
-                <h1>Renewing <span className='dark'>Inequality</span></h1>
-                <h2>Family Displacements through Urban Renewal, 1955-1966</h2>
+                <h1><a href='./'>Renewing <span className='dark'>Inequality</span></a></h1>
+                <h2><a href='./'>Family Displacements through Urban Renewal, 1955-1966</a></h2>
                 <h4 onClick={ this.onModalClick } id={ 'intro' }>Introduction</h4>
                 <h4 onClick={ this.onModalClick } id={ 'sources' }>Sources & Method</h4>
                 <h4 onClick={ this.onModalClick } id={ 'citing' }>Citing</h4>
@@ -484,6 +484,7 @@ export default class App extends React.Component {
               onProjectClick={ this.onProjectSelected }
               onProjectInspected={ this.onProjectInspected }
               onProjectOut={ this.onProjectOut }
+              onContactUsToggle={ this.onContactUsToggle }
               selected={ CitiesStore.getHighlightedProject() == CitiesStore.getSelectedProject() }
             /> : ''
           }
@@ -522,10 +523,8 @@ export default class App extends React.Component {
               onClick={ this.onYearClicked }
               state={ this.state }
               selectedYear={ CitiesStore.getSelectedYear() }
-              yearSpan={ (false && CitiesStore.getSelectedCity()) ? [CitiesStore.getCityData(CitiesStore.getSelectedCity()).startYear, CitiesStore.getCityData(CitiesStore.getSelectedCity()).endYear] : [1954, 1972] }
-              yearsData={ (false && CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).yearsData : CitiesStore.getYearsTotals() }
-              projects={ (false && CitiesStore.getSelectedCity()) ? CitiesStore.getCityData(CitiesStore.getSelectedCity()).projects : false }
-              name={ (false && CitiesStore.getSelectedCity()) ? (CitiesStore.getCityData(CitiesStore.getSelectedCity()).city + ', ' + CitiesStore.getCityData(CitiesStore.getSelectedCity()).state).toUpperCase() : 'United States' }
+              yearSpan={ [1954, 1972] }
+              yearsData={ CitiesStore.getYearsTotals() }
               style={ DimensionsStore.getTimelineStyle() }
             />
           </div>

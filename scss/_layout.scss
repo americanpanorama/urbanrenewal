@@ -41,6 +41,15 @@ header {
     
     margin: 0;
   }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+
+    &:hover {
+      color: inherit;
+    }
+  }
   h1 {
     font-size: 2em;
     margin: 2px 0;
