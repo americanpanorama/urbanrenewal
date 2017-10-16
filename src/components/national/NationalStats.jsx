@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import DimensionsStore from '../../stores/DimensionsStore.js';
+import CitiesStore from '../../stores/CitiesStore';
 
 export default class NationalStats extends React.Component {
   constructor (props) { super(props); }
@@ -74,6 +75,26 @@ export default class NationalStats extends React.Component {
     return (
       <div className='projectStats'>
         <h2>{ 'Nationwide, ' + ((this.props.selectedYear) ? this.props.selectedYear : '1955-1966') }</h2>
+
+        <div className='context'>
+          { (this.props.selectedYear == 1955) ? 
+            <div>
+              <p>The 1954 Housing Act greatly intensified federally-funded urban renewal initiatives that had been kickstarted by the 1949 Housing Act. The 1954 enabled cities to use some of the land cleared with federal funding for non-residential projects like convention centers and to propose rehabilitation and conservation projects to improve rather than clear residential neighborhoods. Still, scores of federally-funded urban renewal projects razed neighborhoods and displaced thousands of people. </p>
+              <p><span onClick={ this.props.onCityClicked } id={ CitiesStore.getCityIdFromSlug('newyorkNY')}>New York</span> early sought urban renewal funds, not just because of its size but because of the aggressive slum clearing policies of New York urban planner Robert Moses.</p>
+            </div> : 
+            (this.props.selectedYear == 1956) ? 
+              <div>
+                <p>The 1956 Federal-Aid Highway Act became another tool of urban renewal. Over the subsequent decade, many poorer neighborhoods, particularly African American neighborhoods, were destroyed for highway construction, and highways were carefully position to buttress segregation and insulate white and black neighborhoods from one aanother. Urban planners viewed highways as essential arteries that would enable middle-class white families to live in the suburbs but still work and shop in downtown central business districts.</p>
+                <p>example?</p>
+              </div> : 
+            (this.props.selectedYear == 1958) ? 
+              <div>
+                <p>Nearly a hundred cities and towns that had not received urban renewal grants launch projects in 1958 that involved displacements. These weren't large cities but instead mid-sized and small cities and towns. Bessemer, Alabama's <span onClick={ this.props.onProjectClick } id={1690}>Downtown 19th Street Project</span> would displace nearly 400 families; Tacoma, Washington's <span onClick={ this.props.onProjectClick } id={4062}>Center Street Project</span> nearly 100; and Springfield, Massachusetts's <span onClick={ this.props.onProjectClick } id={334}>North End Project</span> more than a thousand, all launched in 1958.</p>
+              </div> : ''
+          }
+        </div>
+
+
 
         { (this.props.total_projects > 0) ?
           <svg

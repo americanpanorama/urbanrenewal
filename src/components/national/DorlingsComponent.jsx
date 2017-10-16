@@ -16,10 +16,6 @@ export default class Dorlings extends React.Component {
     };
   }
 
-  componentWillEnter(callback) { callback(); }
-
-  componentWillLeave(callback) { callback(); }
-
   componentWillReceiveProps(nextProps) {
     if (this.props.z !== nextProps.z && this.props.view !== 'cartogram') {
       d3.select(ReactDOM.findDOMNode(this))

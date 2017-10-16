@@ -826,7 +826,7 @@ const CitiesStore = {
       (cat == '500000+') ? '> 500K' : '';
   },
 
-  getProjectBoundingBox: function (id) { return (this.data.cities[this.getHighlightedCity()].projects[id]) ? this.data.cities[this.getHighlightedCity()].projects[id].boundingBox : null; },
+  getProjectBoundingBox: function (id) { return (this.data.cities[this.getHighlightedCity()] && this.data.cities[this.getHighlightedCity()].projects[id]) ? this.data.cities[this.getHighlightedCity()].projects[id].boundingBox : null; },
 
   getProjectCenter: function (id) { return (this.data.cities[this.getHighlightedCity()].projects[id]) ? this.data.cities[this.getHighlightedCity()].projects[id].center : null; },
 

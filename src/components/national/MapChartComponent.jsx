@@ -28,6 +28,7 @@ export default class MapChartField extends React.Component {
   }
 
   render () {
+    console.log(CitiesStore.getDorlingsForce());
     return (
       <svg 
         { ...DimensionsStore.getMapDimensions() }

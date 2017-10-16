@@ -511,6 +511,8 @@ export default class App extends React.Component {
             <NationalStats 
               { ...CitiesStore.getYearTotals(CitiesStore.getSelectedYear()) }
               selectedYear={ CitiesStore.getSelectedYear() }
+              onCityClicked={ this.onCityClicked }
+              onProjectClick={ this.onProjectSelected }
             /> : ''
           }
         </aside>
