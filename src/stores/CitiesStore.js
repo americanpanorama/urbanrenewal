@@ -8,6 +8,7 @@ import { getColorForRace, calculateDorlingsPosition, calculateDorlingsPositionUn
 import StateAbbrs from '../../data/stateAbbrs.json';
 import DorlingLocations from '../../data/dorlingLngLats.json';
 import DorlingXYs from '../../data/dorlingXYs.json';
+import nara from '../../data/nara.json';
 
 const CitiesStore = {
 
@@ -132,6 +133,7 @@ const CitiesStore = {
         r.totalFamilies = r.nonwhite + r.whites + r.pr_total;
         r.percentFamiliesOfColor = (this.data.cities[r.city_id].state !== 'pr' && this.data.cities[r.city_id].state !== 'vi') ? r.nonwhite / r.totalFamilies : null;
         r.yearsData = {};
+        r.citations = {};
         r.center = [r.centerlat,r.centerlng];
         r.boundingBox = (r.bbymin) ? [[r.bbymin,r.bbxmin],[r.bbymax,r.bbxmax]] : null;
 
@@ -349,6 +351,10 @@ const CitiesStore = {
       {
         query: "SELECT distinct on(project_id, combined_dire_char_raw.category_id) combined_dire_char_raw.project_id, combined_dire_char_raw.category_id, value, year, assessed_category, unit_of_measurement FROM digitalscholarshiplab.combined_dire_char_raw join urdr_category_id_key on city_id = " + city_id + " and combined_dire_char_raw.category_id != 71 and combined_dire_char_raw.category_id != 72 and combined_dire_char_raw.category_id = urdr_category_id_key.category_id order by project_id, combined_dire_char_raw.category_id, year desc",
         format: 'JSON'
+      },
+      {
+        query: "select projects.project_id, urdr_citations.citation_id, citation, urdr_citations.link, box, report, urdr_citation_amazon.link as internal_link from urdr_id_key projects join urdr_citation_join on projects.project_id = urdr_citation_join.project_id join urdr_citations on urdr_citations.citation_id = urdr_citation_join.citation_id left join urdr_citation_amazon on urdr_citation_amazon.citation_id = urdr_citations.citation_id where city_id = " + city_id,
+        format: 'JSON'
       }
     ]).then(responses => {
       responses[0].forEach(response => {
@@ -385,6 +391,27 @@ const CitiesStore = {
       responses[3].forEach(r => {
         if (this.data.cities[city_id].projects[r.project_id]) {
           this.data.cities[city_id].projects[r.project_id][cat_codes[r.assessed_category]] = r.value; 
+        }
+      });
+
+      responses[4].forEach(response => {
+        if (response.box) {
+          // const boxData = nara.find(report => report.containerId == response.box);
+          // if (boxData && boxData.items) {
+          //   const recordData = boxData.items.find(item => item.reportNum == response.report);
+          //   console.log(boxData.items, recordData);
+          // }
+          
+          response.citation = " Box " + response.box + ", Report " + response.report + "; Final Grant Reports, 1951 - 1981; General Records of the Department of Housing and Urban Development, 1931 - 2003, Record Group 207; Records National Archives at College Park, MD.";
+          response.link = response.internal_link;
+        } 
+        if (response.citation && !this.data.cities[city_id].projects[response.project_id].citations[response.citation_id]) {
+          this.data.cities[city_id].projects[response.project_id].citations[response.citation_id] = {
+            citation: response.citation,
+            links: (response.link !== "") ? [response.link] : []
+          };
+        } else if (response.citation && response.link !== "" && !this.data.cities[city_id].projects[response.project_id].citations[response.citation_id].links.includes(response.link)) {
+          this.data.cities[city_id].projects[response.project_id].citations[response.citation_id].links.push(response.link);
         }
       });
 

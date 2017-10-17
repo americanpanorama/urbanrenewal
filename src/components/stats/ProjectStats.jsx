@@ -504,6 +504,36 @@ export default class ProjectStats extends React.Component {
         }
 
         <p onClick={this.props.onContactUsToggle } className='invitation'>If you have maps, photos, or information about { theProject.project } you're willing to share with us, we encourage you to contact us.</p>
+
+        { (Object.keys(theProject.citations).length > 0) ? 
+          <div className='citations'>
+            <h3>{(Object.keys(theProject.citations).length == 1) ? 'Source' : 'Sources'} for Project Footprint</h3>
+            <ul>
+            { Object.keys(theProject.citations).map(citation_id => {
+              if (theProject.citations[citation_id].links.length == 0) {
+                return (
+                  <li key={'citation_' + citation_id}>{theProject.citations[citation_id].citation}</li>
+                );
+              } else if (theProject.citations[citation_id].links.length == 1) {
+                return (
+                  <li key={'citation_' + citation_id}>
+                    <a href={theProject.citations[citation_id].links[0]} target='_blank'>{theProject.citations[citation_id].citation}</a>
+                  </li>
+                );
+              } else {
+                return (
+                  <li key={'citation_' + citation_id}>
+                    { theProject.citations[citation_id].citation }
+                    { theProject.citations[citation_id].links.map((link, i) => <span key={'link'+link}>{(i<theProject.citations[citation_id].links-1) ? ', ' : ' '}<a href={link} target='_blank' >Image {(i+1)}</a></span>  )}
+                  </li>
+                );
+              }
+
+            })}
+            </ul>
+          </div> : ''
+        }
+
       </div>
     );
   }
