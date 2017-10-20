@@ -11,8 +11,8 @@ export default class Dorlings extends React.Component {
     this.state = {
       r: (this.props.view == 'cartogram') ? this.props.r : this.props.r / this.props.z,
       color: this.props.color,
-      cx: this.props.cx,
-      cy: this.props.cy
+      cx: this.props.coords[this.props.view].cx,
+      cy: this.props.coords[this.props.view].cy
     };
   }
 
@@ -32,19 +32,19 @@ export default class Dorlings extends React.Component {
     const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4),
       scatterplotMaxY = DimensionsStore.getNationalMapHeight()/2 + shortside;
 
-    if (this.props.r !== nextProps.r || this.props.color !== nextProps.color || this.props.cx !== nextProps.cx || this.props.cy !== nextProps.cy ) {
+    if (this.props.r !== nextProps.r || this.props.color !== nextProps.color || this.props.coords[this.props.view].cx !== nextProps.coords[nextProps.view].cx || this.props.coords[this.props.view].cy !== nextProps.coords[nextProps.view].cy ) {
       d3.select(ReactDOM.findDOMNode(this))
         .transition()
-        .delay((nextProps.view == 'scatterplot' && this.props.view !== 'scatterplot') ? (1- nextProps.cy/scatterplotMaxY) * 5000 : 0)
+        .delay((nextProps.view == 'scatterplot' && this.props.view !== 'scatterplot') ? (1- nextProps.coords[nextProps.view].cy/scatterplotMaxY) * 5000 : 0)
         .duration(750)
         .attr('r', (nextProps.view !== 'cartogram') ? nextProps.r / nextProps.z : nextProps.r)
-        .attr('cx', nextProps.cx)
-        .attr('cy', nextProps.cy)
+        .attr('cx', nextProps.coords[nextProps.view].cx)
+        .attr('cy', nextProps.coords[nextProps.view].cy)
         .style('fill', nextProps.color)
         .each('end', () => {
           this.setState({
-            cx: nextProps.cx,
-            cy: nextProps.cy,
+            cx: nextProps.coords[nextProps.view].cx,
+            cy: nextProps.coords[nextProps.view].cy,
             r: (nextProps.view !== 'cartogram') ? nextProps.r / nextProps.z : nextProps.r,
             color: nextProps.color
           });

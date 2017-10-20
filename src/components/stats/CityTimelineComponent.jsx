@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import ReactTransitionGroup from 'react-addons-transition-group';
 import Displacements from './DisplacementTimespanComponent.jsx';
 import ProjectSnippet from './ProjectSnippetComponent.jsx';
-import { getColorForRace, formatNumber } from '../../utils/HelperFunctions';
+import { getColorForRace, getColorForProjectType, formatNumber } from '../../utils/HelperFunctions';
 
 import DimensionsStore from '../../stores/DimensionsStore';
 import CitiesStore from '../../stores/CitiesStore';
@@ -31,12 +31,23 @@ export default class Timeline extends React.Component {
       >
 
         <text
-          x={ DimensionsStore.getCityTimelineStyle().width / 2 - 5 }
+          x={ DimensionsStore.getCityTimelineStyle().width / 2 - 40 }
           y={ 14 }
           className='label projects'
         >
-          Renewal Projects
+          Project
         </text>
+
+        { (sortedProjects.find(p => p.project_type)) ?
+          <text
+            x={ DimensionsStore.getCityTimelineStyle().width / 2 - 10 }
+            y={ 14 }
+            className='label displacements'
+          >
+            Type
+          </text> : ''
+        }
+
         <text
           x={ DimensionsStore.getCityTimelineStyle().width * 0.75 }
           y={ 14 }
@@ -44,6 +55,8 @@ export default class Timeline extends React.Component {
         >
           Families Displaced
         </text>
+
+
 
 
         { sortedProjects.map((p, i) => 
@@ -56,13 +69,22 @@ export default class Timeline extends React.Component {
             transform='translate(0 22)'
           >
             <text
-              x={ DimensionsStore.getCityTimelineStyle().width / 2 - 5}
+              x={ DimensionsStore.getCityTimelineStyle().width / 2 - 20}
               y={ i * 20 + 14}
               className={ 'project' + ((p.the_geojson) ? ' hasFootprint' : '') + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '') }
               id={ p.project_id  }
             >
               { p.project }
             </text>
+            { (p.project_type) ?
+              <circle
+                cx={ DimensionsStore.getCityTimelineStyle().width / 2 - 10}
+                cy={ i * 20 + 7}
+                r={5}
+                fill={ getColorForProjectType(p.project_type) }
+              /> : ''
+            }
+
             { (p.nonwhite || p.whites) ?
               <g>
 

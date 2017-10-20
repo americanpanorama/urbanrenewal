@@ -35,6 +35,23 @@ export const getColorForRace =  function(weight) {
   return 'rgb(' + rgb + ')';
 };
 
+export const getColorForProjectType= function(type, a) {
+  a = a || 1;
+  let hex= (type == 'R') ? '#DF894A' :
+    (type == 'OB') ? '#FFB90F' :
+    (type == 'PO') ? '#67C8FF' :
+    (type == 'O') ? '#5DFC0A' :
+    (type == 'D') ? '#ff0000' :
+    (type == 'U') ? '#FF00FF' : '#999999';
+
+  hex = hex.replace('#','');
+  const r = parseInt(hex.substring(0,2), 16),
+    g = parseInt(hex.substring(2,4), 16),
+    b = parseInt(hex.substring(4,6), 16);
+
+  return 'rgba('+r+','+g+','+b+','+a+')';
+};
+
 export const formatNumber = function(num, decimal) {
   decimal = (decimal) ? decimal : 0;
   if (num < 1000000 && num >= 1000) {

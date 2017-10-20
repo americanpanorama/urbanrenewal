@@ -305,36 +305,37 @@ export default class App extends React.Component {
 
   render () {
 
-    let tempStats = {}, cityCount =0, projects = [];
-    [10000,25000,50000,100000,250000,500000,'500000+'].forEach(pop => tempStats[pop] = {cities: 0, projects: 0, whites: 0, nonwhite: 0, total: 0});
-    Object.keys(CitiesStore.getCities()).forEach(city_id => {
-      const cityData = CitiesStore.getCityData(city_id),
-        pPop = CitiesStore.getPopKey(cityData.pop_1960);
-      if (pPop && cityData.yearsData[1965]) {
-        cityCount++;
-        tempStats[pPop].cities++;
-        tempStats[pPop].whites += cityData.yearsData[1965].whites;
-        tempStats[pPop].nonwhite += cityData.yearsData[1965].nonwhite;
-        tempStats[pPop].total += cityData.yearsData[1965].whites + cityData.yearsData[1965].nonwhite;
+    // let tempStats = {}, cityCount =0, projects = [];
+    // [10000,25000,50000,100000,250000,500000,'500000+'].forEach(pop => tempStats[pop] = {cities: 0, projects: 0, whites: 0, nonwhite: 0, total: 0});
+    // Object.keys(CitiesStore.getCities()).forEach(city_id => {
+    //   const cityData = CitiesStore.getCityData(city_id),
+    //     pPop = CitiesStore.getPopKey(cityData.pop_1960),
+    //     aYear = 1963;
+    //   if (pPop && cityData.yearsData[aYear]) {
+    //     cityCount++;
+    //     tempStats[pPop].cities++;
+    //     tempStats[pPop].whites += cityData.yearsData[aYear].whites;
+    //     tempStats[pPop].nonwhite += cityData.yearsData[aYear].nonwhite;
+    //     tempStats[pPop].total += cityData.yearsData[aYear].whites + cityData.yearsData[aYear].nonwhite;
 
-        Object.keys(cityData.projects).forEach(project_id => {
-          if (cityData.projects[project_id].yearsData[1965] && cityData.projects[project_id].yearsData[1965].totalFamilies > 0) {
-            tempStats[pPop].projects++;
+    //     Object.keys(cityData.projects).forEach(project_id => {
+    //       if (cityData.projects[project_id].yearsData[aYear] && cityData.projects[project_id].yearsData[aYear].totalFamilies > 0) {
+    //         tempStats[pPop].projects++;
 
-            if (pPop == 10000 || pPop==25000) {
-              if (cityData.projects[project_id].the_geojson) {
-                projects.push(cityData.projects[project_id]);
-              }
-            }
-          }
-        });
-      }
+    //         if (pPop == 10000 || pPop==25000) {
+    //           if (cityData.projects[project_id].the_geojson) {
+    //             projects.push(cityData.projects[project_id]);
+    //           }
+    //         }
+    //       }
+    //     });
+    //   }
 
-    });
+    // });
 
-    console.log(tempStats);
-    console.log(cityCount);
-    console.log(projects.sort((a,b) => b.totalFamilies - a.totalFamilies ));
+    // console.log(tempStats);
+    // console.log(cityCount);
+    // console.log(projects.sort((a,b) => b.totalFamilies - a.totalFamilies ));
 
     return (
         <div className='container full-height'>
@@ -361,7 +362,6 @@ export default class App extends React.Component {
                       <CityMap
                         { ...CitiesStore.getVisibleCitiesDetails() }
                         cityData= { CitiesStore.getCityData(CitiesStore.getSelectedCity()) }
-                        //visibleCityIds = { CitiesStore.getVisibleCityIds() }
                         { ...GeographyStore.getLatLngZoom() }
                         maxForYear={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).maxDisplacmentsForYear }
                         onMoveend={ this.onCityMapMove }

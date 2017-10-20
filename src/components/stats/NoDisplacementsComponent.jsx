@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import ReactTransitionGroup from 'react-addons-transition-group';
 import Displacements from './DisplacementTimespanComponent.jsx';
 import ProjectSnippet from './ProjectSnippetComponent.jsx';
-import { getColorForRace, formatNumber } from '../../utils/HelperFunctions';
+import { getColorForRace, getColorForProjectType, formatNumber } from '../../utils/HelperFunctions';
 
 import DimensionsStore from '../../stores/DimensionsStore';
 
@@ -28,7 +28,7 @@ export default class NoDisplacements extends React.Component {
         >
 
           <text
-            x={ DimensionsStore.getCityTimelineStyle().width / 2 - 5 }
+            x={ DimensionsStore.getCityTimelineStyle().width / 2 - 20 }
             y={ 14 }
             className='label projects'
           >
@@ -53,13 +53,22 @@ export default class NoDisplacements extends React.Component {
               transform='translate(0 22)'
             >
               <text
-                x={ DimensionsStore.getCityTimelineStyle().width / 2 - 5}
+                x={ DimensionsStore.getCityTimelineStyle().width / 2 - 20}
                 y={ i * 20 + 14}
                 className={ 'project' + ((p.the_geojson) ? ' hasFootprint' : '') + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '') }
                 id={ p.project_id  }
               >
                 { p.project }
               </text>
+
+              { (p.project_type) ?
+                <circle
+                  cx={ DimensionsStore.getCityTimelineStyle().width / 2 - 10}
+                  cy={ i * 20 + 7}
+                  r={5}
+                  fill={ getColorForProjectType(p.project_type) }
+                /> : ''
+              }
 
               <text
                 x={ DimensionsStore.getCityTimelineStyle().width / 2 + 30 + (p.start_year-1955)/(1974-1955)*(DimensionsStore.getCityTimelineStyle().width / 2 - 60) - 5 }

@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { AppActions, AppActionTypes } from '../../utils/AppActionCreator';
-import { getColorForRace, formatNumber } from '../../utils/HelperFunctions';
+import { getColorForRace, getColorForProjectType, formatNumber } from '../../utils/HelperFunctions';
 
 // stores
 import DimensionsStore from '../../stores/DimensionsStore';
@@ -173,7 +173,7 @@ export default class CityMap extends React.Component {
             key={ 'highway' + this.props.selectedYear }
             userId={ cartodbConfig.userId }
             sql={ "SELECT * FROM interstate_detailed where year_open <= " + ((this.props.selectedYear) ? this.props.selectedYear : 1966) + "\n"}
-            cartocss="#layer {  line-color: #E4D96F;  line-width: 3;  line-opacity: 1;}"
+            cartocss="#layer {  line-color: lightsteelblue;  line-width: 3;  line-opacity: 1;}"
             zIndex={1000}
             maxZoom={ 22 }
             url=''
@@ -197,22 +197,24 @@ export default class CityMap extends React.Component {
           {/* race and income data in census tracts */}
           { (this.props.holc_areas.length == 0 || (!this.props.HOLCSelected && this.props.tracts)) ? 
             Object.keys(this.props.tracts).map(tractId => {
-              return(
-                <GeoJSON
-                  data={ this.props.tracts[tractId].the_geojson }
-                  key={ 'tract' + tractId }
-                  style= { {
-                    fillColor: getColorForRace(this.props.tracts[tractId].percentPeopleOfColor / 100),
-                    //fillColor: 'transparent',
-                    //fillOpacity: (this.props.tracts[tractId].medianIncome < 10000) ? (1 - ((this.props.tracts[tractId].medianIncome - 999) / 10000)) / 3: 0,
-                    //fillOpacity: (this.props.tracts[tractId].medianIncome < 5000) ? 0.7 - (1 - ((this.props.tracts[tractId].medianIncome - 999) / 5000)): 0.05,
-                    fillOpacity: (this.props.tracts[tractId].percentBelow  / 100) * 0.9,
-                    weight: 0, //(this.props.tracts[tractId].medianIncome < 5000) ? 10 - 10 * (1 - ((this.props.tracts[tractId].medianIncome - 999) / 5000)): 0,
-                    color: getColorForRace(this.props.tracts[tractId].percentPeopleOfColor / 100),
-                  } }
-                  className='tract'
-                />
-              ); 
+              if (this.props.tracts[tractId].percentBelow > 0.2) {
+                return(
+                  <GeoJSON
+                    data={ this.props.tracts[tractId].the_geojson }
+                    key={ 'tract' + tractId }
+                    style= { {
+                      fillColor: getColorForRace(this.props.tracts[tractId].percentPeopleOfColor / 100),
+                      //fillColor: 'transparent',
+                      //fillOpacity: (this.props.tracts[tractId].medianIncome < 10000) ? (1 - ((this.props.tracts[tractId].medianIncome - 999) / 10000)) / 3: 0,
+                      //fillOpacity: (this.props.tracts[tractId].medianIncome < 5000) ? 0.7 - (1 - ((this.props.tracts[tractId].medianIncome - 999) / 5000)): 0.05,
+                      fillOpacity: (this.props.tracts[tractId].percentBelow  / 100) * 0.9,
+                      weight: 0, //(this.props.tracts[tractId].medianIncome < 5000) ? 10 - 10 * (1 - ((this.props.tracts[tractId].medianIncome - 999) / 5000)): 0,
+                      color: getColorForRace(this.props.tracts[tractId].percentPeopleOfColor / 100),
+                    } }
+                    className='tract'
+                  />
+                ); 
+              }
             }) : 
             ''
           }
@@ -286,7 +288,7 @@ export default class CityMap extends React.Component {
               if (this.props.projects[projectId].the_geojson) {
                 return (
                   <LayerGroup 
-                    className='projectFootprint' 
+                    className='projectFootprints' 
                     key={ 'geojson' + projectId } 
                   >
                     <UrbanRenewalPolygon
@@ -297,12 +299,15 @@ export default class CityMap extends React.Component {
                       id={ projectId }
                       style={ {
                         weight: 3,
-                        color: (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId) ? 'black' : ((this.props.highlightedCity && this.props.highlightedCity == this.props.projects[projectId].city_id) &&  (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId || (this.props.inspectedProject == null && this.props.inspectedProjectStats == null))) ?  '#DF894A' : '#aaa',
+                        //color: (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId) ? 'black' : ((this.props.highlightedCity && this.props.highlightedCity == this.props.projects[projectId].city_id) &&  (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId || (this.props.inspectedProject == null && this.props.inspectedProjectStats == null))) ?  '#DF894A' : '#aaa',
+                        color: getColorForProjectType(this.props.projects[projectId].project_type),
+                        opacity: ((!this.props.inspectedProjectStats && !this.props.inspectedProject) || this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId) ? 1 : 0.5,
                         dashArray: (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId || !this.props.selectedYear || (this.props.projects[projectId].start_year <= this.props.selectedYear && this.props.projects[projectId].end_year >= this.props.selectedYear)) ? 'none' : (this.props.projects[projectId].start_year <= this.props.selectedYear) ? '2, 2' : '5, 10',
-                        fillColor: (this.props.projects[projectId].totalFamilies) ?getColorForRace(this.props.projects[projectId].percentFamiliesOfColor) : '#eee',
+                        fillColor: (!this.props.inspectedProjectStats && !this.props.inspectedProject) ? getColorForProjectType(this.props.projects[projectId].project_type) : (this.props.projects[projectId].totalFamilies) ? getColorForRace(this.props.projects[projectId].percentFamiliesOfColor) : '#eee',
                         fillOpacity: (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId) ? 1 : 0,
                       } }
                       ref={ 'projectFootprint' + projectId }
+                      className={ this.props.projects[projectId].project_type }
                     >
                       { (this.props.inspectedProject == projectId || this.props.inspectedProject == null) ?
                         <Tooltip 

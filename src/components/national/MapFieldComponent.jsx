@@ -14,6 +14,10 @@ export default class MapField extends React.Component {
     };
   }
 
+  shouldComponentUpdate(nextProps) {
+    return this.props.selectedView !== nextProps.selectedView || this.props.z !== nextProps.z;
+  }
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.selectedView == 'scatterplot') {
       d3.select(ReactDOM.findDOMNode(this))
@@ -49,18 +53,6 @@ export default class MapField extends React.Component {
         <filter id="glow" x="-50%" y="-10%" width="200%" height="160%">
           <feGaussianBlur stdDeviation="10" result="glow"/>
         </filter>
-
-      {/* JSX Comment 
-        <text
-          x={ GeographyStore.projectedX([-94.5, 51]) }
-          y={ GeographyStore.projectedY([-94.5, 51])}
-          textAnchor='middle'
-          fontSize={24}
-          fill='white'
-        >
-          { 'FAMILIES DISPLACED, ' + this.props.selectedYear }
-        </text> */}
-
 
         { GeographyStore.getStatesGeojson().map(polygon => {
           return (

@@ -1,4 +1,23 @@
 .projectFootprint {
+	display: inline-block;
+	line-height: 1.05;
+
+	h4 {
+		text-align: center;
+		font-size: 16px;
+		font-family: 'Roboto Condensed', sans-serif;
+		margin-bottom: 4px;
+	}
+
+  .colorkey {
+    width: 20px;
+    height: 3px;
+    display: inline-block;
+    margin-right: 6px;
+    border: 0px solid;
+    margin-bottom: 5px;
+   }
+
 	@extend .cityMapBubble;
 
 	text.note {

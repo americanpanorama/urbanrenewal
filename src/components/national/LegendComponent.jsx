@@ -34,7 +34,7 @@ export default class LegendAndControls extends React.Component {
               y1={(DimensionsStore.getLegendFontSize()+ 2)/2}
               y2={(DimensionsStore.getLegendFontSize()+ 2)/2}
               strokeWidth={2 }
-              stroke='#E4D96F'
+              stroke='steelblue'
             />
 
             <text x={33} y={DimensionsStore.getLegendFontSize()+ 2} fontSize={DimensionsStore.getLegendFontSize()+ 2}>interstates</text>

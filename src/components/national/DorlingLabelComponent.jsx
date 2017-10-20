@@ -9,8 +9,8 @@ export default class DorlingLabel extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
-      cx: this.props.cx,
-      cy: this.props.cy
+      cx: this.props.coords[this.props.selectedView].cx,
+      cy: this.props.coords[this.props.selectedView].cy
     };
   }
 
@@ -19,12 +19,12 @@ export default class DorlingLabel extends React.Component {
   componentWillLeave(callback) { callback(); }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.cx !== nextProps.cx || this.props.cy !== nextProps.cy ) {
+    if (this.props.coords[this.props.selectedView].cx !== nextProps.coords[this.props.selectedView].cy || this.props.coords[this.props.selectedView].cy !== nextProps.coords[this.props.selectedView].cy ) {
       d3.select(ReactDOM.findDOMNode(this))
         .transition()
-        .delay((this.props.selectedView == 'scatterplot') ? Math.min((DimensionsStore.getNationalMapHeight() * 0.9 - nextProps.cy) * 10, 5000) : 0)
+        .delay((this.props.selectedView == 'scatterplot') ? Math.min((DimensionsStore.getNationalMapHeight() * 0.9 - nextProps.coords[this.props.selectedView].cy) * 10, 5000) : 0)
         .duration(750)
-        .attr('transform', 'translate(' + nextProps.cx + ' ' + nextProps.cy + ')');
+        .attr('transform', 'translate(' + nextProps.coords[this.props.selectedView].cx + ' ' + nextProps.coords[this.props.selectedView].cy + ')');
     }
   }
 

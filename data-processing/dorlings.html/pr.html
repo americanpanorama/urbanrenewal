@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+rect {
+  fill: none;
+  pointer-events: all;
+}
+
+.sphere {
+  fill: none;
+  stroke: #ccc;
+  shape-rendering: crispEdges;
+}
+
+.graticule {
+  fill: none;
+  stroke: #777;
+  stroke-opacity: .2;
+}
+
+.mesh {
+  fill: none;
+  stroke: #000;
+}
+
+</style>
+<body>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/topojson.v2.min.js"></script>
+<script src="albers-usa-pr.js"></script>
+<script>
+
+function albersUsaPr() {
+  var ε = 1e-6;
+
+  var lower48 = d3.geoAlbers();
+
+  // EPSG:3338
+  var alaska = d3.geoConicEqualArea()
+      .rotate([154, 0])
+      .center([-2, 58.5])
+      .parallels([55, 65]);
+
+  // ESRI:102007
+  var hawaii = d3.geoConicEqualArea()
+      .rotate([157, 0])
+      .center([-3, 19.9])
+      .parallels([8, 18]);
+
+  // XXX? You should check that this is a standard PR projection!
+  var puertoRico = d3.geoConicEqualArea()
+      .rotate([66, 0])
+      .center([0, 18])
+      .parallels([8, 18]);
+
+  var point,
+      pointStream = {point: function(x, y) { point = [x, y]; }},
+      lower48Point,
+      alaskaPoint,
+      hawaiiPoint,
+      puertoRicoPoint;
+
+  function albersUsa(coordinates) {
+    var x = coordinates[0], y = coordinates[1];
+    point = null;
+    (lower48Point(x, y), point)
+        || (alaskaPoint(x, y), point)
+        || (hawaiiPoint(x, y), point)
+        || (puertoRicoPoint(x, y), point);
+    return point;
+  }
+
+  albersUsa.invert = function(coordinates) {
+    var k = lower48.scale(),
+        t = lower48.translate(),
+        x = (coordinates[0] - t[0]) / k,
+        y = (coordinates[1] - t[1]) / k;
+    return (y >= .120 && y < .234 && x >= -.425 && x < -.214 ? alaska
+        : y >= .166 && y < .234 && x >= -.214 && x < -.115 ? hawaii
+        : y >= .204 && y < .234 && x >= .320 && x < .380 ? puertoRico
+        : lower48).invert(coordinates);
+  };
+
+  // A naïve multi-projection stream.
+  // The projections must have mutually exclusive clip regions on the sphere,
+  // as this will avoid emitting interleaving lines and polygons.
+  albersUsa.stream = function(stream) {
+    var lower48Stream = lower48.stream(stream),
+        alaskaStream = alaska.stream(stream),
+        hawaiiStream = hawaii.stream(stream),
+        puertoRicoStream = puertoRico.stream(stream);
+    return {
+      point: function(x, y) {
+        lower48Stream.point(x, y);
+        alaskaStream.point(x, y);
+        hawaiiStream.point(x, y);
+        puertoRicoStream.point(x, y);
+      },
+      sphere: function() {
+        lower48Stream.sphere();
+        alaskaStream.sphere();
+        hawaiiStream.sphere();
+        puertoRicoStream.sphere();
+      },
+      lineStart: function() {
+        lower48Stream.lineStart();
+        alaskaStream.lineStart();
+        hawaiiStream.lineStart();
+        puertoRicoStream.lineStart();
+      },
+      lineEnd: function() {
+        lower48Stream.lineEnd();
+        alaskaStream.lineEnd();
+        hawaiiStream.lineEnd();
+        puertoRicoStream.lineEnd();
+      },
+      polygonStart: function() {
+        lower48Stream.polygonStart();
+        alaskaStream.polygonStart();
+        hawaiiStream.polygonStart();
+        puertoRicoStream.polygonStart();
+      },
+      polygonEnd: function() {
+        lower48Stream.polygonEnd();
+        alaskaStream.polygonEnd();
+        hawaiiStream.polygonEnd();
+        puertoRicoStream.polygonEnd();
+      }
+    };
+  };
+
+  albersUsa.precision = function(_) {
+    if (!arguments.length) return lower48.precision();
+    lower48.precision(_);
+    alaska.precision(_);
+    hawaii.precision(_);
+    puertoRico.precision(_);
+    return albersUsa;
+  };
+
+  albersUsa.scale = function(_) {
+    if (!arguments.length) return lower48.scale();
+    lower48.scale(_);
+    alaska.scale(_ * .35);
+    hawaii.scale(_);
+    puertoRico.scale(_);
+    return albersUsa.translate(lower48.translate());
+  };
+
+  albersUsa.translate = function(_) {
+    if (!arguments.length) return lower48.translate();
+    var k = lower48.scale(), x = +_[0], y = +_[1];
+
+    lower48Point = lower48
+        .translate(_)
+        .clipExtent([[x - .455 * k, y - .238 * k], [x + .455 * k, y + .238 * k]])
+        .stream(pointStream).point;
+
+    alaskaPoint = alaska
+        .translate([x - .307 * k, y + .201 * k])
+        .clipExtent([[x - .425 * k + ε, y + .120 * k + ε], [x - .214 * k - ε, y + .234 * k - ε]])
+        .stream(pointStream).point;
+
+    hawaiiPoint = hawaii
+        .translate([x - .205 * k, y + .212 * k])
+        .clipExtent([[x - .214 * k + ε, y + .166 * k + ε], [x - .115 * k - ε, y + .234 * k - ε]])
+        .stream(pointStream).point;
+
+    puertoRicoPoint = puertoRico
+        .translate([x + .350 * k, y + .224 * k])
+        .clipExtent([[x + .320 * k, y + .204 * k], [x + .380 * k, y + .234 * k]])
+        .stream(pointStream).point;
+
+    return albersUsa;
+  };
+
+  return albersUsa.scale(1070);
+}
+
+var width = 960,
+    height = 500;
+
+var projection = albersUsaPr()
+    .scale(1070)
+    .translate([width / 2, height / 2]);
+
+
+
+var path = d3.geoPath()
+    .projection(projection);
+
+console.log(path({type:"Point", coordinates: [-79, 37]}));
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+var graticule = d3.geoGraticule()
+    .step([2, 2]);
+
+svg.append("rect")
+    .attr("width", width)
+    .attr("height", height);
+
+svg.append("path")
+    .datum({type: "Sphere"})
+    .attr("class", "sphere")
+    .attr("d", path);
+
+svg.append("path")
+    .datum(graticule)
+    .attr("class", "graticule")
+    .attr("d", path);
+
+  var k = projection.scale(), t = projection.translate();
+svg.append('circle')
+.attr('transform', 'translate(' + t + ')')
+.attr('r', 5)
+.attr('fill', 'red');
+
+
+var vertical = svg.selectAll('line.vertical')
+.data([ -.425, -.214, -.115, .32, .38])
+.enter();
+vertical
+.append('line')
+.classed('vertical', true)
+.attr('y2', 500)
+.attr('stroke', function(d){ return d>0 ? 'green' : 'red'})
+.attr('transform', function(d) { return 'translate('+[ t[0] + d * k, 0 ]+')'; });
+vertical.append('text')
+.attr('transform', function(d) { return 'translate('+[ t[0] + d * k + 2, 14 ]+')'; })
+.text(function(d) { return d; });
+
+var horizontal = svg.selectAll('line.horizontal')
+.data([ 0., .120, .166, .234, .204])
+.enter();
+horizontal
+.append('line')
+.classed('horizontal', true)
+.attr('x2', 960)
+.attr('stroke', function(d){ return d==.204 ? 'green' : 'red'})
+.attr('transform', function(d) { return 'translate('+[ 0, t[1] + d * k ]+')'; });
+horizontal.append('text')
+.attr('transform', function(d) { return 'translate('+[ width-50, t[1] + d * k -2 ]+')'; })
+.text(function(d) { return d; });
+
+svg.selectAll('rect.bg')
+.data( [ [[-.425,.120], [-.214,.234]], [[-.214,.166], [-.115,.234]], [[.32,.204], [.38,.234]],  ] )
+.enter()
+.append('rect')
+.attr('class', 'bg')
+.attr('x', function(d) { return t[0] + d[0][0] * k; })
+.attr('y', function(d) { return t[1] + d[0][1] * k; })
+.attr('width', function(d) { return (d[1][0] - d[0][0]) * k; })
+.attr('height', function(d) { return (d[1][1] - d[0][1]) * k; })
+.style('fill', 'rgba(255,200,200,.3)')
+
+  
+d3.json("https://gist.githubusercontent.com/mbostock/4090846/raw/d534aba169207548a8a3d670c9c2cc719ff05c47/us.json", function(error, us) {
+  if (error) throw error;
+
+  svg.append("path")
+      .datum(topojson.mesh(us))
+      .attr("class", "mesh")
+      .attr("d", path);
+});
+
+</script>

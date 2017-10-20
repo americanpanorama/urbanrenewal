@@ -2,7 +2,7 @@ import * as React from 'react';
 import LegendProjectFootprint from './LegendProjectFootprint.jsx';
 import LegendCityNoFootprints from './LegendCityNoFootprints.jsx';
 
-import { getColorForRace } from '../../utils/HelperFunctions';
+import { getColorForRace, getColorForProjectType } from '../../utils/HelperFunctions';
 
 export default class LegendRaceAndIncome extends React.Component {
 
@@ -11,7 +11,22 @@ export default class LegendRaceAndIncome extends React.Component {
       <div 
         className='mapLegend demographics'
       >
+
        <LegendProjectFootprint selectedYear={ this.props.selectedYear } />
+
+       <div className='projectFootprint'>
+        <h4>Type of Project</h4>
+        <div><span className='colorkey' style={{backgroundColor: getColorForProjectType('R', 1), borderColor: getColorForProjectType('R')}}> </span>Residential "Blighted"</div>
+        <div><span className='colorkey' style={{backgroundColor: getColorForProjectType('OB', 1), borderColor:getColorForProjectType('OB')}}> </span>Non-residential "Blighted"</div>
+        <div><span className='colorkey' style={{backgroundColor: getColorForProjectType('O', 1), borderColor: getColorForProjectType('O')}}> </span>Open Land</div>
+        <div><span className='colorkey' style={{backgroundColor: getColorForProjectType('PO', 1), borderColor:getColorForProjectType('PO')}}> </span>Predominantly Open</div>
+        <div><span className='colorkey' style={{backgroundColor: getColorForProjectType('D', 1), borderColor: getColorForProjectType('D')}}> </span>Disaster Area</div>
+        <div><span className='colorkey' style={{backgroundColor: getColorForProjectType('U', 1), borderColor: getColorForProjectType('U')}}> </span>University or College</div>
+        <div><span className='colorkey' style={{backgroundColor: getColorForProjectType('', 1), borderColor: getColorForProjectType('')}}> </span>Unknown or Unspecified</div>
+
+
+        </div>
+
        <LegendCityNoFootprints />
 
         <span className='tooltip'>The poverty line in 1960 was approximately $3000 for average-sized families. Census tracts with no families below $3000 in annual income are full transparent, invisible. The deeper the color the higher percentage of families whose income was below the poverty line.</span>

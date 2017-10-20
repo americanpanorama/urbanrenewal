@@ -17,15 +17,7 @@ import HelperFunctions from '../../utils/HelperFunctions.js';
 
 export default class MapChartField extends React.Component {
 
-  constructor (props) { 
-    super(props); 
-    this.state = {
-      x: this.props.x,
-      y: this.props.y,
-      z: this.props.z,
-      dorlingZoom: this.props.z
-    };
-  }
+  constructor (props) { super(props); }
 
   render () {
     return (
@@ -58,7 +50,6 @@ export default class MapChartField extends React.Component {
           <MapField
             selectedView={ this.props.selectedView }
             z={ GeographyStore.getXYZ().z }
-            selectedYear={ CitiesStore.getSelectedYear() || '1955-1966' }
           />
 
           { (this.props.selectedView == 'map') ? 
@@ -66,7 +57,7 @@ export default class MapChartField extends React.Component {
               { HighwaysStore.getHighwayForYear(CitiesStore.getSelectedYear() || 1966).map((section, i) => 
                 <path
                   d={GeographyStore.getPath(section)}
-                  stroke='#E4D96F'
+                  stroke='lightsteelblue'
                   strokeWidth='1.5'
                   fill='transparent'
                   key={'highway' + i}
@@ -75,7 +66,7 @@ export default class MapChartField extends React.Component {
             </g> : ''
           }
 
-          { CitiesStore.getDorlingsForce().map((cityData, i) => {
+          { CitiesStore.getDorlingsCoords().map((cityData, i) => {
             return (
               <Dorlings
                 { ...cityData }
@@ -93,7 +84,7 @@ export default class MapChartField extends React.Component {
             );  
           })}
 
-          { CitiesStore.getDorlingsForce().map((cityData, i) => {
+          { CitiesStore.getDorlingsCoords().map((cityData, i) => {
             const visibleRadius = (CitiesStore.getSelectedView() == 'cartogram') ? DimensionsStore.getDorlingRadius(cityData.value) * GeographyStore.getZ() : DimensionsStore.getDorlingRadius(cityData.value) ;
             if (DimensionsStore.dorlingHasLabel(cityData.city_id, visibleRadius) && (this.props.highlightedCities.length == 0 || this.props.highlightedCities.includes(cityData.city_id))) {
               return (
