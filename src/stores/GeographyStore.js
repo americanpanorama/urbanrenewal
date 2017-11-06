@@ -45,6 +45,13 @@ const GeographyStore = {
     this.emit(AppActionTypes.storeChanged);
   },
 
+  setViewFromProjectBounds(project_id) {
+    this.data.lat = CitiesStore.getProjectCenter(project_id)[0];
+    this.data.lng = CitiesStore.getProjectCenter(project_id)[1];
+    this.data.zoom = (CitiesStore.getProjectBoundingBox(project_id)) ? Math.min(this.data.theMap.getBoundsZoom(CitiesStore.getProjectBoundingBox(project_id)) - 2, 16) : 14;
+    this.emit(AppActionTypes.storeChanged);
+  },
+
   setXYZ: function(x,y,z) {
     this.data.x = Math.round(x * 100) / 100;
     this.data.y = Math.round(y * 100) / 100;
@@ -351,11 +358,17 @@ GeographyStore.dispatchToken = AppDispatcher.register((action) => {
   case AppActionTypes.projectSelected:
     // if the project city isn't loaded, load it
     const city_id = CitiesStore.getCityId(action.value);
+    console.log(CitiesStore.getSelectedCity(), city_id);
     if (city_id && CitiesStore.getSelectedCity() !== city_id) {
       const waitingId = setInterval(() => {
         if (GeographyStore.getTheMap()) {
           clearInterval(waitingId);
-          GeographyStore.setViewFromBounds(city_id);
+          if (CitiesStore.getProjectCenter(action.value)) {
+            console.log('executed');
+            GeographyStore.setViewFromProjectBounds(action.value);
+          } else {
+            GeographyStore.setViewFromBounds(city_id);
+          }
           // only reset the map if it's not already on the map
           // if (!GeographyStore.getTheMap().getBounds().contains([CitiesStore.getCityData(action.value).lat, CitiesStore.getCityData(action.value).lng])) {
           //   GeographyStore.setViewFromBounds(action.value);

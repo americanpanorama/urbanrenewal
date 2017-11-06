@@ -503,7 +503,7 @@ export default class App extends React.Component {
           style={ DimensionsStore.getSidebarStyle() }
         >
 
-          { (CitiesStore.getHighlightedProject()) ? 
+          { (CitiesStore.getHighlightedProject() && !CitiesStore.getInspectedCity()) ? 
             <ProjectStats 
               { ...CitiesStore.getCityData(CitiesStore.getHighlightedCity()) }
               project_id={ CitiesStore.getHighlightedProject() }
@@ -520,7 +520,7 @@ export default class App extends React.Component {
             /> : ''
           }
 
-          { (!CitiesStore.getHighlightedProject() && CitiesStore.getHighlightedCity()) ? 
+          { ((!CitiesStore.getHighlightedProject() && CitiesStore.getHighlightedCity()) || CitiesStore.getInspectedCity()) ? 
             <CityStats 
               { ...CitiesStore.getCityData(CitiesStore.getHighlightedCity()) }
               otherCities={ CitiesStore.getVisibleCitiesDetails().cities }

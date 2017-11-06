@@ -80,6 +80,7 @@ export default class MapChartField extends React.Component {
                 onCityClicked={ this.props.onCityClicked }
                 onCityHover={ this.props.onCityHover }
                 onCityOut={ this.props.onCityOut }
+                pocSpan={ CitiesStore.getPOC() }
               />
             );  
           })}

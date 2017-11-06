@@ -45,7 +45,6 @@ const CitiesStore = {
       '500000+': {displacements: [], percentsFamiliesOfColor: [], projects: [] }
     },
     dorlingCoords: {},
-    dorlingXYs: {},
     maxDisplacementsInCityForYear: 5139,
 
     // util variables to prevent reloading data that's already been loaded
@@ -305,9 +304,6 @@ const CitiesStore = {
 
       this.setSelectedYear(year);
 
-      this.assignDorlingXYs();
-
-
       this.data.loaded = true;
       this.data.yearsLoaded.push(year);
 
@@ -457,6 +453,7 @@ const CitiesStore = {
     });
   },
 
+  // used when the city map moves to figure which cities need to be loaded
   loadVisibleCities: function() {
     // a couple utility functions from https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
     const getDistanceFromLatLonInKm = function(lat1,lon1,lat2,lon2) {
@@ -524,17 +521,6 @@ const CitiesStore = {
     }
   },
 
-  assignDorlingXYs: function() {
-    DorlingXYs.forEach(yearData => {
-      const year = yearData.year || 'all';
-      this.data.dorlingXYs[year] = (!this.data.dorlingXYs[year]) ? {} : this.data.dorlingXYs[year];
-      yearData.cities.forEach(cityData => {
-        this.data.dorlingXYs[year][cityData.city_id] = [ cityData.x * DimensionsStore.getMapScale() + DimensionsStore.getNationalMapWidth() / 2, cityData.y * DimensionsStore.getMapScale() + DimensionsStore.getNationalMapHeight() * 12.5/31 ];
-      });
-    });
-    //this.emit(AppActionTypes.storeChanged);
-  },
-
   parseDorlings: function() {
     const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4),
       l = Math.sqrt(2*shortside*shortside);
@@ -555,7 +541,8 @@ const CitiesStore = {
         }
         let [scatterplotcx, scatterplotcy] = DimensionsStore.translateScatterplotPoint([cx, cy]);
 
-        let [cartogramcx, cartogramcy] = (this.data.dorlingXYs[year] && this.data.dorlingXYs[year][cityData.city_id]) ? this.data.dorlingXYs[year][cityData.city_id] : [0,0];
+        let cityCoords = DorlingXYs.find(aYearData => (!aYearData.year && year == 'all') || aYearData.year == year).cities.find(dCityData => dCityData.city_id == cityData.city_id);
+        let [cartogramcx, cartogramcy] = [ cityCoords.x * DimensionsStore.getMapScale() + DimensionsStore.getNationalMapWidth() / 2, cityCoords.y * DimensionsStore.getMapScale() + DimensionsStore.getNationalMapHeight() * 12.5/31 ];
 
         let [mapcx, mapcy] = (ProjectedCoords[cityData.city_id]) ? [ ProjectedCoords[cityData.city_id][0]* DimensionsStore.getMapScale() + DimensionsStore.getNationalMapWidth() / 2, ProjectedCoords[cityData.city_id][1] * DimensionsStore.getMapScale() + DimensionsStore.getNationalMapHeight() * 12.5/31 ] : [0,0];
 
@@ -568,7 +555,8 @@ const CitiesStore = {
           },
           r: DimensionsStore.getDorlingRadius((year && false) ? cityData.yearsData[year]['totalFamilies'] : cityData.totalFamilies), 
           city_id: cityData.city_id,
-          value: (year !== 'all') ? cityData.yearsData[year]['totalFamilies'] : cityData.totalFamilies,
+          value: (year !== 'all') ? cityData.yearsData[year].totalFamilies : cityData.totalFamilies,
+          percentFamiliesOfColor: (year !== 'all') ? cityData.yearsData[year].percentFamiliesOfColor : cityData.percentFamiliesOfColor,
           color: (year !== 'all' && cityData.yearsData[year].percentFamiliesOfColor >= this.getPOCBottom() && cityData.yearsData[year].percentFamiliesOfColor <= this.getPOCTop()) ? getColorForRace(cityData.yearsData[year].percentFamiliesOfColor) : (cityData.percentFamiliesOfColor >= this.getPOCBottom() && cityData.percentFamiliesOfColor <= this.getPOCTop()) ? getColorForRace(cityData.percentFamiliesOfColor) : 'transparent',
           name: cityData.city,
           hasProjectGeojson: cityData.hasProjectGeojson
@@ -704,7 +692,7 @@ const CitiesStore = {
 
   getCityData: function(city_id) { return (this.data && this.data.loaded && this.data.cities[city_id]) ? this.data.cities[city_id] : {}; },
   
-  getCityId: function(project_id) { return (project_id) ? Object.keys(this.data.cities).filter(city_id => this.data.cities[city_id].projects.hasOwnProperty(project_id))[0] : null; },
+  getCityId: function(project_id) { return (project_id) ? parseInt(Object.keys(this.data.cities).filter(city_id => this.data.cities[city_id].projects.hasOwnProperty(project_id))[0]) : null; },
 
   getCityIdFromSlug: function(slug) { return (this.data.cities) ? Object.keys(this.data.cities).filter(cityId => (this.data.cities[cityId].slug == slug))[0] : null; },
 
@@ -754,46 +742,6 @@ const CitiesStore = {
     } else {
       return [];
     }
-  },
-
-  getDorlingsForce: function() {
-    return (this.data && this.data.loaded) ?
-      this.getCitiesList()
-        //.filter(cityData => GeographyStore.projected([cityData.lng, cityData.lat]) !== null)
-        .filter(cityData => (this.data.selectedYear) ? cityData.yearsData[this.data.selectedYear] && cityData.yearsData[this.data.selectedYear]['totalFamilies'] > 0 && cityData.name !== 'hartford' : cityData.totalFamilies && cityData.totalFamilies > 0)
-        .map(cityData => {
-          let cx, cy;
-          if (this.data.selectedView == 'scatterplot') {
-            const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4),
-              l = Math.sqrt(2*shortside*shortside);
-            if (!this.getCityData(cityData.city_id).pop_1960 || !this.getCityData(cityData.city_id).nonwhite_1960 || this.getCityData(cityData.city_id).state == 'pr' || this.getCityData(cityData.city_id).state == 'vi') {
-              cx = (this.data.selectedYear) ? this.getCityData(cityData.city_id).yearsData[this.data.selectedYear].totalFamilies : this.getCityData(cityData.city_id).totalFamilies; // use this to calculate a small offset
-              cy = null; 
-            } else {
-              cx = this.getPercentNonWhitePop(cityData.city_id) * l;
-              cy = (this.data.selectedYear) ? l - this.getCityData(cityData.city_id).yearsData[this.data.selectedYear].percentFamiliesOfColor * l : l - this.getCityData(cityData.city_id).percentFamiliesOfColor * l;
-            }
-            [cx, cy] = DimensionsStore.translateScatterplotPoint([cx, cy]);
-          } else if (this.data.selectedView == 'cartogram') {
-            [cx, cy] = this.getDorlingXY(cityData.city_id);
-          } else {
-            [cx, cy] = GeographyStore.projected([cityData.lng, cityData.lat]);
-          }
-
-          return {
-            lngLat: [cityData.lng, cityData.lat],
-            cx: cx,
-            cy: cy,
-            r: DimensionsStore.getDorlingRadius((this.data.selectedYear && false) ? cityData.yearsData[this.data.selectedYear]['totalFamilies'] : cityData.totalFamilies), 
-            city_id: cityData.city_id,
-            value: (this.data.selectedYear !== null) ? cityData.yearsData[this.data.selectedYear]['totalFamilies'] : cityData.totalFamilies,
-            color: (this.data.selectedYear && cityData.yearsData[this.data.selectedYear].percentFamiliesOfColor >= this.getPOCBottom() && cityData.yearsData[this.data.selectedYear].percentFamiliesOfColor <= this.getPOCTop()) ? getColorForRace(cityData.yearsData[this.data.selectedYear].percentFamiliesOfColor) : (cityData.percentFamiliesOfColor >= this.getPOCBottom() && cityData.percentFamiliesOfColor <= this.getPOCTop()) ? getColorForRace(cityData.percentFamiliesOfColor) : 'transparent',
-            name: cityData.city,
-            hasProjectGeojson: cityData.hasProjectGeojson
-          };
-        })
-        .sort((a,b) => b.value - a.value) :
-      [];
   },
 
   getDorlingsForceForYear: function(year) {
@@ -889,9 +837,15 @@ const CitiesStore = {
       (cat == '500000+') ? '> 500K' : '';
   },
 
-  getProjectBoundingBox: function (id) { return (this.data.cities[this.getHighlightedCity()] && this.data.cities[this.getHighlightedCity()].projects[id]) ? this.data.cities[this.getHighlightedCity()].projects[id].boundingBox : null; },
+  getProjectBoundingBox: function (id) { 
+    const city_id = this.getCityId(id);
+    return (this.data.cities[city_id] && this.data.cities[city_id].projects[id]) ? this.data.cities[city_id].projects[id].boundingBox : null; 
+  },
 
-  getProjectCenter: function (id) { return (this.data.cities[this.getHighlightedCity()].projects[id]) ? this.data.cities[this.getHighlightedCity()].projects[id].center : null; },
+  getProjectCenter: function (id) { 
+    const city_id = this.getCityId(id);
+    return (this.data.cities[city_id].projects[id]) ? this.data.cities[city_id].projects[id].center : null; 
+  },
 
   getProjectTimelineBars: function(cityId) {
     let projects = Object.keys(this.data.cities[cityId].projects)
@@ -1173,10 +1127,12 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
 
   case AppActionTypes.projectInspected:
     CitiesStore.setInspectedProject(action.value);
+    CitiesStore.setInspectedCity(null);
     break;
 
   case AppActionTypes.projectInspectedStats:
     CitiesStore.setInspectedProjectStats(action.value);
+    CitiesStore.setInspectedCity(null);
     break;
 
   case AppActionTypes.projectSelected:
@@ -1186,7 +1142,9 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
     } else if (city_id && CitiesStore.getSelectedCity() !== city_id) {
       if (CitiesStore.cityLoaded(city_id)) {
         CitiesStore.setSelectedCity(city_id);
+        CitiesStore.setInspectedCity(null);
         CitiesStore.setSelectedProject(action.value);
+        CitiesStore.setInspectedProject(null);
       } else {
         CitiesStore.loadCityData(city_id);
         let waitingId = setInterval(() => {
@@ -1224,7 +1182,7 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
     break;
 
   case AppActionTypes.windowResized:
-    CitiesStore.assignDorlingXYs();
+    CitiesStore.parseDorlings();
     break;
 
   case AppActionTypes.HOLCToggle:
