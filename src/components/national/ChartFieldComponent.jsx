@@ -123,7 +123,7 @@ export default class ChartField extends React.Component {
             <text
               x={ DimensionsStore.getScatterplotLength() * 0.5}
               y={ DimensionsStore.getScatterplotLength() * -0.06 - 32 }
-              transform={'rotate(180 ' + DimensionsStore.getScatterplotLength() * 0.5 + ' ' + DimensionsStore.getScatterplotLength() * -0.12 + ')'}
+              transform={'rotate(180 ' + DimensionsStore.getScatterplotLength() * 0.5 + ' ' + (DimensionsStore.getScatterplotLength() * -0.06 - 32) + ')'}
               className='label'
             >
               {'percentage of the city that was white (' + this.props.popYear + ')'}
@@ -161,7 +161,7 @@ export default class ChartField extends React.Component {
               x={ DimensionsStore.getScatterplotLength() * -0.06 - 32 }
               y={ DimensionsStore.getScatterplotLength() * 0.5 }
               className='label'
-              transform={'rotate(90 ' + DimensionsStore.getScatterplotLength() * -0.12 + ' ' + DimensionsStore.getScatterplotLength()*0.5 + ')'}
+              transform={'rotate(90 ' + (DimensionsStore.getScatterplotLength() * -0.06 - 32) + ' ' + DimensionsStore.getScatterplotLength()*0.5 + ')'}
             >
               percentage of families displaced who were white
             </text>
@@ -191,6 +191,35 @@ export default class ChartField extends React.Component {
                 { Math.round((1 -this.props.percentFamiliesOfColor) * 100) + '% white/' + (100 - Math.round((1-this.props.percentFamiliesOfColor) * 100)) + '% of color' }
               </text> : ''
             }
+
+            <text
+              x={ DimensionsStore.getScatterplotLength() * 0.7 + Math.sqrt(50)  }
+              y={ DimensionsStore.getScatterplotLength() * 0.3 + Math.sqrt(50)}
+              transform={'rotate(135 ' + (DimensionsStore.getScatterplotLength() * 0.7 + Math.sqrt(50)) + ' ' + (DimensionsStore.getScatterplotLength() * 0.3 + Math.sqrt(50)) + ')'}
+              className='proportional arrow'
+            >
+              
+            </text>
+
+            <text
+              x={ DimensionsStore.getScatterplotLength() * 0.7 + Math.sqrt(50)  }
+              y={ DimensionsStore.getScatterplotLength() * 0.3 + Math.sqrt(50)}
+              transform={'rotate(135 ' + (DimensionsStore.getScatterplotLength() * 0.7 + Math.sqrt(50)) + ' ' + (DimensionsStore.getScatterplotLength() * 0.3 + Math.sqrt(50)) + ')'}
+              className='proportional'
+            >
+              ⬆ white families disproportionately displaced 
+            </text>
+
+
+
+            <text
+              x={ DimensionsStore.getScatterplotLength() * 0.7 - Math.sqrt(338)  }
+              y={ DimensionsStore.getScatterplotLength() * 0.3 - Math.sqrt(338)}
+              transform={'rotate(135 ' + (DimensionsStore.getScatterplotLength() * 0.7 - Math.sqrt(338)) + ' ' + (DimensionsStore.getScatterplotLength() * 0.3 - Math.sqrt(338)) + ')'}
+              className='proportional'
+            >
+              ⬇ families of color disproportionately displaced
+            </text>
 
             <text
               x={ DimensionsStore.getScatterplotLength() * -0.4 }

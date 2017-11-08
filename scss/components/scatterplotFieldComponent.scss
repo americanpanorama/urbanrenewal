@@ -16,9 +16,10 @@
 	text {
 		fill: black;
 		text-anchor: middle;
+    font-size: 16px;
 
     &.label {
-      font-size: 1.5em;
+      font-weight: 400;
     }
 
     &.inadequate {
@@ -28,6 +29,14 @@
 
     &.masked {
       fill-opacity: 0.1;
+    }
+
+    &.proportional {
+      fill: #555;
+
+      &.arrow {
+       font-size: 32px;
+      }
     }
 	}
 }

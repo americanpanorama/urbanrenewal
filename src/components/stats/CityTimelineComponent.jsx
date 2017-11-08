@@ -135,13 +135,13 @@ export default class Timeline extends React.Component {
                   y={i * 20}
                   width={ (p.totalFamilies / theMax) * DimensionsStore.getCityTimelineStyle().width / 3 }
                   height={14}
-                  className={'territory' + + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '')}
+                  className={'territory ' + +((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '')}
                   id={ p.project_id  }
                 />
                 <text
                   x={ DimensionsStore.getCityTimelineStyle().width * 0.5 + (p.totalFamilies / theMax) * DimensionsStore.getCityTimelineStyle().width / 3 + 3}
-                  y={ i * 20 + 1 }
-                  className={'count territory' + + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '')}
+                  y={ i * 20 + 13 }
+                  className={'count territory '  + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '')}
                   id={ p.project_id  }
                 >
                   { formatNumber(p.totalFamilies) }
