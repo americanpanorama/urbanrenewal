@@ -523,6 +523,7 @@ export default class App extends React.Component {
           { ((!CitiesStore.getHighlightedProject() && CitiesStore.getHighlightedCity()) || CitiesStore.getInspectedCity()) ? 
             <CityStats 
               { ...CitiesStore.getCityData(CitiesStore.getHighlightedCity()) }
+              displacementProjects={ CitiesStore.getCityProjectsOrganized(CitiesStore.getHighlightedCity()) }
               otherCities={ CitiesStore.getVisibleCitiesDetails().cities }
               categories={ CitiesStore.getCategories() }
               selectedYear={ CitiesStore.getSelectedYear() }

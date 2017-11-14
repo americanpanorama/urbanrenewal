@@ -2,33 +2,50 @@
 	pointer-events: auto; 
 	overflow: visible;
 
-
-	svg {
+	div.gradient {
 		display: inline-block;
 
-		&.demographics {
+		svg {
+			
 
-			text {
-				fill: black;
-				text-anchor: middle;
-				font-size: 16px;
+			&.demographics {
 
-				&.quantities {
-					fill: grey;
-					font-size: 14px;
+				text {
+					fill: black;
+					text-anchor: middle;
+					font-size: 16px;
 
-					&.y {
-						text-anchor: start;
+					&.quantities {
+						fill: grey;
+						font-size: 14px;
+
+						&.y {
+							text-anchor: start;
+						}
 					}
 				}
-			}
 
-			rect {
-				stroke-width: 0.5;
-				stroke-opacity: 0.1;
+				rect {
+					stroke-width: 0.5;
+					stroke-opacity: 0.1;
+				}
+
+
 			}
 		}
+
+		&:hover {
+		    .tooltip {
+		        visibility: visible;
+		    }
+		}
+
 	}
+
+
+
+
+
 
 
 
@@ -46,14 +63,15 @@
 	    /* Position the tooltip */
 	    position: absolute;
 	    right: 0px;
-	    top: -160px;
-	}
+	    bottom: 180px;
 
-	&:hover {
-	    .tooltip {
-	        visibility: visible;
+	    &.projectType {
+	    	right: 300px;
+	    	line-height: 1.6;
 	    }
 	}
+
+
 }
 
 .shadow {

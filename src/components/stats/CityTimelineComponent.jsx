@@ -3,6 +3,8 @@ import * as d3 from 'd3';
 import ReactTransitionGroup from 'react-addons-transition-group';
 import Displacements from './DisplacementTimespanComponent.jsx';
 import ProjectSnippet from './ProjectSnippetComponent.jsx';
+import ProjectDisplacementGraph from './ProjectDisplacementGraph.jsx';
+import ProjectDisplacementGraphLabel from './ProjectDisplacementGraphLabel.jsx';
 import { getColorForRace, getColorForProjectType, formatNumber } from '../../utils/HelperFunctions';
 
 import DimensionsStore from '../../stores/DimensionsStore';
@@ -10,19 +12,37 @@ import CitiesStore from '../../stores/CitiesStore';
 
 export default class Timeline extends React.Component {
 
-  constructor (props) { super(props); }
+  constructor (props) { 
+    super(props); 
+
+  }
 
   render() {
-    const years = [1955,1956,1957,1958,1959,1960,1961,1962,1963,1964,1965,1966];
+    let labels = [];
+    const activeCount = this.props.displacementProjects.reduce((count, p) => (p.status == 'active') ? count + 1 : count, 0),
+      planningCount = this.props.displacementProjects.reduce((count, p) => (p.status == 'planning') ? count + 1 : count, 0),
+      completedCount = this.props.displacementProjects.reduce((count, p) => (p.status == 'completed') ? count + 1 : count, 0),
+      futureCount = this.props.displacementProjects.reduce((count, p) => (p.status == 'future') ? count + 1 : count, 0),
+      activeHeight = activeCount * 20 + ((activeCount > 0) ? 42 : 0),
+      planningHeight = planningCount * 20 + ((planningCount > 0) ? 42 : 0),
+      completedHeight = completedCount * 20 + ((completedCount > 0) ? 42 : 0),
+      futureHeight = futureCount * 20 + ((futureCount > 0) ? 42 : 0),
+      height = activeHeight + planningHeight + completedHeight + futureHeight;
 
-    const sortedProjects = Object.keys(this.props.projects)
-      .map(project_id => this.props.projects[project_id])
-      .filter(p => p.totalFamilies > 0)
-      .sort((a,b)=> (a.project < b.project) ? -1 : (a.project > b.project) ? 1 : 0);
+    if (activeCount > 0) {
+      labels.push({label: 'Projects that were being executed in ' + this.props.selectedYear, y: 0});
+    }
+    if (planningCount > 0) {
+      labels.push({label: 'Projects in the planning phase in ' + this.props.selectedYear, y: activeHeight});
+    }
+    if (completedCount > 0) {
+      labels.push({label: 'Projects completed by ' + this.props.selectedYear, y: activeHeight + planningHeight});
+    }
+    if (futureCount > 0) {
+      labels.push({label: 'Future projects', y: activeHeight + planningHeight + completedHeight});
+    }
 
-    const theMax = (this.props.state !== 'pr' && this.props.state !== 'vi' ) ? sortedProjects.reduce((max,project) => Math.max(max, project.whites || 0, project.nonwhite || 0), 0) : Math.max(...sortedProjects.map(project => project.totalFamilies)),
-      height = (sortedProjects.length + 1) * 22;
-
+    console.log(this.props.displacementProjects);
     return (
       <svg 
         { ...DimensionsStore.getCityTimelineStyle() }
@@ -30,15 +50,20 @@ export default class Timeline extends React.Component {
         className='project'
       >
 
+        { labels.map(label => <ProjectDisplacementGraphLabel {...label } />) }
+
+      {/* JSX Comment
+
+
         <text
           x={ DimensionsStore.getCityTimelineStyle().width / 2 - 40 }
           y={ 14 }
           className='label projects'
         >
-          Project
+          Projects Actively Executing in { this.props.selectedYear }
         </text>
 
-        { (sortedProjects.find(p => p.project_type)) ?
+        { (this.props.displacementProjects.find(p => p.project_type)) ?
           <text
             x={ DimensionsStore.getCityTimelineStyle().width / 2 - 10 }
             y={ 14 }
@@ -58,97 +83,46 @@ export default class Timeline extends React.Component {
 
 
 
+      
 
-        { sortedProjects.map((p, i) => 
-          <g 
-            key={ 'projectData' + p.project_id }
-            onMouseEnter={ (p.the_geojson) ? this.props.onProjectInspected : null }
-            onMouseLeave={ (p.the_geojson) ? this.props.onProjectOut : null }
-            onClick={ this.props.onProjectSelected }
-            id={ p.project_id  }
-            transform='translate(0 22)'
+        <text
+          x={ DimensionsStore.getCityTimelineStyle().width / 2 - 40 }
+          y={ this.state.activeHeight + this.state.activeOffset + 14 }
+          className='label projects'
+        >
+          Projects Being Planned in { this.props.selectedYear }
+        </text>
+
+        { (this.state.sortedProjects.find(p => p.project_type)) ?
+          <text
+            x={ DimensionsStore.getCityTimelineStyle().width / 2 - 10 }
+            y={ this.state.activeHeight + this.state.activeOffset + 14 }
+            className='label displacements'
           >
-            <text
-              x={ DimensionsStore.getCityTimelineStyle().width / 2 - 20}
-              y={ i * 20 + 14}
-              className={ 'project' + ((p.the_geojson) ? ' hasFootprint' : '') + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '') }
-              id={ p.project_id  }
-            >
-              { p.project }
-            </text>
-            { (p.project_type) ?
-              <circle
-                cx={ DimensionsStore.getCityTimelineStyle().width / 2 - 10}
-                cy={ i * 20 + 7}
-                r={5}
-                fill={ getColorForProjectType(p.project_type) }
-              /> : ''
-            }
+            Type
+          </text> : ''
+        }
 
-            { (p.nonwhite || p.whites) ?
-              <g>
+        <text
+          x={ DimensionsStore.getCityTimelineStyle().width * 0.75 }
+          y={ this.state.activeHeight + this.state.activeOffset + 14 }
+          className='label displacements'
+        >
+          Families Displaced
+        </text>
 
-                <line
-                  x1={ DimensionsStore.getCityTimelineStyle().width * 0.75 }
-                  x2={ DimensionsStore.getCityTimelineStyle().width * 0.75 }
-                  y1={i * 20}
-                  y2={20}
-                  className='divider'
-                />
+     */}
 
-                <rect
-                  x={DimensionsStore.getCityTimelineStyle().width * 0.75  - ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6}
-                  y={i * 20}
-                  width={ ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 }
-                  height={14}
-                  className={ 'poc' + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '') }
-                  id={ p.project_id  }
-                />
-                <text
-                  x={ DimensionsStore.getCityTimelineStyle().width * 0.75  - ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 - 3}
-                  y={ i * 20 + 13}
-                  className={'count poc' + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '')}
-                >
-                  { formatNumber(p.nonwhite) }
-                </text>
-                <rect
-                  x={DimensionsStore.getCityTimelineStyle().width * 0.75}
-                  y={i * 20}
-                  width={ ((p.whites || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 }
-                  height={14}
-                  className={'white' + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '')}
-                  id={ p.project_id  }
-                />
-                <text
-                  x={ DimensionsStore.getCityTimelineStyle().width * 0.75 + ((p.whites || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6 + 3}
-                  y={ i * 20 + 13 }
-                  className={'count white' + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '')}
-                  id={ p.project_id  }
-                >
-                  { formatNumber(p.whites) }
-                </text>
-              </g> : 
 
-              <g>
-                <rect
-                  x={DimensionsStore.getCityTimelineStyle().width * 0.5  }
-                  y={i * 20}
-                  width={ (p.totalFamilies / theMax) * DimensionsStore.getCityTimelineStyle().width / 3 }
-                  height={14}
-                  className={'territory ' + +((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '')}
-                  id={ p.project_id  }
-                />
-                <text
-                  x={ DimensionsStore.getCityTimelineStyle().width * 0.5 + (p.totalFamilies / theMax) * DimensionsStore.getCityTimelineStyle().width / 3 + 3}
-                  y={ i * 20 + 13 }
-                  className={'count territory '  + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '')}
-                  id={ p.project_id  }
-                >
-                  { formatNumber(p.totalFamilies) }
-                </text>
-              </g>
-            }
-          </g>
+        { this.props.displacementProjects.map((p, i) => 
+          <ProjectDisplacementGraph
+            { ...p }
+            inspectedProject={ this.props.inspectedProject }
+            onProjectInspected={this.props.onProjectInspected}
+            onProjectOut={this.props.onProjectOut}
+            onProjectSelected={this.props.onProjectSelected}
+            key={ 'projectData' + p.project_id }
+          />
         )} 
       
       </svg>

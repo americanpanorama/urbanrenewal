@@ -298,11 +298,12 @@ export default class CityMap extends React.Component {
                       onClick={ this.props.onProjectClick }
                       id={ projectId }
                       style={ {
-                        weight: 3,
+                        weight: (this.props.selectedYear <= this.props.projects[projectId].planning_start_year) ? 1.5 : 3,
                         //color: (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId) ? 'black' : ((this.props.highlightedCity && this.props.highlightedCity == this.props.projects[projectId].city_id) &&  (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId || (this.props.inspectedProject == null && this.props.inspectedProjectStats == null))) ?  '#DF894A' : '#aaa',
                         color: getColorForProjectType(this.props.projects[projectId].project_type),
                         opacity: ((!this.props.inspectedProjectStats && !this.props.inspectedProject) || this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId) ? 1 : 0.5,
-                        dashArray: (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId || !this.props.selectedYear || (this.props.projects[projectId].start_year <= this.props.selectedYear && this.props.projects[projectId].end_year >= this.props.selectedYear)) ? 'none' : (this.props.projects[projectId].start_year <= this.props.selectedYear) ? '2, 2' : '5, 10',
+                        //dashArray: (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId || !this.props.selectedYear || this.props.projects[projectId].completed_year <= this.props.selectedYear) ? 'none' : (this.props.selectedYear >= this.props.projects[projectId].planning_start_year && this.props.selectedYear < this.props.projects[projectId].active_start_year) ? '2, 2' : '10, 5',
+                        dashArray: (!this.props.selectedYear || this.props.selectedYear >= this.props.projects[projectId].completed_year) ? 'none' : (this.props.selectedYear < this.props.projects[projectId].active_start_year) ? '2, 5' : '15, 5',
                         fillColor: (!this.props.inspectedProjectStats && !this.props.inspectedProject) ? getColorForProjectType(this.props.projects[projectId].project_type) : (this.props.projects[projectId].totalFamilies) ? getColorForRace(this.props.projects[projectId].percentFamiliesOfColor) : '#eee',
                         fillOpacity: (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId) ? 1 : 0,
                       } }

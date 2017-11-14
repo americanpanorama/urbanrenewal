@@ -441,7 +441,7 @@ const DimensionsStore = {
 
   getMainTimelineMaxBarHeight: function() { return this.getTimelineAttrs().height - this.data.containerPadding * 2; },
 
-  getMainTimelineYearWidth: function() { return this.getMainTimelineBarFieldWidth() / (1966-1954); },
+  getMainTimelineYearWidth: function() { return this.getMainTimelineBarFieldWidth() / (1966-1949); },
   
   getMainTimelineBarWidth: function() { return this.getMainTimelineYearWidth() / 3 - 1.5; },
 
@@ -449,12 +449,12 @@ const DimensionsStore = {
 
   getMainTimelineBarY: function(year, race) { return this.data.containerPadding + this.getMainTimelineMaxBarHeight() - this.getMainTimelineBarHeight(year, race) || 0; },
 
-  getMainTimlineXOffset: function(year) { return (year - 1955 + 0.5) * this.getMainTimelineYearWidth(); },
+  getMainTimlineXOffset: function(year) { return (year - 1950 + 0.5) * this.getMainTimelineYearWidth(); },
 
   getMainTimelineLabelXOffset: function(year) { 
-    return (year - 1955) * this.getMainTimelineBarFieldWidth() / (1966-1954) + this.getMainTimelineBarFieldWidth() / (1966-1954) / 2;
-    // years run from 1949-55 through individual years until 66
-    const w49_55 = this.getMainTimelineBarWidth() * (1955-1948),
+    return (year - 1950) * this.getMainTimelineBarFieldWidth() / (1966-1949) + this.getMainTimelineBarFieldWidth() / (1966-1949) / 2;
+    // years run from 1950-55 through individual years until 66
+    const w49_55 = this.getMainTimelineBarWidth() * (1955-1949),
       wOtherYear = (this.getMainTimelineBarFieldWidth() - w49_55) / (1966-1955);
     return (year == 1955) ? w49_55 / 2 : w49_55 + (year - 1956) * wOtherYear + wOtherYear / 2;
   },
@@ -529,7 +529,7 @@ const DimensionsStore = {
 
   getMainTimelineYearLabelAttrs: function() {
     return {
-      dx: this.getMainTimlineXOffset(1955),
+      dx: this.getMainTimlineXOffset(1950),
       dy: 18,
       fontSize: 18,
       className: 'timelineLabel',
@@ -538,7 +538,7 @@ const DimensionsStore = {
 
   getMainTimelineLegendBoxPOCAttrs() {
     return {
-      x: this.getMainTimlineXOffset(1955) * 1.5,
+      x: this.getMainTimlineXOffset(1950) * 1.5,
       y: 27,
       width: this.getMainTimelineBarWidth(),
       height: this.getMainTimelineBarWidth(),
@@ -550,7 +550,7 @@ const DimensionsStore = {
 
   getMainTimelineLegendLabelPOCAttrs() {
     return {
-      dx: this.getMainTimlineXOffset(1955) * 1.5 + this.getMainTimelineBarWidth() * 1.5 ,
+      dx: this.getMainTimlineXOffset(1950) * 1.5 + this.getMainTimelineBarWidth() * 1.5 ,
       dy: 27 + this.getMainTimelineBarWidth() ,
       fontSize: this.getMainTimelineBarWidth(),
     };
@@ -558,7 +558,7 @@ const DimensionsStore = {
 
   getMainTimelineLegendBoxWhiteAttrs() {
     return {
-      x: this.getMainTimlineXOffset(1955) * 1.5,
+      x: this.getMainTimlineXOffset(1950) * 1.5,
       y: 27 + this.getMainTimelineBarWidth() * 1.5 ,
       width: this.getMainTimelineBarWidth(),
       height: this.getMainTimelineBarWidth(),
@@ -570,7 +570,7 @@ const DimensionsStore = {
 
   getMainTimelineLegendLabelWhiteAttrs() {
     return {
-      dx: this.getMainTimlineXOffset(1955) * 1.5 + this.getMainTimelineBarWidth() * 1.5 ,
+      dx: this.getMainTimlineXOffset(1950) * 1.5 + this.getMainTimelineBarWidth() * 1.5 ,
       dy: 27 + this.getMainTimelineBarWidth() * 2.5,
       fontSize: this.getMainTimelineBarWidth(),
     };
@@ -578,7 +578,7 @@ const DimensionsStore = {
 
   getMainTimelineLegendBoxPRVIAttrs() {
     return {
-      x: this.getMainTimlineXOffset(1955) * 1.5,
+      x: this.getMainTimlineXOffset(1950) * 1.5,
       y: 27 + this.getMainTimelineBarWidth() * 3 ,
       width: this.getMainTimelineBarWidth(),
       height: this.getMainTimelineBarWidth(),
@@ -590,7 +590,7 @@ const DimensionsStore = {
 
   getMainTimelineLegendLabelPRVIAttrs() {
     return {
-      dx: this.getMainTimlineXOffset(1955) * 1.5 + this.getMainTimelineBarWidth() * 1.5 ,
+      dx: this.getMainTimlineXOffset(1950) * 1.5 + this.getMainTimelineBarWidth() * 1.5 ,
       dy: 27 + this.getMainTimelineBarWidth() * 4,
       fontSize: this.getMainTimelineBarWidth(),
     };

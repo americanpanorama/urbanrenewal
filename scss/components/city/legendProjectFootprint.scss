@@ -9,6 +9,14 @@
 		margin-bottom: 4px;
 	}
 
+	div {
+	    &:hover {
+	    	.tooltip {
+	    		visibility: visible;
+	    	}
+	    }
+	}
+
   .colorkey {
     width: 20px;
     height: 3px;
@@ -16,6 +24,8 @@
     margin-right: 6px;
     border: 0px solid;
     margin-bottom: 5px;
+
+
    }
 
 	@extend .cityMapBubble;

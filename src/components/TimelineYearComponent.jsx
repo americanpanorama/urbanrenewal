@@ -17,7 +17,7 @@ export default class Timeline extends React.Component {
   componentDidUpdate() {}
 
   render() {
-    const years = [1955,1956,1957,1958,1959,1960,1961,1962,1963,1964,1965,1966];
+    const years = [1950,1951,1952,1953,1954,1955,1956,1957,1958,1959,1960,1961,1962,1963,1964,1965,1966];
 
     //console.log(this.props);
 
@@ -35,7 +35,7 @@ export default class Timeline extends React.Component {
               onClick={ this.props.onClick }
               id={ year }
             >
-              { year }
+              { (year % 5 == 0) ? year : '\'' + (year-1900) }
             </text>
           )}
 
@@ -97,7 +97,7 @@ export default class Timeline extends React.Component {
         />
 
         {/* label for year */}
-        <text { ...DimensionsStore.getMainTimelineYearLabelAttrs() }>Family Displacements by Race</text>
+        <text { ...DimensionsStore.getMainTimelineYearLabelAttrs() }>Nationwide Family Displacements by Race</text>
 
         <rect { ...DimensionsStore.getMainTimelineLegendBoxPOCAttrs() } />
         <text { ...DimensionsStore.getMainTimelineLegendLabelPOCAttrs() }>of color</text>

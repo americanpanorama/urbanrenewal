@@ -32,7 +32,7 @@ export default class Timeline extends React.Component {
   }
 
   render() {
-    let firstYear = 1955,
+    let firstYear = 1949,
       years = [...Array(12).keys()].map(num => num+firstYear),
       width = this.props.style.width,
       contentWidth = width,

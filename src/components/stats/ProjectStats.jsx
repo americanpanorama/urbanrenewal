@@ -92,6 +92,9 @@ export default class ProjectStats extends React.Component {
 
         <h3>{ theProject.project + ' — ' + theProject.start_year + ((theProject.end_year !== theProject.start_year) ? '-' + theProject.end_year : '') + ''}</h3>
 
+        <h3>Planning: {theProject.start_year} - {theProject.active_start_year}</h3>
+        <h3>Executed: {theProject.active_start_year} - {theProject.completed_year}</h3>
+
         { (theProject.totalFamilies > 0) ?
           <svg
             { ...DimensionsStore.getProjectStatsOverallDimensions() }

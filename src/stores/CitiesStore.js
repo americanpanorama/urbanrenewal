@@ -72,7 +72,7 @@ const CitiesStore = {
         format: 'JSON'
       },
       // data for projects: duration, displacments, etc.
-      { query: "select projects.city_id, projects.project_id, projects.project, project_type, st_asgeojson(projects.the_geom) as the_geojson, round(st_xmin(st_envelope(projects.the_geom))::numeric, 3) as bbxmin, round(st_ymin(st_envelope(projects.the_geom))::numeric, 3) as bbymin, round(st_xmax(st_envelope(projects.the_geom))::numeric, 3) as bbxmax, round(st_ymax(st_envelope(projects.the_geom))::numeric, 3) as bbymax, round(st_y(st_centroid(projects.the_geom))::numeric, 3) as centerlat, round(st_x(st_centroid(projects.the_geom))::numeric, 3) as centerlng, duration.start_year, duration.end_year, whites.value as whites, nonwhites.value as nonwhite, pr.value as pr_total, substandard.value as substandard, standard.value as standard, funding.value as funding from urdr_id_key projects left join (SELECT project_id, min(year) as start_year, max(year) as end_year FROM combined_dire_char_raw group by project_id, city_id) duration on projects.project_id = duration.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 71 order by project_id, year desc) whites on whites.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 72 order by project_id, year desc) nonwhites on nonwhites.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 80 order by project_id, year desc) pr on pr.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 69 order by project_id, year desc) substandard on substandard.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 70 order by project_id, year desc) standard on standard.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 68 order by project_id, year desc) funding on funding.project_id = projects.project_id",
+      { query: "select projects.city_id, projects.project_id, projects.project, project_type, st_asgeojson(projects.the_geom) as the_geojson, round(st_xmin(st_envelope(projects.the_geom))::numeric, 3) as bbxmin, round(st_ymin(st_envelope(projects.the_geom))::numeric, 3) as bbymin, round(st_xmax(st_envelope(projects.the_geom))::numeric, 3) as bbxmax, round(st_ymax(st_envelope(projects.the_geom))::numeric, 3) as bbymax, round(st_y(st_centroid(projects.the_geom))::numeric, 3) as centerlat, round(st_x(st_centroid(projects.the_geom))::numeric, 3) as centerlng, duration.start_year, duration.end_year, whites.value as whites, nonwhites.value as nonwhite, pr.value as pr_total, substandard.value as substandard, standard.value as standard, funding.value as funding, planning, contract, completion, completed.year as completed_year, active.year as active_year, planning.year as planning_year from urdr_id_key projects join (SELECT project_id, min(year) as start_year, max(year) as end_year FROM combined_dire_char_raw group by project_id, city_id) duration on projects.project_id = duration.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 71 order by project_id, year desc) whites on whites.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 72 order by project_id, year desc) nonwhites on nonwhites.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 80 order by project_id, year desc) pr on pr.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 69 order by project_id, year desc) substandard on substandard.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 70 order by project_id, year desc) standard on standard.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, value FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 68 order by project_id, year desc) funding on funding.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, year FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 88 and value = 3 order by project_id, year) completed on completed.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, year FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 88 and value = 2 order by project_id, year) active on active.project_id = projects.project_id left join (SELECT distinct on (project_id) project_id, year FROM digitalscholarshiplab.combined_dire_char_raw where category_id = 88 and value = 1 order by project_id, year) planning on planning.project_id = projects.project_id",
         format: 'JSON'
       },
       // national stats
@@ -111,7 +111,7 @@ const CitiesStore = {
         r.totalFamilies = 0;
         r.percentFamiliesOfColor = 0;
         r.projectsWithDisplacements = 0;
-
+        
         // delete a few values you no longer need
         delete r.centerlat;
         delete r.centerlng;
@@ -138,6 +138,13 @@ const CitiesStore = {
         r.citations = {};
         r.center = [r.centerlat,r.centerlng];
         r.boundingBox = (r.bbymin) ? [[r.bbymin,r.bbxmin],[r.bbymax,r.bbxmax]] : null;
+        r.planning_start_year = (r.planning && r.planning !== 'none') ? 1900 + Math.min(parseInt(r.planning.split('-')[1]), r.start_year) : (r.planning_year) ? Math.min(r.planning_year, r.start_year) : r.start_year;
+        r.active_start_year = (r.contract&& r.contract !== 'none') ? 1900 + parseInt(r.contract.split('-')[1]) : r.active_year || r.start_year;
+        r.completed_year = (r.completed && r.completed !== 'none') ? 1900 + parseInt(r.completed.split('-')[1]) : r.completed_year || r.end_year;
+
+        if (!r.planning_start_year) {
+          console.log(r);
+        }
 
         delete r.centerlat;
         delete r.centerlng;
@@ -145,6 +152,11 @@ const CitiesStore = {
         delete r.bbxmin;
         delete r.bbymax;
         delete r.bbxmax;
+        delete r.completed;
+        delete r.planning_year;
+        delete r.planning;
+        delete r.active_year;
+        delete r.contract;
 
         // add the project
         this.data.cities[r.city_id].projects[r.project_id] = r;
@@ -159,8 +171,9 @@ const CitiesStore = {
         }
 
         // calculate and add years data
-        for (let aYear = r.start_year; aYear <= r.end_year; aYear += 1) {
-          const duration = 1 + Math.min(r.end_year, 1966) - Math.max(r.start_year, 1955),
+        for (let aYear = r.active_start_year; aYear <= Math.min(r.active_start_year + 2, 1966); aYear += 1) {
+          //const duration = (r.active_start_year) >= 1965 ? 1967 - r.active_start_year : 3,
+          const duration = (1 + r.completed_year - r.active_start_year) / 3 || 4,
             whites = r.whites / duration,
             nonwhite = r.nonwhite / duration,
             prForYear = r.pr_total / duration,
@@ -168,7 +181,7 @@ const CitiesStore = {
             standard = r.standard / duration;
 
           // total up year data
-          if (aYear >= 1955 && aYear <= 1966) {
+          if (aYear >= 1949 && aYear <= 1966) {
             this.data.yearsTotals[aYear] = this.data.yearsTotals[aYear] || {whites: 0, nonwhite: 0, unspecified: 0, houses_sub_standard: 0, houses_standard: 0};
             this.data.yearsTotals[aYear].whites += whites;
             this.data.yearsTotals[aYear].nonwhite += nonwhite;
@@ -200,7 +213,6 @@ const CitiesStore = {
           this.data.cities[r.city_id].maxDisplacmentsForYear = (this.data.cities[r.city_id].projects[r.project_id].yearsData[aYear].totalFamilies  > this.data.cities[r.city_id].maxDisplacmentsForYear) ? this.data.cities[r.city_id].projects[r.project_id].yearsData[aYear].totalFamilies : this.data.cities[r.city_id].maxDisplacmentsForYear;
         }
       }); 
-
 
       responses[3].forEach(r => this.data.yearsTotals[r.year][r.assessed_category.replace(/ /g,"_")] = r.value);
 
@@ -307,8 +319,6 @@ const CitiesStore = {
       this.data.loaded = true;
       this.data.yearsLoaded.push(year);
 
-      this.parseDorlings();
-
       // let projectNames = [];
       // Object.keys(this.data.cities).forEach(id => {
       //   Object.keys(this.data.cities[id].projects).forEach(projectId => {
@@ -327,6 +337,8 @@ const CitiesStore = {
       //   };
       // });
       // console.log(citiesForDorlingProcessing);
+
+      this.parseDorlings();
 
       this.emit(AppActionTypes.storeChanged);
     });
@@ -525,7 +537,7 @@ const CitiesStore = {
     const shortside = Math.min(DimensionsStore.getNationalMapWidth() * 0.4, DimensionsStore.getNationalMapHeight() * 0.4),
       l = Math.sqrt(2*shortside*shortside);
 
-    ['all',1955,1956,1957,1958,1959,1960,1961,1962,1963,1964,1965,1966].forEach(year => {
+    ['all',1949,1950,1951,1952,1953,1954,1955,1956,1957,1958,1959,1960,1961,1962,1963,1964,1965,1966].forEach(year => {
       const citiesForYear = this.getCitiesList().filter(cityData => (year == 'all') ? cityData.totalFamilies && cityData.totalFamilies > 0 : cityData.yearsData[year] && cityData.yearsData[year]['totalFamilies'] > 0);
       let cx, cy;
 
@@ -691,6 +703,98 @@ const CitiesStore = {
   },
 
   getCityData: function(city_id) { return (this.data && this.data.loaded && this.data.cities[city_id]) ? this.data.cities[city_id] : {}; },
+
+  getCityProjectsOrganized(city_id) {
+    const cityData = this.getCityData(city_id),
+      cityProjects = cityData.projects;
+
+    if (cityProjects) {
+      const cityProjectIds = Object.keys(cityProjects),
+        labelHeight = 22,
+        rowHeight = 20,
+
+        theMax = (cityData.state !== 'pr' && cityData.state !== 'vi' ) ? 
+          cityProjectIds.reduce((max,project_id) => Math.max(max, cityProjects[project_id].whites || 0, cityProjects[project_id].nonwhite || 0), 0) : 
+          Math.max(...cityProjectIds.map(project_id => cityProjects[project_id].totalFamilies)),
+
+        activeProjects = Object.keys(cityProjects)
+          .map(project_id => cityProjects[project_id])
+          .filter(p => p.totalFamilies > 0 && (!this.getSelectedYear() || (p.active_start_year <= this.getSelectedYear() && p.completed_year > this.getSelectedYear())))
+          .sort((a,b)=> (a.project < b.project) ? -1 : (a.project > b.project) ? 1 : 0)
+          .map((p,i) => {
+            p.status = 'active';
+            p.y = i * rowHeight;
+            p.xNonwhite =DimensionsStore.getCityTimelineStyle().width * 0.75  - ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6;
+            p.widthNonwhite = ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6;
+            p.xWhite = DimensionsStore.getCityTimelineStyle().width * 0.75;
+            p.widthWhite = ((p.whites || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6; 
+            return p;
+          }),
+
+        activeHeight = activeProjects.length * 20,
+        activeOffset = (activeProjects.length > 0) ? 42 : 0,
+
+        planningProjects = Object.keys(cityProjects)
+          .map(project_id => cityProjects[project_id])
+          .filter(p => p.totalFamilies > 0 && (!this.getSelectedYear() || (p.planning_start_year <= this.getSelectedYear() && p.active_start_year > this.getSelectedYear())))
+          .sort((a,b)=> (a.project < b.project) ? -1 : (a.project > b.project) ? 1 : 0)
+          .map((p,i) => {
+            p.status = 'planning';
+            p.y = activeHeight + activeOffset + i * rowHeight;
+            p.xNonwhite =DimensionsStore.getCityTimelineStyle().width * 0.75  - ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6;
+            p.widthNonwhite = ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6;
+            p.xWhite = DimensionsStore.getCityTimelineStyle().width * 0.75;
+            p.widthWhite = ((p.whites || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6; 
+            return p;
+          }),
+
+        planningHeight = planningProjects.length * 20,
+        planningOffset = (planningProjects.length > 0) ? 42 : 0,
+
+        completedProjects = Object.keys(cityProjects)
+          .map(project_id => cityProjects[project_id])
+          .filter(p => p.totalFamilies > 0 && this.getSelectedYear() >= p.completed_year)
+          .sort((a,b)=> (a.project < b.project) ? -1 : (a.project > b.project) ? 1 : 0)
+          .map((p,i) => {
+            p.status = 'completed';
+            p.y = activeHeight + activeOffset + planningHeight + planningOffset + i * rowHeight;
+            p.xNonwhite =DimensionsStore.getCityTimelineStyle().width * 0.75  - ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6;
+            p.widthNonwhite = ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6;
+            p.xWhite = DimensionsStore.getCityTimelineStyle().width * 0.75;
+            p.widthWhite = ((p.whites || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6; 
+            return p;
+          }),
+
+        completedHeight = completedProjects.length * 20,
+        completedOffset = (completedProjects.length > 0) ? 42 : 0,
+
+        futureProjects = Object.keys(cityProjects)
+          .map(project_id => cityProjects[project_id])
+          .filter(p => p.totalFamilies > 0 && p.planning_start_year > this.getSelectedYear())
+          .sort((a,b)=> (a.project < b.project) ? -1 : (a.project > b.project) ? 1 : 0)
+          .map((p,i) => {
+            p.status = 'future';
+            p.y = activeHeight + activeOffset + planningHeight + planningOffset + completedHeight + completedOffset + i * rowHeight;
+            p.xNonwhite =DimensionsStore.getCityTimelineStyle().width * 0.75  - ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6;
+            p.widthNonwhite = ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6;
+            p.xWhite = DimensionsStore.getCityTimelineStyle().width * 0.75;
+            p.widthWhite = ((p.whites || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6; 
+            return p;
+          }),
+
+        futureHeight = 22 + futureProjects.length * 20,
+        futureOffset = (futureProjects.length > 0) ? 20 : 0;
+
+      console.log( activeHeight, activeOffset, planningHeight, planningOffset, completedHeight, completedOffset);
+
+
+
+      return activeProjects.concat(planningProjects).concat(completedProjects).concat(futureProjects);
+    }
+
+
+
+  },
   
   getCityId: function(project_id) { return (project_id) ? parseInt(Object.keys(this.data.cities).filter(city_id => this.data.cities[city_id].projects.hasOwnProperty(project_id))[0]) : null; },
 
