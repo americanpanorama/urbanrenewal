@@ -38,22 +38,51 @@ export default class ProjectDisplacementGraph extends React.Component {
         id={ this.props.project_id  }
         transform={'translate(0 ' + (this.state.y + 22) +')'}
       >
+        {/* JSX Comment 
+        <rect
+          x={0}
+          y={0}
+          width={DimensionsStore.getCityTimelineStyle().width}
+          height={20}
+          fill={(this.props.status == 'planning') ? 'beige' : (this.props.status == 'active') ? 'yellow' : 'silver'} 
+        />
+        
+        <line
+          x1={DimensionsStore.getCityTimelineStyle().width / 2}
+          x2={DimensionsStore.getCityTimelineStyle().width / 2}
+          y1={0}
+          y2={20}
+          strokeWidth={(this.props.status == 'future') ? 0.5 : 2}
+          //strokeWidth={DimensionsStore.getCityTimelineStyle().width}
+          className='divider'
+
+          strokeDasharray={(this.props.status == 'planning') ? '2 3' : (this.props.status == 'active') ? '5 5' : (this.props.status == 'completed') ? 'none' : '2 3' } 
+        />*/}
+
         <text
-          x={ DimensionsStore.getCityTimelineStyle().width / 2 - 20}
+          x={ DimensionsStore.getCityTimelineStyle().width / 2 - 23}
           y={ 0 + 14}
           className={ 'project' + ((this.props.the_geojson) ? ' hasFootprint' : '') + ((this.props.inspectedProject && this.props.inspectedProject != this.props.project_id) ? ' notInspected' : '') }
           id={ this.props.project_id  }
         >
           { this.props.project }
         </text>
-        { (this.props.project_type) ?
-          <circle
-            cx={ DimensionsStore.getCityTimelineStyle().width / 2 - 10}
-            cy={ 0 + 7}
-            r={5}
-            fill={ getColorForProjectType(this.props.project_type) }
-          /> : ''
-        }
+
+        <circle
+          cx={ DimensionsStore.getCityTimelineStyle().width / 2 - 10}
+          cy={ 0 + 7}
+          r={8}
+          fill={ (this.props.status == 'planning' || this.props.status == 'active') ? getColorForProjectType(this.props.project_type) : 'transparent' }
+          stroke={ getColorForProjectType(this.props.project_type) }
+          strokeWidth={2}
+        /> 
+        <text
+          x={ DimensionsStore.getCityTimelineStyle().width / 2 - 10}
+          y={12}
+          className={'stage ' +  this.props.status}
+        >
+          { this.props.status.substring(0,1).toUpperCase()}
+        </text>
 
         { (this.props.nonwhite || this.props.whites) ?
           <g>

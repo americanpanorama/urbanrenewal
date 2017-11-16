@@ -721,20 +721,37 @@ const CitiesStore = {
       cityProjects = cityData.projects;
 
     if (cityProjects) {
-      const cityProjectIds = Object.keys(cityProjects),
-        labelHeight = 22,
+      const projectsWithDisplacements = Object.keys(cityProjects)
+        .map(project_id => cityProjects[project_id])
+        .filter(p => p.totalFamilies > 0);
+        // .sort((a,b)=> (a.project < b.project) ? -1 : (a.project > b.project) ? 1 : 0)
+        // .sort((a,b)=> ((a.completed_year <= 1966 || b.completed_year <= 1966) && a.completed_year < b.completed_year) ? -1 : ((a.completed_year <= 1966 || b.completed_year <= 1966) && a.completed_year > b.completed_year) ? 1 : 0)
+        // .sort((a,b)=> (a.active_start_year < b.active_start_year) ? -1 : (a.active_start_year > b.active_start_year) ? 1 : 0)
+        // .sort((a,b)=> {
+        //   if (a.planning_start_year && b.planning_start_year && (a.planning_start_year < b.planning_start_year)) {
+        //     return -1;
+        //   } else if (a.planning_start_year && (a.planning_start_year <= b.active_start_year)) {
+        //     return -1;
+        //   } else if (b.planning_start_year && (b.planning_start_year <= a.active_start_year)) {
+        //     return 1;
+        //   } else {
+        //     return 0;
+        //   }
+        // });
+
+      console.log(projectsWithDisplacements);
+
+      const labelHeight = 22,
         rowHeight = 20,
 
         theMax = (cityData.state !== 'pr' && cityData.state !== 'vi' ) ? 
-          cityProjectIds.reduce((max,project_id) => Math.max(max, cityProjects[project_id].whites || 0, cityProjects[project_id].nonwhite || 0), 0) : 
-          Math.max(...cityProjectIds.map(project_id => cityProjects[project_id].totalFamilies)),
+          projectsWithDisplacements.reduce((max,p) => Math.max(max, p.whites || 0, p.nonwhite || 0), 0) : 
+          Math.max(...projectsWithDisplacements.map(p=> p.totalFamilies)),
 
-        activeProjects = Object.keys(cityProjects)
-          .map(project_id => cityProjects[project_id])
-          .filter(p => p.totalFamilies > 0 && (!this.getSelectedYear() || (p.active_start_year <= this.getSelectedYear() && p.completed_year > this.getSelectedYear())))
-          .sort((a,b)=> (a.project < b.project) ? -1 : (a.project > b.project) ? 1 : 0)
+        completedProjects = projectsWithDisplacements.filter(p => this.getSelectedYear() >= p.completed_year)
+          .sort((a,b)=> (a.completed_year < b.completed_year) ? -1 : (a.completed_year > b.completed_year) ? 1 : 0)
           .map((p,i) => {
-            p.status = 'active';
+            p.status = 'completed';
             p.y = i * rowHeight;
             p.xNonwhite =DimensionsStore.getCityTimelineStyle().width * 0.75  - ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6;
             p.widthNonwhite = ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6;
@@ -743,16 +760,34 @@ const CitiesStore = {
             return p;
           }),
 
-        activeHeight = activeProjects.length * 20,
-        activeOffset = (activeProjects.length > 0) ? 42 : 0,
+        completedHeight = completedProjects.length * 20,
+        // completedOffset = (completedProjects.length > 0) ? 42 : 0,
+        completedOffset = 5,
 
-        planningProjects = Object.keys(cityProjects)
-          .map(project_id => cityProjects[project_id])
-          .filter(p => p.totalFamilies > 0 && (!this.getSelectedYear() || (p.planning_start_year <= this.getSelectedYear() && p.active_start_year > this.getSelectedYear())))
-          .sort((a,b)=> (a.project < b.project) ? -1 : (a.project > b.project) ? 1 : 0)
+        activeProjects = projectsWithDisplacements.filter(p => (!this.getSelectedYear() || (p.active_start_year <= this.getSelectedYear() && p.completed_year > this.getSelectedYear())))
+          .sort((a,b)=> (a.active_start_year < b.active_start_year) ? -1 : (a.active_start_year > b.active_start_year) ? 1 : 0)
+          //.sort((a,b)=> (a.planning_start_year < !b.planning_start_year) ? -1 : (a.active_start_year > b.active_start_year) ? 1 : 0)
+          .sort((a,b)=> ((a.completed_year <= 1966 || b.completed_year <= 1966) && a.completed_year < b.completed_year) ? -1 : ((a.completed_year <= 1966 || b.completed_year <= 1966) && a.completed_year > b.completed_year) ? 1 : 0)
+          .map((p,i) => {
+            p.status = 'active';
+            p.y = completedHeight + completedOffset + i * rowHeight;
+            p.xNonwhite =DimensionsStore.getCityTimelineStyle().width * 0.75  - ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6;
+            p.widthNonwhite = ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6;
+            p.xWhite = DimensionsStore.getCityTimelineStyle().width * 0.75;
+            p.widthWhite = ((p.whites || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6; 
+            return p;
+          }),
+
+        activeHeight = activeProjects.length * 20,
+        // activeOffset = (activeProjects.length > 0) ? 42 : 0,
+        activeOffset = 5,
+
+        planningProjects = projectsWithDisplacements.filter(p => (!this.getSelectedYear() || (p.planning_start_year <= this.getSelectedYear() && p.active_start_year > this.getSelectedYear())))
+          .sort((a,b)=> (a.planning_start_year < b.planning_start_year) ? -1 : (a.planning_start_year > b.planning_start_year) ? 1 : 0)
+          .sort((a,b)=> (a.active_start_year < b.active_start_year) ? -1 : (a.active_start_year > b.active_start_year) ? 1 : 0)
           .map((p,i) => {
             p.status = 'planning';
-            p.y = activeHeight + activeOffset + i * rowHeight;
+            p.y = completedHeight + completedOffset + activeHeight + activeOffset + i * rowHeight;
             p.xNonwhite =DimensionsStore.getCityTimelineStyle().width * 0.75  - ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6;
             p.widthNonwhite = ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6;
             p.xWhite = DimensionsStore.getCityTimelineStyle().width * 0.75;
@@ -761,29 +796,15 @@ const CitiesStore = {
           }),
 
         planningHeight = planningProjects.length * 20,
-        planningOffset = (planningProjects.length > 0) ? 42 : 0,
+        // planningOffset = (planningProjects.length > 0) ? 42 : 0,
+        planningOffset = 5,
 
-        completedProjects = Object.keys(cityProjects)
-          .map(project_id => cityProjects[project_id])
-          .filter(p => p.totalFamilies > 0 && this.getSelectedYear() >= p.completed_year)
-          .sort((a,b)=> (a.project < b.project) ? -1 : (a.project > b.project) ? 1 : 0)
-          .map((p,i) => {
-            p.status = 'completed';
-            p.y = activeHeight + activeOffset + planningHeight + planningOffset + i * rowHeight;
-            p.xNonwhite =DimensionsStore.getCityTimelineStyle().width * 0.75  - ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6;
-            p.widthNonwhite = ((p.nonwhite || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6;
-            p.xWhite = DimensionsStore.getCityTimelineStyle().width * 0.75;
-            p.widthWhite = ((p.whites || 0) / theMax) * DimensionsStore.getCityTimelineStyle().width / 6; 
-            return p;
-          }),
 
-        completedHeight = completedProjects.length * 20,
-        completedOffset = (completedProjects.length > 0) ? 42 : 0,
-
-        futureProjects = Object.keys(cityProjects)
-          .map(project_id => cityProjects[project_id])
-          .filter(p => p.totalFamilies > 0 && p.planning_start_year > this.getSelectedYear())
-          .sort((a,b)=> (a.project < b.project) ? -1 : (a.project > b.project) ? 1 : 0)
+        futureProjects = projectsWithDisplacements.filter(p => p.planning_start_year > this.getSelectedYear())
+          // .sort((a,b)=> (a.project < b.project) ? -1 : (a.project > b.project) ? 1 : 0)
+          .sort((a,b)=> (a.active_start_year < b.active_start_year) ? -1 : (a.active_start_year > b.active_start_year) ? 1 : 0)
+          .sort((a,b)=> (a.planning_start_year && b.planning_start_year && a.planning_start_year < b.planning_start_year) ? -1 : (a.planning_start_year && b.planning_start_year && a.planning_start_year > b.planning_start_year) ? 1 : 0)
+          .sort((a,b)=> (a.planning_start_year && !b.planning_start_year) ? -1 : (!a.planning_start_year && b.planning_start_year) ? 1 : 0)
           .map((p,i) => {
             p.status = 'future';
             p.y = activeHeight + activeOffset + planningHeight + planningOffset + completedHeight + completedOffset + i * rowHeight;
@@ -795,13 +816,13 @@ const CitiesStore = {
           }),
 
         futureHeight = 22 + futureProjects.length * 20,
-        futureOffset = (futureProjects.length > 0) ? 20 : 0;
+        // futureOffset = (futureProjects.length > 0) ? 20 : 0,
+        futureOffset = 5;
 
-      console.log( activeHeight, activeOffset, planningHeight, planningOffset, completedHeight, completedOffset);
+      
 
 
-
-      return activeProjects.concat(planningProjects).concat(completedProjects).concat(futureProjects);
+      return completedProjects.concat(activeProjects).concat(planningProjects).concat(futureProjects);
     }
 
 

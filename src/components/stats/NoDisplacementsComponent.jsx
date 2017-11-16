@@ -16,7 +16,21 @@ export default class NoDisplacements extends React.Component {
     const sortedProjects = Object.keys(this.props.projects)
         .map(project_id => this.props.projects[project_id])
         .filter(p => !p.totalFamilies || p.totalFamilies == 0)
-        .sort((a,b)=> (a.project < b.project) ? -1 : (a.project > b.project) ? 1 : 0),
+        .sort((a,b)=> (a.project < b.project) ? -1 : (a.project > b.project) ? 1 : 0)
+        .sort((a,b)=> (a.completed_year < b.completed_year) ? -1 : (a.completed_year > b.completed_year) ? 1 : 0)
+        .sort((a,b)=> (a.active_start_year < b.active_start_year) ? -1 : (a.active_start_year > b.active_start_year) ? 1 : 0)
+        .sort((a,b)=> {
+          if (a.planning_start_year && b.planning_start_year && (a.planning_start_year < b.planning_start_year)) {
+            return -1;
+          } else if (a.planning_start_year && (a.planning_start_year <= b.active_start_year)) {
+            return -1;
+          } else if (b.planning_start_year && (b.planning_start_year <= a.active_start_year)) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }), 
+        
       height = sortedProjects.length * 20 + 22;
 
     return (
@@ -70,39 +84,68 @@ export default class NoDisplacements extends React.Component {
                 /> : ''
               }
 
-              <text
-                x={ DimensionsStore.getCityTimelineStyle().width / 2 + 30 + (p.start_year-1955)/(1974-1955)*(DimensionsStore.getCityTimelineStyle().width / 2 - 60) - 5 }
-                y={ i * 20 + 16 }
-                className={'startYear' + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '') }
-              >
-                { p.start_year }
-              </text>
+              { (p.planning_start_year && p.planning_start_year !== p.active_start_year) ?
+                <text
+                  x={ DimensionsStore.getCityTimelineStyle().width / 2 + 30 + (p.planning_start_year-1950)/(1974-1950)*(DimensionsStore.getCityTimelineStyle().width / 2 - 60) - 5 }
+                  y={ i * 20 + 16 }
+                  className={'startYear' + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '') }
+                >
+                  { p.planning_start_year }
+                </text> : 
+                <text
+                  x={ DimensionsStore.getCityTimelineStyle().width / 2 + 30 + (p.active_start_year-1950)/(1974-1950)*(DimensionsStore.getCityTimelineStyle().width / 2 - 60) - 5 }
+                  y={ i * 20 + 16 }
+                  className={'startYear' + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '') }
+                >
+                  { p.active_start_year }
+                </text>
+              }
 
               <text
-                x={ DimensionsStore.getCityTimelineStyle().width / 2 + 30 + (p.end_year-1955)/(1974-1955)*(DimensionsStore.getCityTimelineStyle().width / 2 - 60) + 5 }
+                x={ DimensionsStore.getCityTimelineStyle().width / 2 + 30 + (p.completed_year-1950)/(1974-1950)*(DimensionsStore.getCityTimelineStyle().width / 2 - 60) + 5 }
                 y={ i * 20 + 16 }
                 className={'endYear' + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '') }
               >
-                { p.end_year }
+                { p.completed_year }
               </text>
 
+              { (p.planning_start_year && p.planning_start_year !== p.active_start_year) ?
+                <line
+                  x1={ DimensionsStore.getCityTimelineStyle().width / 2 + 30 + (p.planning_start_year-1950)/(1974-1950)*(DimensionsStore.getCityTimelineStyle().width / 2 - 60) }
+                  x2={ DimensionsStore.getCityTimelineStyle().width / 2 + 30 + (p.active_start_year-1950)/(1974-1950)*(DimensionsStore.getCityTimelineStyle().width / 2 - 60) }
+                  y1={ i * 20 + 10 }
+                  y2={ i * 20 + 10 }
+                  className={ 'duration' + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '') }
+                  strokeDasharray='2 3'
+                /> : ''
+              }
+
               <line
-                x1={ DimensionsStore.getCityTimelineStyle().width / 2 + 30 + (p.start_year-1955)/(1974-1955)*(DimensionsStore.getCityTimelineStyle().width / 2 - 60) }
-                x2={ DimensionsStore.getCityTimelineStyle().width / 2 + 30 + (p.end_year-1955)/(1974-1955)*(DimensionsStore.getCityTimelineStyle().width / 2 - 60) }
+                x1={ DimensionsStore.getCityTimelineStyle().width / 2 + 30 + (p.active_start_year-1950)/(1974-1950)*(DimensionsStore.getCityTimelineStyle().width / 2 - 60) }
+                x2={ DimensionsStore.getCityTimelineStyle().width / 2 + 30 + (p.completed_year-1950)/(1974-1950)*(DimensionsStore.getCityTimelineStyle().width / 2 - 60) }
                 y1={ i * 20 + 10 }
                 y2={ i * 20 + 10 }
                 className={ 'duration' + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '') }
               />
 
+              { (p.planning_start_year && p.planning_start_year !== p.active_start_year) ?
+                <circle
+                  cx={ DimensionsStore.getCityTimelineStyle().width / 2 + 30 + (p.planning_start_year-1950)/(1974-1950)*(DimensionsStore.getCityTimelineStyle().width / 2 - 60) }
+                  cy={ i * 20 + 10 }
+                  r={1.5}
+                  className={ 'duration' + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '') }
+                /> : ''
+              }
+
               <circle
-                cx={ DimensionsStore.getCityTimelineStyle().width / 2 + 30 + (p.end_year-1955)/(1974-1955)*(DimensionsStore.getCityTimelineStyle().width / 2 - 60) }
+                cx={ DimensionsStore.getCityTimelineStyle().width / 2 + 30 + (p.completed_year-1950)/(1974-1950)*(DimensionsStore.getCityTimelineStyle().width / 2 - 60) }
                 cy={ i * 20 + 10 }
                 r={1.5}
                 className={ 'duration' + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '') }
               />
 
               <circle
-                cx={ DimensionsStore.getCityTimelineStyle().width / 2 + 30 + (p.start_year-1955)/(1974-1955)*(DimensionsStore.getCityTimelineStyle().width / 2 - 60) }
+                cx={ DimensionsStore.getCityTimelineStyle().width / 2 + 30 + (p.active_start_year-1950)/(1974-1950)*(DimensionsStore.getCityTimelineStyle().width / 2 - 60) }
                 cy={ i * 20 + 10 }
                 r={1.5}
                 className={ 'duration' + ((this.props.inspectedProject && this.props.inspectedProject != p.project_id) ? ' notInspected' : '') }

@@ -29,20 +29,21 @@ export default class Timeline extends React.Component {
       futureHeight = futureCount * 20 + ((futureCount > 0) ? 42 : 0),
       height = activeHeight + planningHeight + completedHeight + futureHeight;
 
-    if (activeCount > 0) {
-      labels.push({label: 'Stage in ' + this.props.selectedYear + ': Active', y: 0});
-    }
-    if (planningCount > 0) {
-      labels.push({label: 'Stage in ' + this.props.selectedYear + ': Planning', y: activeHeight});
-    }
     if (completedCount > 0) {
       labels.push({label: 'Completed by ' + this.props.selectedYear, y: activeHeight + planningHeight});
     }
+    if (activeCount > 0) {
+      labels.push({label: 'Stage in ' + this.props.selectedYear + ': Active', y: planningHeight});
+    }
+    if (planningCount > 0) {
+      labels.push({label: 'Stage in ' + this.props.selectedYear + ': Planning', y: 0});
+    }
+
+
     if (futureCount > 0) {
       labels.push({label: 'Post ' + this.props.selectedYear + ' projects', y: activeHeight + planningHeight + completedHeight});
     }
 
-    console.log(this.props.displacementProjects);
     return (
       <svg 
         { ...DimensionsStore.getCityTimelineStyle() }
@@ -50,9 +51,9 @@ export default class Timeline extends React.Component {
         className='project'
       >
 
-        { labels.map(label => <ProjectDisplacementGraphLabel {...label } />) }
+       {/* { labels.map(label => <ProjectDisplacementGraphLabel {...label } />) }
 
-      {/* JSX Comment
+       JSX Comment
 
 
         <text
