@@ -129,6 +129,8 @@ const CitiesStore = {
         this.data.cities[r.city_id] = r;
       });
 
+      let durations = {};
+
       responses[2].forEach(r => {
         // calculate some additional/aggregate and initialization values 
         r.the_geojson = JSON.parse(r.the_geojson);
@@ -138,13 +140,19 @@ const CitiesStore = {
         r.citations = {};
         r.center = [r.centerlat,r.centerlng];
         r.boundingBox = (r.bbymin) ? [[r.bbymin,r.bbxmin],[r.bbymax,r.bbxmax]] : null;
-        r.planning_start_year = (r.planning && r.planning !== 'none') ? 1900 + Math.min(parseInt(r.planning.split('-')[1]), r.start_year) : (r.planning_year) ? Math.min(r.planning_year, r.start_year) : r.start_year;
-        r.active_start_year = (r.contract&& r.contract !== 'none') ? 1900 + parseInt(r.contract.split('-')[1]) : r.active_year || r.start_year;
-        r.completed_year = (r.completed && r.completed !== 'none') ? 1900 + parseInt(r.completed.split('-')[1]) : r.completed_year || r.end_year;
-
-        if (!r.planning_start_year) {
-          console.log(r);
+        if (r.contract) {
+          r.active_start_year = 1900 + parseInt(r.contract.split('-')[0]);
+          r.planning_start_year = (r.planning && r.planning !== 'none') ? 1900 + Math.min(parseInt(r.planning.split('-')[0]), r.start_year) : null;
+          r.completed_year = (r.completion) ? 1900 + parseInt(r.completion.split('-')[0]) : 1974;
+        } else {
+          r.active_start_year = r.start_year;
+          r.planning_start_year = null;
+          r.completed_year = r.completed_year || r.end_year  || 1974;
         }
+        // r.planning_start_year = (r.planning && r.planning !== 'none') ? 1900 + Math.min(parseInt(r.planning.split('-')[0]), r.start_year) : (r.planning_year) ? Math.min(r.planning_year, r.start_year) : r.start_year;
+        // r.active_start_year = (r.contract&& r.contract !== 'none') ? 1900 + parseInt(r.contract.split('-')[0]) : r.active_year || r.start_year;
+        // r.completed_year = (r.completed && r.completed !== 'none') ? 1900 + parseInt(r.completed.split('-')[0]) : r.completed_year || r.end_year || 1974;
+
 
         delete r.centerlat;
         delete r.centerlng;
@@ -170,25 +178,26 @@ const CitiesStore = {
           this.data.cities[r.city_id].projectsWithDisplacements += 1;
         }
 
+        const duration = Math.round(Math.max((1 + r.completed_year - r.active_start_year) / 3, 1));
+        durations[duration] = (durations[duration]) ? durations[duration] + 1 : 1;
+
         // calculate and add years data
-        for (let aYear = r.active_start_year; aYear <= Math.min(r.active_start_year + 2, 1966); aYear += 1) {
+        for (let aYear = r.active_start_year; aYear <= r.active_start_year + duration; aYear += 1) {
           //const duration = (r.active_start_year) >= 1965 ? 1967 - r.active_start_year : 3,
-          const duration = (1 + r.completed_year - r.active_start_year) / 3 || 4,
-            whites = r.whites / duration,
+          
+          const whites = r.whites / duration,
             nonwhite = r.nonwhite / duration,
             prForYear = r.pr_total / duration,
             substandard = r.substandard / duration,
             standard = r.standard / duration;
 
-          // total up year data
-          if (aYear >= 1949 && aYear <= 1966) {
-            this.data.yearsTotals[aYear] = this.data.yearsTotals[aYear] || {whites: 0, nonwhite: 0, unspecified: 0, houses_sub_standard: 0, houses_standard: 0};
-            this.data.yearsTotals[aYear].whites += whites;
-            this.data.yearsTotals[aYear].nonwhite += nonwhite;
-            this.data.yearsTotals[aYear].unspecified += prForYear;
-            this.data.yearsTotals[aYear].houses_sub_standard += substandard;
-            this.data.yearsTotals[aYear].houses_standard += standard;
-          }
+
+          this.data.yearsTotals[aYear] = this.data.yearsTotals[aYear] || {whites: 0, nonwhite: 0, unspecified: 0, houses_sub_standard: 0, houses_standard: 0};
+          this.data.yearsTotals[aYear].whites += whites;
+          this.data.yearsTotals[aYear].nonwhite += nonwhite;
+          this.data.yearsTotals[aYear].unspecified += prForYear;
+          this.data.yearsTotals[aYear].houses_sub_standard += substandard;
+          this.data.yearsTotals[aYear].houses_standard += standard;
 
           // aggregate total and year data for city
           if (!this.data.cities[r.city_id].yearsData[aYear]) {
@@ -213,6 +222,9 @@ const CitiesStore = {
           this.data.cities[r.city_id].maxDisplacmentsForYear = (this.data.cities[r.city_id].projects[r.project_id].yearsData[aYear].totalFamilies  > this.data.cities[r.city_id].maxDisplacmentsForYear) ? this.data.cities[r.city_id].projects[r.project_id].yearsData[aYear].totalFamilies : this.data.cities[r.city_id].maxDisplacmentsForYear;
         }
       }); 
+
+      console.log(durations);
+      console.log(this.data.yearsTotals);
 
       responses[3].forEach(r => this.data.yearsTotals[r.year][r.assessed_category.replace(/ /g,"_")] = r.value);
 
@@ -327,16 +339,16 @@ const CitiesStore = {
       // });
       // console.log(projectNames);
 
-      // var citiesForDorlingProcessing = Object.keys(this.data.cities).map(id=> { return {city_id: id, lat: this.data.cities[id].lat, lng: this.data.cities[id].lng, yearsData: this.data.cities[id].yearsData}; });
-      // citiesForDorlingProcessing.forEach(cityData => {
-      //   cityData.yearsData['all'] = {
-      //     whites: this.data.cities[cityData.city_id].whites,
-      //     nonwhite: this.data.cities[cityData.city_id].nonwhite,
-      //     totalFamilies: this.data.cities[cityData.city_id].totalFamilies,
-      //     percentFamiliesOfColor: this.data.cities[cityData.city_id].percentFamiliesOfColor
-      //   };
-      // });
-      // console.log(citiesForDorlingProcessing);
+      var citiesForDorlingProcessing = Object.keys(this.data.cities).map(id=> { return {city_id: id, lat: this.data.cities[id].lat, lng: this.data.cities[id].lng, yearsData: this.data.cities[id].yearsData}; });
+      citiesForDorlingProcessing.forEach(cityData => {
+        cityData.yearsData['all'] = {
+          whites: this.data.cities[cityData.city_id].whites,
+          nonwhite: this.data.cities[cityData.city_id].nonwhite,
+          totalFamilies: this.data.cities[cityData.city_id].totalFamilies,
+          percentFamiliesOfColor: this.data.cities[cityData.city_id].percentFamiliesOfColor
+        };
+      });
+      console.log(citiesForDorlingProcessing);
 
       this.parseDorlings();
 

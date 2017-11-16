@@ -30,16 +30,16 @@ export default class Timeline extends React.Component {
       height = activeHeight + planningHeight + completedHeight + futureHeight;
 
     if (activeCount > 0) {
-      labels.push({label: 'Projects that were being executed in ' + this.props.selectedYear, y: 0});
+      labels.push({label: 'Stage in ' + this.props.selectedYear + ': Active', y: 0});
     }
     if (planningCount > 0) {
-      labels.push({label: 'Projects in the planning phase in ' + this.props.selectedYear, y: activeHeight});
+      labels.push({label: 'Stage in ' + this.props.selectedYear + ': Planning', y: activeHeight});
     }
     if (completedCount > 0) {
-      labels.push({label: 'Projects completed by ' + this.props.selectedYear, y: activeHeight + planningHeight});
+      labels.push({label: 'Completed by ' + this.props.selectedYear, y: activeHeight + planningHeight});
     }
     if (futureCount > 0) {
-      labels.push({label: 'Future projects', y: activeHeight + planningHeight + completedHeight});
+      labels.push({label: 'Post ' + this.props.selectedYear + ' projects', y: activeHeight + planningHeight + completedHeight});
     }
 
     console.log(this.props.displacementProjects);
