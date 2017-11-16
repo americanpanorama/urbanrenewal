@@ -6,6 +6,8 @@ import CitySnippet from '../search/CitySnippetComponent2.jsx';
 import NoDisplacements from './NoDisplacementsComponent.jsx';
 import converter from 'number-to-words';
 
+import { getColorForProjectType } from '../../utils/HelperFunctions';
+
 export default class CityStats extends React.Component {
   constructor (props) { super(props); }
 
@@ -24,10 +26,22 @@ export default class CityStats extends React.Component {
         <h2>{ this.props.city + ', ' + this.props.state.toUpperCase() }</h2>
 
         <p className='summary'>
-          By 1966 an estimated <strong>{ Math.round(this.props.totalFamilies).toLocaleString() + ' '}</strong> families were displaced,<br /><strong>{' ' + Math.round(this.props.percentFamiliesOfColor * 100) + '% '}</strong> of which were families of color.
+          By the late 1960s, an estimated <strong>{ Math.round(this.props.totalFamilies).toLocaleString() + ' '}</strong> families<br /> had been displaced by urban renewal projects in { this.props.city },<br /><strong>{' ' + Math.round(this.props.percentFamiliesOfColor * 100) + '% '}</strong> of which were families of color.
         </p>
 
-        <p className='footprintExplanation'>Project footprints are available for project in bold below.<br /> Hover over to highlight on map, click to select.</p>
+        { (this.props.selectedYear && this.props.yearsData[this.props.selectedYear]) ?
+          <p className='summary'>
+            In  { this.props.selectedYear } we estimate that roughly <strong>{ Math.round(this.props.yearsData[this.props.selectedYear].totalFamilies).toLocaleString() + ' '}</strong> families were displaced,<br /><strong>{' ' + Math.round(this.props.yearsData[this.props.selectedYear].percentFamiliesOfColor * 100) + '% '}</strong> of which were families of color.
+          </p> : 
+          <p className='summary'>&nbsp;<br />&nbsp;</p>
+        }
+
+
+        <p className='footprintExplanation'>
+          Project footprints are available for projects in bold below.<br />
+          Hover over to highlight on map, click to select.<br />
+          See map legend for key to type {(this.props.selectedYear) ? 'and stage' : ''} icon.
+        </p>
 
         <CityTimelineComponent {...this.props } />
 

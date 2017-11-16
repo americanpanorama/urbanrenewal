@@ -1,6 +1,12 @@
 .mapLegend.demographics {
 	pointer-events: auto; 
-	overflow: visible;
+	overflow-x: scroll;
+	overflow-y: visible;
+	
+	.legendComponents {
+		white-space: nowrap;
+	}
+
 
 	div.gradient {
 		display: inline-block;

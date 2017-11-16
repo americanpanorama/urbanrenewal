@@ -186,9 +186,9 @@ export default class CityMap extends React.Component {
               key={ 'city_geom' + i}
               style= { {
                 fillColor: 'transparent',
-                color: '#999',
-                dashArray: '5, 5',
-                weight: 2 //(this.props.tracts[tractId].medianIncome < 5000) ? 10 - 10 * (1 - ((this.props.tracts[tractId].medianIncome - 999) / 5000)): 0
+                color: '#bbb',
+                //dashArray: '4 20',
+                weight: 1 //(this.props.tracts[tractId].medianIncome < 5000) ? 10 - 10 * (1 - ((this.props.tracts[tractId].medianIncome - 999) / 5000)): 0
               } }
               className='city_boundary'
             />

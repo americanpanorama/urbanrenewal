@@ -13,7 +13,8 @@ export default class NoDisplacements extends React.Component {
 
   render() {
 
-    const sortedProjects = Object.keys(this.props.projects)
+    const sortedProjects = (this.props.selectedYear) ?
+      Object.keys(this.props.projects)
         .map(project_id => this.props.projects[project_id])
         .filter(p => !p.totalFamilies || p.totalFamilies == 0)
         .sort((a,b)=> (a.project < b.project) ? -1 : (a.project > b.project) ? 1 : 0)
@@ -29,9 +30,15 @@ export default class NoDisplacements extends React.Component {
           } else {
             return 0;
           }
-        }), 
+        }) :
+      Object.keys(this.props.projects)
+        .map(project_id => this.props.projects[project_id])
+        .filter(p => !p.totalFamilies || p.totalFamilies == 0)
+        .sort((a,b)=> (a.project < b.project) ? -1 : (a.project > b.project) ? 1 : 0);
+
+
         
-      height = sortedProjects.length * 20 + 22;
+    const height = sortedProjects.length * 20 + 22;
 
     return (
       <div>

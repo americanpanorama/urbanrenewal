@@ -12,66 +12,44 @@ import CitiesStore from '../../stores/CitiesStore';
 
 export default class Timeline extends React.Component {
 
-  constructor (props) { 
-    super(props); 
-
-  }
+  constructor (props) { super(props); }
 
   render() {
-    let labels = [];
-    const activeCount = this.props.displacementProjects.reduce((count, p) => (p.status == 'active') ? count + 1 : count, 0),
-      planningCount = this.props.displacementProjects.reduce((count, p) => (p.status == 'planning') ? count + 1 : count, 0),
-      completedCount = this.props.displacementProjects.reduce((count, p) => (p.status == 'completed') ? count + 1 : count, 0),
-      futureCount = this.props.displacementProjects.reduce((count, p) => (p.status == 'future') ? count + 1 : count, 0),
-      activeHeight = activeCount * 20 + ((activeCount > 0) ? 42 : 0),
-      planningHeight = planningCount * 20 + ((planningCount > 0) ? 42 : 0),
-      completedHeight = completedCount * 20 + ((completedCount > 0) ? 42 : 0),
-      futureHeight = futureCount * 20 + ((futureCount > 0) ? 42 : 0),
-      height = activeHeight + planningHeight + completedHeight + futureHeight;
-
-    if (completedCount > 0) {
-      labels.push({label: 'Completed by ' + this.props.selectedYear, y: activeHeight + planningHeight});
-    }
-    if (activeCount > 0) {
-      labels.push({label: 'Stage in ' + this.props.selectedYear + ': Active', y: planningHeight});
-    }
-    if (planningCount > 0) {
-      labels.push({label: 'Stage in ' + this.props.selectedYear + ': Planning', y: 0});
-    }
-
-
-    if (futureCount > 0) {
-      labels.push({label: 'Post ' + this.props.selectedYear + ' projects', y: activeHeight + planningHeight + completedHeight});
-    }
-
     return (
       <svg 
         { ...DimensionsStore.getCityTimelineStyle() }
-        height={ height }
+        height={ this.props.displacementProjects.length * 20 + 42 + 20 }
         className='project'
       >
 
-       {/* { labels.map(label => <ProjectDisplacementGraphLabel {...label } />) }
-
-       JSX Comment
-
-
         <text
-          x={ DimensionsStore.getCityTimelineStyle().width / 2 - 40 }
-          y={ 14 }
+          x={ DimensionsStore.getCityTimelineStyle().width / 2 - 60 }
+          y={ 34 }
           className='label projects'
         >
-          Projects Actively Executing in { this.props.selectedYear }
+          Project
         </text>
 
         { (this.props.displacementProjects.find(p => p.project_type)) ?
-          <text
-            x={ DimensionsStore.getCityTimelineStyle().width / 2 - 10 }
-            y={ 14 }
-            className='label displacements'
-          >
-            Type
-          </text> : ''
+          <g>
+            { (this.props.selectedYear) ?
+              <text
+                x={ DimensionsStore.getCityTimelineStyle().width / 2 - 10 }
+                y={ 14 }
+                className='label displacements'
+              >
+                Type & Stage
+              </text> : ''
+            }
+
+            <text
+              x={ DimensionsStore.getCityTimelineStyle().width / 2 - 10 }
+              y={ 34 }
+              className='label displacements'
+            >
+              {(this.props.selectedYear) ? 'in ' + this.props.selectedYear : 'Type'}
+            </text> 
+          </g>: ''
         }
 
         <text
@@ -79,41 +57,15 @@ export default class Timeline extends React.Component {
           y={ 14 }
           className='label displacements'
         >
-          Families Displaced
+          Families
         </text>
-
-
-
-      
-
-        <text
-          x={ DimensionsStore.getCityTimelineStyle().width / 2 - 40 }
-          y={ this.state.activeHeight + this.state.activeOffset + 14 }
-          className='label projects'
-        >
-          Projects Being Planned in { this.props.selectedYear }
-        </text>
-
-        { (this.state.sortedProjects.find(p => p.project_type)) ?
-          <text
-            x={ DimensionsStore.getCityTimelineStyle().width / 2 - 10 }
-            y={ this.state.activeHeight + this.state.activeOffset + 14 }
-            className='label displacements'
-          >
-            Type
-          </text> : ''
-        }
-
         <text
           x={ DimensionsStore.getCityTimelineStyle().width * 0.75 }
-          y={ this.state.activeHeight + this.state.activeOffset + 14 }
+          y={ 34 }
           className='label displacements'
         >
-          Families Displaced
+          Displaced
         </text>
-
-     */}
-
 
         { this.props.displacementProjects.map((p, i) => 
           <ProjectDisplacementGraph

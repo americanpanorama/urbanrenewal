@@ -20,7 +20,7 @@ export default class ProjectDisplacementGraph extends React.Component {
       d3.select(ReactDOM.findDOMNode(this))
         .transition()
         .duration(750)
-        .attr('transform', 'translate(0 ' + (nextProps.y + 22) +')')
+        .attr('transform', 'translate(0 ' + (nextProps.y + 42) +')')
         .each('end', () => {
           this.setState({
             y: this.props.y
@@ -36,7 +36,7 @@ export default class ProjectDisplacementGraph extends React.Component {
         onMouseLeave={ (this.props.the_geojson) ? this.props.onProjectOut : null }
         onClick={ this.props.onProjectSelected }
         id={ this.props.project_id  }
-        transform={'translate(0 ' + (this.state.y + 22) +')'}
+        transform={'translate(0 ' + (this.state.y + 42) +')'}
       >
         {/* JSX Comment 
         <rect
@@ -72,17 +72,21 @@ export default class ProjectDisplacementGraph extends React.Component {
           cx={ DimensionsStore.getCityTimelineStyle().width / 2 - 10}
           cy={ 0 + 7}
           r={8}
-          fill={ (this.props.status == 'planning' || this.props.status == 'active') ? getColorForProjectType(this.props.project_type) : 'transparent' }
+          fill={ (!this.props.status|| this.props.status == 'planning' || this.props.status == 'active') ? getColorForProjectType(this.props.project_type) : 'transparent' }
           stroke={ getColorForProjectType(this.props.project_type) }
           strokeWidth={2}
         /> 
-        <text
-          x={ DimensionsStore.getCityTimelineStyle().width / 2 - 10}
-          y={12}
-          className={'stage ' +  this.props.status}
-        >
-          { this.props.status.substring(0,1).toUpperCase()}
-        </text>
+
+        { (this.props.status) ?
+          <text
+            x={ DimensionsStore.getCityTimelineStyle().width / 2 - 10}
+            y={12}
+            className={'stage ' +  this.props.status}
+          >
+            { this.props.status.substring(0,1).toUpperCase()}
+          </text> : ''
+        }
+
 
         { (this.props.nonwhite || this.props.whites) ?
           <g>

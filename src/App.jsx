@@ -393,7 +393,7 @@ export default class App extends React.Component {
 
                       { (CitiesStore.getHOLCSelected() && CitiesStore.hasHOLCData(CitiesStore.getSelectedCity()) && this.state.legendVisible) ? 
                         <LegendHOLC 
-                          miurl={ 'https://dsl.richmond.edu/panorama/redlining/#loc=' + [GeographyStore.getLatLngZoom().zoom, GeographyStore.getLatLngZoom().lat, GeographyStore.getLatLngZoom().lng].join('/') + "&opacity=0" }
+                          miurl={ 'https://dsl.richmond.edu/panorama/redlining/#loc=' + [GeographyStore.getLatLngZoom().zoom, GeographyStore.getLatLngZoom().lat, GeographyStore.getLatLngZoom().lng].join('/') }
                           city={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).city }
                           selectedYear={ CitiesStore.getSelectedYear() }
                         /> : ''

@@ -263,6 +263,27 @@
     font-size: 0.9em;
     font-style: italic;
     text-align: center;
+
+    svg {
+
+      transform: translateY(4px);
+      padding: 0 2px 0 4px;
+
+      text {
+        font-style: normal;
+        text-anchor: middle;
+        font-family: Oswald, sans-serif;
+        font-weight: 400;
+        font-size: 12px;
+        fill: white;
+        stroke: transparent;
+
+        &.future,
+        &.completed {
+          fill: #999;
+        }
+      }
+    }
   }
 
   rect {
