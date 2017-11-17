@@ -74,7 +74,7 @@ export default class NationalStats extends React.Component {
 
     return (
       <div className='projectStats'>
-        <h2>{ 'Nationwide, ' + ((this.props.selectedYear) ? this.props.selectedYear : '1955-1966') }</h2>
+        <h2>{ 'Nationwide, ' + ((this.props.selectedYear) ? this.props.selectedYear : '1950-1966') }</h2>
 
         <div className='context'>
           { (this.props.selectedYear == 1955) ? 

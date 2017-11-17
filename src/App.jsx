@@ -62,7 +62,7 @@ export default class App extends React.Component {
     this.coords = {};
 
     // bind handlers
-    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle', 'onProjectInspected', 'onProjectOut', 'onSearching', 'onProjectMapHover', 'onProjectSelected', 'onProjectMapUnhover','onSearchBlur','onCloseSearch','toggleScatterplotExplanationVisibility','onDismissIntroModal','onModalClick','onContactUsToggle'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle', 'onProjectInspected', 'onProjectOut', 'onSearching', 'onProjectMapHover', 'onProjectSelected', 'onProjectMapUnhover','onSearchBlur','onCloseSearch','toggleScatterplotExplanationVisibility','onDismissIntroModal','onModalClick','onContactUsToggle','onCityViewSelected'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
 
     console.time('update');
@@ -199,6 +199,14 @@ export default class App extends React.Component {
     this.setState({ searching: true });
   }
 
+  onCityViewSelected(event) {
+    if (event.target.id == CitiesStore.getSelectedCityView()) {
+      AppActions.cityViewSelected(null); 
+    } else {
+      AppActions.cityViewSelected(event.target.id); 
+    }
+  }
+
   onViewSelected(event) { 
     if (event.target.id !== CitiesStore.getSelectedView()) {
       AppActions.viewSelected(event.target.id, CitiesStore.getSelectedView()); 
@@ -285,9 +293,9 @@ export default class App extends React.Component {
     const vizState = { 
       year: CitiesStore.getSelectedYear(),
       view: [GeographyStore.getX(), GeographyStore.getY(), GeographyStore.getZ()].join('/'),
+      cityview: CitiesStore.getSelectedCityView(),
       city: CitiesStore.getSlug(),
       viz: CitiesStore.getSelectedView(),
-      holc: CitiesStore.getHOLCSelected() || null,
       project: CitiesStore.getSelectedProject(),
       text: TextsStore.getSubject(),
     };
@@ -343,7 +351,7 @@ export default class App extends React.Component {
             <div className='columns eight full-height'>
               <header style={ DimensionsStore.getHeaderStyle() }>
                 <h1><a href='./'>Renewing <span className='dark'>Inequality</span></a></h1>
-                <h2><a href='./'>Family Displacements through Urban Renewal, 1955-1966</a></h2>
+                <h2><a href='./'>Family Displacements through Urban Renewal, 1950-1966</a></h2>
                 <h4 onClick={ this.onModalClick } id={ 'intro' }>Introduction</h4>
                 <h4 onClick={ this.onModalClick } id={ 'sources' }>Sources & Method</h4>
                 <h4 onClick={ this.onModalClick } id={ 'citing' }>Citing</h4>
@@ -372,6 +380,7 @@ export default class App extends React.Component {
                         onProjectUnhover={ this.onProjectMapUnhover }
                         onProjectClick={ this.onProjectSelected }
                         HOLCSelected={ CitiesStore.getHOLCSelected() }
+                        selectedCityView={ CitiesStore.getSelectedCityView() }
                         highlightedCity={ CitiesStore.getHighlightedCity() }
                         inspectedCity={ CitiesStore.getInspectedCity() }
                         inspectedProject={ CitiesStore.getInspectedProject() }
@@ -387,11 +396,14 @@ export default class App extends React.Component {
                         <img src='static/us-outline.svg' />
                       </button>
 
-                      { (!CitiesStore.getHOLCSelected() && this.state.legendVisible) ? 
-                        <LegendRaceAndIncome selectedYear={ CitiesStore.getSelectedYear() } /> : ''
+                      { ((CitiesStore.getSelectedCityView() !== 'holc' || !CitiesStore.hasHOLCData(CitiesStore.getSelectedCity())) && this.state.legendVisible) ? 
+                        <LegendRaceAndIncome 
+                          selectedYear={ CitiesStore.getSelectedYear() } 
+                          selectedCityView={ CitiesStore.getSelectedCityView() }
+                        /> : ''
                       }
 
-                      { (CitiesStore.getHOLCSelected() && CitiesStore.hasHOLCData(CitiesStore.getSelectedCity()) && this.state.legendVisible) ? 
+                      { (CitiesStore.getSelectedCityView() == 'holc' && CitiesStore.hasHOLCData(CitiesStore.getSelectedCity()) && this.state.legendVisible) ? 
                         <LegendHOLC 
                           miurl={ 'https://dsl.richmond.edu/panorama/redlining/#loc=' + [GeographyStore.getLatLngZoom().zoom, GeographyStore.getLatLngZoom().lat, GeographyStore.getLatLngZoom().lng].join('/') }
                           city={ CitiesStore.getCityData(CitiesStore.getSelectedCity()).city }
@@ -399,12 +411,11 @@ export default class App extends React.Component {
                         /> : ''
                       }
 
-                      { (CitiesStore.hasHOLCData(CitiesStore.getSelectedCity())) ?
-                        <CityMapControls 
-                         holcSelected={ CitiesStore.getHOLCSelected() }
-                         onHOLCToggle={ this.onHOLCToggle }
-                        /> : ''
-                      }
+                      <CityMapControls 
+                       selectedCityView={ CitiesStore.getSelectedCityView() }
+                       onCityViewSelected={ this.onCityViewSelected }
+                       hasHOLCData = { CitiesStore.hasHOLCData(CitiesStore.getSelectedCity()) }
+                      /> 
 
                       <div 
                         className='hideLegend'
@@ -462,7 +473,7 @@ export default class App extends React.Component {
                         { (this.state.legendVisible) ?
                           <Legend
                             poc={ CitiesStore.getPOC() }
-                            selectedYear={ CitiesStore.getSelectedYear() || '1955-1966' }
+                            selectedYear={ CitiesStore.getSelectedYear() || '1950-1966' }
                             selectedView={ CitiesStore.getSelectedView() }
                             dorlingScale={ (CitiesStore.getSelectedView() == 'cartogram') ? GeographyStore.getZ() : 1 }
                             dorlingIncrements={ DimensionsStore.getLegendDimensionsIntervals() }
@@ -523,7 +534,8 @@ export default class App extends React.Component {
           { ((!CitiesStore.getHighlightedProject() && CitiesStore.getHighlightedCity()) || CitiesStore.getInspectedCity()) ? 
             <CityStats 
               { ...CitiesStore.getCityData(CitiesStore.getHighlightedCity()) }
-              displacementProjects={ CitiesStore.getCityProjectsOrganized(CitiesStore.getHighlightedCity()) }
+              displacementProjects={ CitiesStore.getCityProjectsOrganized(CitiesStore.getHighlightedCity(), true) }
+              noDisplacementProjects={ CitiesStore.getCityProjectsOrganized(CitiesStore.getHighlightedCity(), false) }
               otherCities={ CitiesStore.getVisibleCitiesDetails().cities }
               categories={ CitiesStore.getCategories() }
               selectedYear={ CitiesStore.getSelectedYear() }

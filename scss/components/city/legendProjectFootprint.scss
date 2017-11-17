@@ -50,7 +50,7 @@
 	}
 
 	line.boundary {
-		stroke: black;
+		stroke: #999;
 		stroke-width: 3;
 
 		&.inactive {
@@ -59,10 +59,24 @@
 	}
 
 	path.boundary {
-		stroke: #5B3000;
-		stroke-width: 3;
+		stroke-width: 2;
 		stroke-linecap: round;
 		stroke-linejoin: round;
 		fill-opacity: 0.2;
+	}
+}
+
+text.stage {
+	font-style: normal;
+	text-anchor: middle;
+	font-family: Oswald, sans-serif;
+	font-weight: 400;
+	font-size: 12px;
+	fill: white;
+	stroke: transparent;
+
+	&.future,
+	&.completed {
+	  fill: #999;
 	}
 }

@@ -21,6 +21,7 @@ export const AppActionTypes = {
   projectInspectedStats: 'projectInspectedStats',
   projectSelected: 'projectSelected',
   onModalClick: 'onModalClick',
+  cityViewSelected: 'onCityViewSelected',
 
 };
 
@@ -160,6 +161,13 @@ export const AppActions = {
     AppDispatcher.dispatch({
       type: AppActionTypes.onModalClick,
       subject: subject
+    });
+  },
+
+  cityViewSelected: (value) => {
+    AppDispatcher.dispatch({
+      type: AppActionTypes.onCityViewSelected,
+      value: value
     });
   },
 

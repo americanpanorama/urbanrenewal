@@ -2,7 +2,7 @@ import * as React from 'react';
 import { beeswarm } from 'd3-beeswarm';
 
 import DimensionsStore from '../../stores/DimensionsStore.js';
-import { getColorForRace } from '../../utils/HelperFunctions';
+import { getColorForRace, getColorForProjectType } from '../../utils/HelperFunctions';
 
 export default class ProjectStats extends React.Component {
   constructor (props) { 
@@ -47,13 +47,13 @@ export default class ProjectStats extends React.Component {
     }
 
     let projectsWithDisplacements = this.props.stats.projects.filter(p => p.totalFamilies > 0),
-      maxDisplacements= projectsWithDisplacements[projectsWithDisplacements.length-1].totalFamilies || 0,
+      maxDisplacements= projectsWithDisplacements[projectsWithDisplacements.length-1].totalFamilies * 1.1 || 0,
       displacementTicks = (maxDisplacements < 500) ? [0,100,200,300,400] : 
         (maxDisplacements < 3000) ? [0,500,1000,1500,2000,2500,3000] :
         [0,1000,2000,3000,4000,5000],
       inspectedProject = (this.state.hoverProject) ? this.props.stats.projects.find(p => p.project_id == this.state.hoverProject) : this.props.stats.projects.find(p => p.project_id == this.props.project_id),
       funding = [{funding: this.props.stats.medianFunding, project_id: 'median'}].concat(this.props.stats.projects.filter(p => p.funding && Math.sign(theProject.totalFamilies) == Math.sign(p.totalFamilies))),
-      maxFunding = Math.max(...funding.map(p => p.funding)) || 1,
+      maxFunding = Math.max(...funding.map(p => p.funding)) * 1.1 || 1,
       fundingTicks = (maxFunding <= 10000000) ? [2000000, 3000000, 4000000, 5000000, 6000000, 7000000, 8000000, 9000000, 10000000] : 
         (maxFunding < 30000000) ? [5000000,10000000,15000000,20000000,25000000] :
         [10000000,20000000,30000000,40000000,50000000,60000000],
@@ -73,6 +73,9 @@ export default class ProjectStats extends React.Component {
 
     fundingMid = swarm.reduce((max,p) => Math.max(Math.abs(p.x), max), 0);
 
+    let planningWidth = DimensionsStore.getSidebarStyle().width - 160,
+      planningLineWidth = planningWidth - 50;
+
     return (
       <div className='projectStats'>
 
@@ -90,10 +93,112 @@ export default class ProjectStats extends React.Component {
           >x</div> : ''
         }
 
-        <h3>{ theProject.project + ' — ' + theProject.start_year + ((theProject.end_year !== theProject.start_year) ? '-' + theProject.end_year : '') + ''}</h3>
+        <h3>{ theProject.project + ' Project' }</h3>
 
-        <h3>Planning: {theProject.start_year} - {theProject.active_start_year}</h3>
-        <h3>Executed: {theProject.active_start_year} - {theProject.completed_year}</h3>
+        <svg 
+          width={ planningWidth }
+          height={45}
+        >
+          <line
+            x1={ 25 + (theProject.active_start_year-1950) / (1974-1950) * planningLineWidth}
+            y1={10}
+            x2={ 25 + (theProject.completed_year-1950) / (1974-1950) * planningLineWidth}
+            y2={10}
+            strokeWidth={2}
+            stroke='grey'
+          />
+          { (theProject.planning_start_year && theProject.planning_start_year !== theProject.active_start_year ) ?
+            <g>
+              <line
+                x1={ 25 + (theProject.planning_start_year-1950) / (1974-1950) * planningLineWidth}
+                y1={10}
+                x2={ 25 + (theProject.active_start_year-1950) / (1974-1950) * planningLineWidth}
+                y2={10}
+                strokeWidth={2}
+                stroke='grey'
+                strokeDasharray='2 3'
+              />
+              <circle
+                cx={ 25 + (theProject.planning_start_year-1950) / (1974-1950) * planningLineWidth}
+                cy={10}
+                r={8}
+                fill={ getColorForProjectType(theProject.project_type) }
+                stroke={ getColorForProjectType(theProject.project_type) }
+                strokeWidth={2}
+              /> 
+              <text
+                x={ 25 + (theProject.planning_start_year-1950) / (1974-1950) * planningLineWidth}
+                y={15}
+                className={'stage planning' }
+              >
+                P
+              </text>
+              {/* make sure there's enough room to show the execution date without overlap */}
+              { ((theProject.active_start_year - theProject.planning_start_year) / (1974-1950) * planningLineWidth > 40 ) ?
+                <text
+                  x={ 25 + (theProject.planning_start_year-1950) / (1974-1950) * planningLineWidth}
+                  y={ 38 }
+                  fontSize={16}
+                  textAnchor='middle'
+                > 
+                  { theProject.planning_start_year }
+                </text>: ''
+              }
+            </g> : ''
+          }
+
+          <circle
+            cx={ 25 + (theProject.active_start_year-1950) / (1974-1950) * planningLineWidth}
+            cy={10}
+            r={8}
+            fill={ getColorForProjectType(theProject.project_type) }
+            stroke={ getColorForProjectType(theProject.project_type) }
+            strokeWidth={2}
+          /> 
+          <text
+            x={ 25 + (theProject.active_start_year-1950) / (1974-1950) * planningLineWidth}
+            y={15}
+            className={'stage active' }
+          >
+            A
+          </text>
+
+          <text
+            x={ 25 + (theProject.active_start_year-1950) / (1974-1950) * planningLineWidth}
+            y={ 38 }
+            fontSize={16}
+            textAnchor='middle'
+          >
+            { theProject.active_start_year }
+          </text>
+
+
+          <circle
+            cx={ 25 + (theProject.completed_year-1950) / (1974-1950) * planningLineWidth}
+            cy={10}
+            r={8}
+            fill='white'
+            stroke={ getColorForProjectType(theProject.project_type) }
+            strokeWidth={2}
+          /> 
+          <text
+            x={ 25 + (theProject.completed_year-1950) / (1974-1950) * planningLineWidth}
+            y={15}
+            className={'stage completed ' }
+          >
+            C
+          </text>
+
+          <text
+            x={ 25 + (theProject.completed_year-1950) / (1974-1950) * planningLineWidth}
+            y={ 38 }
+            fontSize={16}
+            textAnchor='middle'
+          >
+            { theProject.completed_year }
+          </text>
+
+        </svg>
 
         { (theProject.totalFamilies > 0) ?
           <svg
@@ -489,8 +594,7 @@ export default class ProjectStats extends React.Component {
         { (theProject.totalFamilies > 0 || theProject.funding) ?
           <div className='legend'>
             <h4>
-              Projects with{ (theProject.totalFamilies == 0) ? 'out' : '' }  displacements<br />
-              in cities with populations {this.props.cityCat}
+              Compared to other projects with{ (theProject.totalFamilies == 0) ? 'out' : '' }  displacements in comparably sized cities (population {this.props.cityCat})
             </h4>
             <ul>
               {/* JSX Comment 

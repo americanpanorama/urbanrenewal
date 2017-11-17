@@ -540,8 +540,8 @@ const DimensionsStore = {
     return {
       x: this.getMainTimlineXOffset(1950) * 1.5,
       y: 27,
-      width: this.getMainTimelineBarWidth(),
-      height: this.getMainTimelineBarWidth(),
+      width: Math.max(this.getMainTimelineBarWidth(), 16),
+      height: Math.max(this.getMainTimelineBarWidth(), 16),
       fill: '#a387be',
       stroke: '#444',
       strokeWidth: 0
@@ -550,18 +550,18 @@ const DimensionsStore = {
 
   getMainTimelineLegendLabelPOCAttrs() {
     return {
-      dx: this.getMainTimlineXOffset(1950) * 1.5 + this.getMainTimelineBarWidth() * 1.5 ,
-      dy: 27 + this.getMainTimelineBarWidth() ,
-      fontSize: this.getMainTimelineBarWidth(),
+      dx: this.getMainTimlineXOffset(1950) * 1.5 + Math.max(this.getMainTimelineBarWidth(), 16) * 1.5 ,
+      dy: 27 + Math.max(this.getMainTimelineBarWidth(), 16) ,
+      fontSize: Math.max(this.getMainTimelineBarWidth(), 16),
     };
   },
 
   getMainTimelineLegendBoxWhiteAttrs() {
     return {
       x: this.getMainTimlineXOffset(1950) * 1.5,
-      y: 27 + this.getMainTimelineBarWidth() * 1.5 ,
-      width: this.getMainTimelineBarWidth(),
-      height: this.getMainTimelineBarWidth(),
+      y: 27 + Math.max(this.getMainTimelineBarWidth(), 16) * 1.5 ,
+      width: Math.max(this.getMainTimelineBarWidth(), 16),
+      height: Math.max(this.getMainTimelineBarWidth(), 16),
       fill: '#2ca02c',
       stroke: '#444',
       strokeWidth: 0
@@ -570,18 +570,18 @@ const DimensionsStore = {
 
   getMainTimelineLegendLabelWhiteAttrs() {
     return {
-      dx: this.getMainTimlineXOffset(1950) * 1.5 + this.getMainTimelineBarWidth() * 1.5 ,
-      dy: 27 + this.getMainTimelineBarWidth() * 2.5,
-      fontSize: this.getMainTimelineBarWidth(),
+      dx: this.getMainTimlineXOffset(1950) * 1.5 + Math.max(this.getMainTimelineBarWidth(), 16) * 1.5 ,
+      dy: 27 + Math.max(this.getMainTimelineBarWidth(), 16) * 2.5,
+      fontSize: Math.max(this.getMainTimelineBarWidth(), 16),
     };
   },
 
   getMainTimelineLegendBoxPRVIAttrs() {
     return {
       x: this.getMainTimlineXOffset(1950) * 1.5,
-      y: 27 + this.getMainTimelineBarWidth() * 3 ,
-      width: this.getMainTimelineBarWidth(),
-      height: this.getMainTimelineBarWidth(),
+      y: 27 + Math.max(this.getMainTimelineBarWidth(), 16) * 3 ,
+      width: Math.max(this.getMainTimelineBarWidth(), 16),
+      height: Math.max(this.getMainTimelineBarWidth(), 16),
       fill: '#909EAC',
       stroke: '#444',
       strokeWidth: 0
@@ -590,9 +590,9 @@ const DimensionsStore = {
 
   getMainTimelineLegendLabelPRVIAttrs() {
     return {
-      dx: this.getMainTimlineXOffset(1950) * 1.5 + this.getMainTimelineBarWidth() * 1.5 ,
-      dy: 27 + this.getMainTimelineBarWidth() * 4,
-      fontSize: this.getMainTimelineBarWidth(),
+      dx: this.getMainTimlineXOffset(1950) * 1.5 + Math.max(this.getMainTimelineBarWidth(), 16) * 1.5 ,
+      dy: 27 + Math.max(this.getMainTimelineBarWidth(), 16) * 4,
+      fontSize: Math.max(this.getMainTimelineBarWidth(), 16),
     };
   },
 

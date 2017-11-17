@@ -6,7 +6,7 @@ import CitySnippet from '../search/CitySnippetComponent2.jsx';
 import NoDisplacements from './NoDisplacementsComponent.jsx';
 import converter from 'number-to-words';
 
-import { getColorForProjectType } from '../../utils/HelperFunctions';
+import { getColorForProjectType, roughNumber } from '../../utils/HelperFunctions';
 
 export default class CityStats extends React.Component {
   constructor (props) { super(props); }
@@ -31,9 +31,9 @@ export default class CityStats extends React.Component {
 
         { (this.props.selectedYear && this.props.yearsData[this.props.selectedYear]) ?
           <p className='summary'>
-            In  { this.props.selectedYear } we estimate that roughly <strong>{ Math.round(this.props.yearsData[this.props.selectedYear].totalFamilies).toLocaleString() + ' '}</strong> families were displaced,<br /><strong>{' ' + Math.round(this.props.yearsData[this.props.selectedYear].percentFamiliesOfColor * 100) + '% '}</strong> of which were families of color.
+            We estimate that roughly <strong>{ roughNumber(this.props.yearsData[this.props.selectedYear].totalFamilies).toLocaleString() + ' '}</strong><br />of those families were displaced in { this.props.selectedYear }<br /> and that <strong>{' ' + Math.round(this.props.yearsData[this.props.selectedYear].percentFamiliesOfColor * 100) + '% '}</strong> of those families were of color.
           </p> : 
-          <p className='summary'>&nbsp;<br />&nbsp;</p>
+          <p className='summary'>&nbsp;<br />&nbsp;<br />&nbsp;</p>
         }
 
 

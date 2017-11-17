@@ -195,7 +195,7 @@ export default class CityMap extends React.Component {
           )}
 
           {/* race and income data in census tracts */}
-          { (this.props.holc_areas.length == 0 || (!this.props.HOLCSelected && this.props.tracts)) ? 
+          { (this.props.selectedCityView == 'pr' && this.props.tracts) ? 
             Object.keys(this.props.tracts).map(tractId => {
               if (this.props.tracts[tractId].percentBelow > 0.2) {
                 return(
@@ -220,7 +220,7 @@ export default class CityMap extends React.Component {
           }
 
         {/* redlining areas */}
-          { this.props.HOLCSelected && this.props.holc_areas.map((area, i) => 
+          { this.props.selectedCityView == 'holc' && this.props.holc_areas.map((area, i) => 
             <GeoJSON
               data={area.the_geojson}
               key={ 'holc' + i }
@@ -298,7 +298,7 @@ export default class CityMap extends React.Component {
                       onClick={ this.props.onProjectClick }
                       id={ projectId }
                       style={ {
-                        weight: (this.props.selectedYear <= this.props.projects[projectId].planning_start_year) ? 1.5 : 3,
+                        weight: (this.props.selectedYear && this.props.selectedYear < this.props.projects[projectId].planning_start_year) ? 1.5 : 3,
                         //color: (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId) ? 'black' : ((this.props.highlightedCity && this.props.highlightedCity == this.props.projects[projectId].city_id) &&  (this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId || (this.props.inspectedProject == null && this.props.inspectedProjectStats == null))) ?  '#DF894A' : '#aaa',
                         color: getColorForProjectType(this.props.projects[projectId].project_type),
                         opacity: ((!this.props.inspectedProjectStats && !this.props.inspectedProject) || this.props.inspectedProjectStats == projectId || this.props.inspectedProject == projectId) ? 1 : 0.5,

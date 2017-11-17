@@ -1,14 +1,14 @@
 import * as React from 'react';
 
-import { getColorForRace } from '../../utils/HelperFunctions';
+import { getColorForRace, getColorForProjectType } from '../../utils/HelperFunctions';
 
 export default class LegendProjectFootprint extends React.Component {
   render () {
     const width=120,
       centerX = width /2,
       height=130,
-      header=30,
-      centerY=header + (height-header)/2;
+      header=0,
+      centerY=45;
 
     return (
       <svg
@@ -16,47 +16,11 @@ export default class LegendProjectFootprint extends React.Component {
         height={height}
         className='projectFootprint'
       >
-        { (this.props.selectedYear) ?
-          <g>
-            <line
-              x1={0}
-              x2={20}
-              y1={8}
-              y2={8}
-              className='boundary'
-            />
-
-            <text
-              x={ 24 }
-              y={ 12 }
-              className='note'
-            >
-              { 'Active in ' + this.props.selectedYear }
-            </text>
-
-            <line
-              x1={0}
-              x2={20}
-              y1={25}
-              y2={25}
-              className='boundary inactive'
-            />
-
-            <text
-              x={ 24 }
-              y={ 27 }
-              className='note'
-            >
-              { 'Inactive in ' + this.props.selectedYear }
-            </text>
-          </g> : ''
-        }
-
-
         <path 
-          d="M20 60L0 20L45 -10L75 40z"
-          transform='translate(22 50)'
+          d="M0 48L0 20L55 -10L110 48z"
+          transform='translate(10 12)'
           fill={getColorForRace(0.2)}
+          stroke={ getColorForProjectType('R') }
           className='boundary'
         />
 
@@ -75,6 +39,40 @@ export default class LegendProjectFootprint extends React.Component {
         >
           # displacements
         </text>
+
+        <g transform='translate(0 60)'>
+
+          <circle
+            cx={ centerX }
+            cy={ centerY}
+            r={25}
+            fill={getColorForRace(0.7)}
+          />
+
+          <text
+            x={ centerX }
+            y={ centerY - 20}
+            className='shadow name'
+          >
+            CITY (no maps)
+          </text>
+
+          <text
+            x={ centerX }
+            y={ centerY }
+            className='shadow displacements'
+          >
+            # displacements
+          </text>
+
+          <text
+            x={ centerX }
+            y={ centerY + 20}
+            className='shadow'
+          >
+            # projects
+          </text>
+        </g>
 
       </svg>
     );

@@ -1,4 +1,4 @@
-&.holc {
+.holc {
   &.redlining {
     display: inline-block;
     width: 150px;
@@ -28,5 +28,31 @@
     pointer-events: auto;
     font-style: italic;
     line-height: 15px;
+  }
+
+
+
+}
+
+.legendStage {
+  .tooltip {
+      visibility: hidden;
+      width: 240px;
+      background-color: #eee;
+      color: black;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      text-shadow: none;
+
+      /* Position the tooltip */
+      position: absolute;
+      right: 0px;
+      bottom: 180px;
+
+      &.projectType {
+        right: 300px;
+        line-height: 1.6;
+      }
   }
 }
