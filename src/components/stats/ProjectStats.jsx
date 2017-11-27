@@ -563,28 +563,31 @@ export default class ProjectStats extends React.Component {
                   }
                 })}
 
-
-                <text
-                  x={inspectedProjectHover.x }
-                  y={ (inspectedProjectHover.y > 100) ? inspectedProjectHover.y - 25 : inspectedProjectHover.y + 29 }
-                  className='shadow'
-                  style={{
-                    textAnchor: (inspectedProjectHover.x < fundingMid * -1/3)  ? 'start' : (inspectedProjectHover.x > fundingMid * 1/3) ? 'end' : 'middle',
-                    fontWeight: (inspectedProjectHover.datum.hasProjectGeojson) ? 400 : 200
-                  }}
-                >
-                  { inspectedProjectHover.datum.project}
-                </text> 
-                <text
-                  x={inspectedProjectHover.x }
-                  y={ (inspectedProjectHover.y > 100) ? inspectedProjectHover.y - 8 : inspectedProjectHover.y + 45 }
-                  className='shadow'
-                  style={{
-                    textAnchor: (inspectedProjectHover.x < fundingMid * -1/3)  ? 'start' : (inspectedProjectHover.x > fundingMid * 1/3) ? 'end' : 'middle' 
-                  }}
-                >
-                  { inspectedProjectHover.datum.city + ', ' + inspectedProjectHover.datum.state.toUpperCase() }
-                </text> 
+                { (inspectedProjectHover) ?
+                  <g>
+                    <text
+                      x={inspectedProjectHover.x }
+                      y={ (inspectedProjectHover.y > 100) ? inspectedProjectHover.y - 25 : inspectedProjectHover.y + 29 }
+                      className='shadow'
+                      style={{
+                        textAnchor: (inspectedProjectHover.x < fundingMid * -1/3)  ? 'start' : (inspectedProjectHover.x > fundingMid * 1/3) ? 'end' : 'middle',
+                        fontWeight: (inspectedProjectHover.datum.hasProjectGeojson) ? 400 : 200
+                      }}
+                    >
+                      { inspectedProjectHover.datum.project}
+                    </text> 
+                    <text
+                      x={inspectedProjectHover.x }
+                      y={ (inspectedProjectHover.y > 100) ? inspectedProjectHover.y - 8 : inspectedProjectHover.y + 45 }
+                      className='shadow'
+                      style={{
+                        textAnchor: (inspectedProjectHover.x < fundingMid * -1/3)  ? 'start' : (inspectedProjectHover.x > fundingMid * 1/3) ? 'end' : 'middle' 
+                      }}
+                    >
+                      { inspectedProjectHover.datum.city + ', ' + inspectedProjectHover.datum.state.toUpperCase() }
+                    </text> 
+                  </g> : ''
+                }
 
               </g>
             </g>

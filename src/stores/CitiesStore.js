@@ -224,9 +224,6 @@ const CitiesStore = {
         }
       }); 
 
-      console.log(durations);
-      console.log(this.data.yearsTotals);
-
       responses[3].forEach(r => this.data.yearsTotals[r.year][r.assessed_category.replace(/ /g,"_")] = r.value);
 
       // calculate additional years total values 
@@ -340,16 +337,16 @@ const CitiesStore = {
       // });
       // console.log(projectNames);
 
-      var citiesForDorlingProcessing = Object.keys(this.data.cities).map(id=> { return {city_id: id, lat: this.data.cities[id].lat, lng: this.data.cities[id].lng, yearsData: this.data.cities[id].yearsData}; });
-      citiesForDorlingProcessing.forEach(cityData => {
-        cityData.yearsData['all'] = {
-          whites: this.data.cities[cityData.city_id].whites,
-          nonwhite: this.data.cities[cityData.city_id].nonwhite,
-          totalFamilies: this.data.cities[cityData.city_id].totalFamilies,
-          percentFamiliesOfColor: this.data.cities[cityData.city_id].percentFamiliesOfColor
-        };
-      });
-      console.log(citiesForDorlingProcessing);
+      // var citiesForDorlingProcessing = Object.keys(this.data.cities).map(id=> { return {city_id: id, lat: this.data.cities[id].lat, lng: this.data.cities[id].lng, yearsData: this.data.cities[id].yearsData}; });
+      // citiesForDorlingProcessing.forEach(cityData => {
+      //   cityData.yearsData['all'] = {
+      //     whites: this.data.cities[cityData.city_id].whites,
+      //     nonwhite: this.data.cities[cityData.city_id].nonwhite,
+      //     totalFamilies: this.data.cities[cityData.city_id].totalFamilies,
+      //     percentFamiliesOfColor: this.data.cities[cityData.city_id].percentFamiliesOfColor
+      //   };
+      // });
+      // console.log(citiesForDorlingProcessing);
 
       this.parseDorlings();
 

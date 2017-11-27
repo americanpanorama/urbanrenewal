@@ -72,7 +72,7 @@ export const roughNumber = function(num) {
     return Math.round(num / 5) * 5;
   }
 
-  return num;
+  return Math.round(num);
 };
 
 export const getMedian = function(args) {

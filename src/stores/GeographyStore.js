@@ -364,8 +364,7 @@ GeographyStore.dispatchToken = AppDispatcher.register((action) => {
       const waitingId = setInterval(() => {
         if (GeographyStore.getTheMap()) {
           clearInterval(waitingId);
-          if (CitiesStore.getProjectCenter(action.value)) {
-            console.log('executed');
+          if (CitiesStore.getProjectCenter(action.value) && CitiesStore.getProjectCenter(action.value)[0]) {
             GeographyStore.setViewFromProjectBounds(action.value);
           } else {
             GeographyStore.setViewFromBounds(city_id);

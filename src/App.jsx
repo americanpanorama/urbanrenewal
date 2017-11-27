@@ -168,7 +168,7 @@ export default class App extends React.Component {
     });
   }
 
-  onProjectInspected(event) { AppActions.projectInspected(event.target.id); }
+  onProjectInspected(event) { console.log(event.target.id); AppActions.projectInspected(event.target.id); }
 
   onProjectMapHover(event) { AppActions.projectInspectedStats(parseInt(event.target.options.id)); }
 
@@ -177,7 +177,7 @@ export default class App extends React.Component {
   onProjectSelected(event) { 
     let id = (event.target.id) ? event.target.id : (event.target.options) ? parseInt(event.target.options.id) : null;
     id = (id == CitiesStore.getSelectedProject()) ? null : id;
-    AppActions.projectSelected(id); 
+    AppActions.projectSelected(parseInt(id)); 
   }
 
   onProjectOut() { AppActions.projectInspected(null); }

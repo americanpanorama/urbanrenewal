@@ -29,7 +29,7 @@ export default class CityStats extends React.Component {
           By the late 1960s, an estimated <strong>{ Math.round(this.props.totalFamilies).toLocaleString() + ' '}</strong> families<br /> had been displaced by urban renewal projects in { this.props.city },<br /><strong>{' ' + Math.round(this.props.percentFamiliesOfColor * 100) + '% '}</strong> of which were families of color.
         </p>
 
-        { (this.props.selectedYear && this.props.yearsData[this.props.selectedYear]) ?
+        { (this.props.selectedYear && this.props.yearsData[this.props.selectedYear] && this.props.yearsData[this.props.selectedYear].totalFamilies > 0) ?
           <p className='summary'>
             We estimate that roughly <strong>{ roughNumber(this.props.yearsData[this.props.selectedYear].totalFamilies).toLocaleString() + ' '}</strong><br />of those families were displaced in { this.props.selectedYear }<br /> and that <strong>{' ' + Math.round(this.props.yearsData[this.props.selectedYear].percentFamiliesOfColor * 100) + '% '}</strong> of those families were of color.
           </p> : 
