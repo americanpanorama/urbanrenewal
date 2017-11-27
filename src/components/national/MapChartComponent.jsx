@@ -94,6 +94,7 @@ export default class MapChartField extends React.Component {
                   { ...GeographyStore.getXYZ() }
                   r={ DimensionsStore.getDorlingRadius(cityData.value) }
                   selectedView={ CitiesStore.getSelectedView() }
+                  roughNumber={ CitiesStore.getSelectedYear() }
                   key={'cityCircle' + cityData.city_id }
                   strokeWidth={ 0.5/GeographyStore.getZ()}
                   onCityClicked={ this.props.onCityClicked }

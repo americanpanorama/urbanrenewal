@@ -2,7 +2,7 @@ import * as React from 'react';
 import ReactDOM from 'react-dom';
 import d3 from 'd3';
 import DimensionsStore from '../../stores/DimensionsStore.js';
-import { formatNumber} from '../../utils/HelperFunctions';
+import { formatNumber, roughNumber } from '../../utils/HelperFunctions';
 
 export default class DorlingLabel extends React.Component {
 
@@ -52,7 +52,7 @@ export default class DorlingLabel extends React.Component {
           key={'cityNumsLabel' + this.props.city_id}
           className={ (this.props.color == 'transparent') ? 'hidden' : 'displacements'}
         >
-          { formatNumber(this.props.value) }
+          { (this.props.roughNumber) ? '~' + formatNumber(roughNumber(this.props.value)) : formatNumber(this.props.value) }
         </text> 
       </g>
     );

@@ -8,116 +8,129 @@
   height='65'
 >
   <style type="text/css">
-      @import url('https://fonts.googleapis.com/css?family=Oswald:200|Roboto+Condensed:400');
+      @import url('https://fonts.googleapis.com/css?family=Oswald:200,400|Roboto+Condensed:300');
    </style>
 
 
-
-   <rect
-    x='90'
-    y='6'
-    width='130'
-    height='10'
-    fill='#A387BE'
+  <line
+    x1='30'
+    x2='111'
+    y1='20'
+    y2='20'
+    stroke-width='2'
+    stroke='#DF894A'
+    stroke-dasharray='2 3'
   />
 
-   <rect
+  <line
+    x1='111'
+    x2='220'
+    y1='20'
+    y2='20'
+    stroke-width='2'
+    stroke='#DF894A'
+  />
+
+  <circle
+    cx='111'
+    cy='20'
+    r='5'
+    fill='#DF894A'
+  />
+
+  <circle
+    cx='30'
+    cy='20'
+    r='5'
+    fill='#DF894A'
+  />
+
+  <circle
+    cx='220'
+    cy='20'
+    r='5'
+    fill='#DF894A'
+  />
+
+  <text
+    x='30'
+    y='40'
+    fill='#EEEEEA'
+    stroke='transparent'
+    style='font-family: Oswald; font-weight: 200; font-size: 12px;'
+    text-anchor="middle"
+  >
+    1952
+  </text>
+
+  <text
+    x='111'
+    y='40'
+    fill='#EEEEEA'
+    stroke='transparent'
+    style='font-family: Oswald; font-weight: 200; font-size: 12px;'
+    text-anchor="middle"
+  >
+    1955
+  </text>
+
+  <text
     x='220'
-    y='6'
-    width='30'
-    height='10'
-    fill='#2CA02C'
-  />
+    y='40'
+    fill='#EEEEEA'
+    stroke='transparent'
+    style='font-family: Oswald; font-weight: 200; font-size: 12px;'
+    text-anchor="middle"
+  >
+    1959
+  </text>
+
+  <text
+    x='70.5'
+    y='17'
+    fill='#aaa'
+    stroke='transparent'
+    style='font-family: "Roboto Condensed"; font-size: 12px;'
+    text-anchor="middle"
+  >
+    planning
+  </text>
+
+  <text
+    x='165.5'
+    y='17'
+    fill='#aaa'
+    stroke='transparent'
+    style='font-family: "Roboto Condensed"; font-size: 12px;'
+    text-anchor="middle"
+  >
+    execution
+  </text>
+
+  <text
+    x='70'
+    y='60'
+    fill='#EEEEEA'
+    stroke='transparent'
+    style='font-family: Oswald; font-weight: 200; font-size: 13px;'
+    text-anchor="middle"
+  >
+    <tspan style='font-weight: 400'>134</tspan> families displaced
+  </text>
+
+  <text
+    x='180'
+    y='60'
+    fill='#EEEEEA'
+    stroke='transparent'
+    style='font-family: Oswald; font-weight: 200; font-size: 13px;'
+    text-anchor="middle"
+  >
+    <tspan style='font-weight: 400'>$1,500,000</tspan> in funding
+  </text>
 
 
 
-   <rect
-    x='90'
-    y='28'
-    width='80'
-    height='10'
-    fill='#800000'
-  />
-
-   <rect
-    x='170'
-    y='28'
-    width='80'
-    height='10'
-    fill='#00AAAA'
-  />
-
-
-   <rect
-    x='90'
-    y='50'
-    width='32'
-    height='10'
-    fill='#8B4600'
-  />
-
-   <rect
-    x='122'
-    y='50'
-    width='24'
-    height='10'
-    fill='#00008B'
-  />
-
-   <rect
-    x='146'
-    y='50'
-    width='64'
-    height='10'
-    fill='#AAAA00'
-  />
-
-   <rect
-    x='210'
-    y='50'
-    width='40'
-    height='10'
-    fill='#8B008B'
-  />
-
-  <g transform='translate(45 11)'>
-    <text
-      x="0"
-      y='0'
-      text-anchor='middle'
-      alignment-baseline='central'
-      fill='white'
-      style='font-family: Oswald; font-size: 13px;'
-    >
-      families displaced
-    </text>
-  </g>
-
-  <g transform='translate(45 33)'>
-    <text
-      x="0"
-      y='0'
-      text-anchor='middle'
-      alignment-baseline='central'
-      fill='white'
-      style='font-family: Oswald; font-size: 13px;'
-    >
-      housing units razed
-    </text>
-  </g>
-
-  <g transform='translate(45 55)'>
-    <text
-      x="0"
-      y='0'
-      text-anchor='middle'
-      alignment-baseline='central'
-      fill='white'
-      style='font-family: Oswald; font-size: 13px;'
-    >
-      acres redeveloped
-    </text>
-  </g>
 
 
 

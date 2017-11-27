@@ -107,7 +107,7 @@ export default class IntroModal extends React.Component {
                 <li className='wider'>
                   <div className='ordinal'>2</div>
                   <div className='item'>
-                    <p>City views include project boundaries and poverty and racial data as available.</p>
+                    <p>City views include project boundaries, project type, and poverty and racial data as available.</p>
                     <object data='./static/intro-city.svg' type="image/svg+xml" />
                   </div>
                 </li>
@@ -121,7 +121,7 @@ export default class IntroModal extends React.Component {
                 <li className='wider'>
                   <div className='ordinal descender'>4</div>
                   <div className='item'>
-                    <p>Inspect projects to see details about funding, housing units raised, zoning, and displacements.</p>
+                    <p>Inspect projects to see more details about duration, displacements, and funding.</p>
                     <object data='./static/intro-project.svg' type="image/svg+xml" />
                   </div>
                 </li>
