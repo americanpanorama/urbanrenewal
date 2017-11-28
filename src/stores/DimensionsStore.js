@@ -464,8 +464,8 @@ const DimensionsStore = {
   getMainTimelineYAxisAttrs: function(value) {
     return {
       dx: this.getMainTimelineBarFieldWidth() + 3,
-      dy: this.data.containerPadding + this.getMainTimelineMaxBarHeight() - (value / CitiesStore.getYearsTotalsMaxRace() * this.getMainTimelineMaxBarHeight()) + this.getMainTimelineFontSize() / 2,
-      fontSize: this.getMainTimelineFontSize(),
+      dy: this.data.containerPadding + this.getMainTimelineMaxBarHeight() - (value / CitiesStore.getYearsTotalsMaxRace() * this.getMainTimelineMaxBarHeight()) + (this.getMainTimelineFontSize() - 2) / 2,
+      fontSize: this.getMainTimelineFontSize() - 2,
       key: 'yAxisLabel' + value
     };
   },
@@ -497,10 +497,10 @@ const DimensionsStore = {
   getMainTimelineXAxisAttrs: function(year) {
     return {
       dx: this.getMainTimelineLabelXOffset(year), 
-      dy: this.getMainTimelineLabelY(),
+      dy: (year % 5 == 0) ? this.getMainTimelineLabelY() : this.getMainTimelineLabelY() - 1,
       fill: (year == CitiesStore.getSelectedYear()) ? 'black' : 'grey',
       stroke: 'transparent',
-      fontSize: this.getMainTimelineFontSize(),
+      fontSize: (year % 5 == 0) ? this.getMainTimelineFontSize() : this.getMainTimelineFontSize() - 2 ,
       key: 'xAxis' + year
     };
   },

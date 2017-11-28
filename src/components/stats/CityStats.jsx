@@ -23,7 +23,7 @@ export default class CityStats extends React.Component {
           >x</div> :''
         }
 
-        <h2>{ this.props.city + ', ' + this.props.state.toUpperCase() }</h2>
+        <h2>{ this.props.city.toUpperCase() + ', ' + this.props.state.toUpperCase() }</h2>
 
         <p className='summary'>
           By the late 1960s, an estimated <strong>{ Math.round(this.props.totalFamilies).toLocaleString() + ' '}</strong> families<br /> had been displaced by urban renewal projects in { this.props.city },<br /><strong>{' ' + Math.round(this.props.percentFamiliesOfColor * 100) + '% '}</strong> of which were families of color.

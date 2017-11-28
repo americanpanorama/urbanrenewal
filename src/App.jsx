@@ -57,12 +57,13 @@ export default class App extends React.Component {
       initialCityLoading: false,
       contactUs: false,
       showIntroModal: window.localStorage.getItem('hasViewedIntroModal-renewal') !== 'true',
+      showIntro: false,
     };
 
     this.coords = {};
 
     // bind handlers
-    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle', 'onProjectInspected', 'onProjectOut', 'onSearching', 'onProjectMapHover', 'onProjectSelected', 'onProjectMapUnhover','onSearchBlur','onCloseSearch','toggleScatterplotExplanationVisibility','onDismissIntroModal','onModalClick','onContactUsToggle','onCityViewSelected'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle', 'onProjectInspected', 'onProjectOut', 'onSearching', 'onProjectMapHover', 'onProjectSelected', 'onProjectMapUnhover','onSearchBlur','onCloseSearch','toggleScatterplotExplanationVisibility','onDismissIntroModal','onModalClick','onContactUsToggle','onCityViewSelected','toggleIntro'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
 
     console.time('update');
@@ -73,6 +74,10 @@ export default class App extends React.Component {
     // check whether city is loading
     if (HashManager.getState().city) {
       this.setState({initialCityLoading: true});
+    }
+
+    if (HashManager.getState().hasOwnProperty('noIntro')) {
+      this.setState({showIntroModal: false});
     }
 
   }
@@ -224,6 +229,8 @@ export default class App extends React.Component {
 
   toggleScatterplotExplanationVisibility() { this.setState({ scatterplotExplanationVisible: !this.state.scatterplotExplanationVisible}); }
 
+  toggleIntro() { this.setState({ showIntro: !this.state.showIntro }); }
+
   onZoomIn(event) {
     event.preventDefault();
     const z = Math.min(GeographyStore.getZ() * 1.62, 18),
@@ -298,6 +305,7 @@ export default class App extends React.Component {
       viz: CitiesStore.getSelectedView(),
       project: CitiesStore.getSelectedProject(),
       text: TextsStore.getSubject(),
+      noIntro: null, // it's done it's job at this point
     };
     if (CitiesStore.getSelectedCity() && GeographyStore.getLatLngZoom().lat) {
       vizState.loc = { 
@@ -347,12 +355,13 @@ export default class App extends React.Component {
 
     return (
         <div className='container full-height'>
+
           <div className='row full-height'>
             <div className='columns eight full-height'>
               <header style={ DimensionsStore.getHeaderStyle() }>
                 <h1><a href='./'>Renewing <span className='dark'>Inequality</span></a></h1>
                 <h2><a href='./'>Family Displacements through Urban Renewal, 1950-1966</a></h2>
-                <h4 onClick={ this.onModalClick } id={ 'intro' }>Introduction</h4>
+                <h4 onClick={ this.toggleIntro } id={ 'intro' }>Introduction</h4>
                 <h4 onClick={ this.onModalClick } id={ 'sources' }>Sources & Method</h4>
                 <h4 onClick={ this.onModalClick } id={ 'citing' }>Citing</h4>
                 <h4 onClick={ this.onModalClick } id={ 'about' }>About</h4>
@@ -604,7 +613,22 @@ export default class App extends React.Component {
           { this.state.showIntroModal ? <IntroModal onDismiss={ this.onDismissIntroModal } /> : '' }
 
 
+
+
         </div>
+
+        { (this.state.showIntro) ?
+          <div
+            className='storymap'
+          >
+            <iframe width="100%" height="100%" src="http://dsl.richmond.edu/panorama/renewal/intro/index.html?appid=8627fd65192a4734a7173f421e240e8c&ui=min&embed" frameBorder="0" scrolling="yes"></iframe>
+
+            <div className='closeIntro' onClick={ this.toggleIntro }>
+              x
+            </div>
+          </div> : ''
+        }
+
       </div>
     );
   }

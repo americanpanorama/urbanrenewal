@@ -84,7 +84,7 @@ export default class ProjectStats extends React.Component {
           className='closeicon'
         >x</div>
 
-        <h2>{ this.props.city + ', ' + this.props.state.toUpperCase() }</h2>
+        <h2>{ this.props.city.toUpperCase() + ', ' + this.props.state.toUpperCase() }</h2>
 
         { (this.props.selected) ?
           <div 

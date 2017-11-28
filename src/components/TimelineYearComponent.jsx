@@ -35,7 +35,7 @@ export default class Timeline extends React.Component {
               onClick={ this.props.onClick }
               id={ year }
             >
-              { (year % 5 == 0) ? year : '\'' + (year-1900) }
+              { (year % 5 == 0 && DimensionsStore.getMainTimelineBarWidth() > 7) ? year : (year % 5 == 0) ? '\'' + (year-1900) : (DimensionsStore.getMainTimelineBarWidth() > 7) ? '\'' + (year-1900) : '•' }
             </text>
           )}
 
@@ -50,7 +50,7 @@ export default class Timeline extends React.Component {
 
         {/* y axis: displacements */}
         <g className='yAxis'>
-          { DimensionsStore.getMainTimelineYAxisValues().map(d => <text { ...DimensionsStore.getMainTimelineYAxisAttrs(d) }>{ formatNumber(d) }</text> )}
+          { DimensionsStore.getMainTimelineYAxisValues().map(d => <text { ...DimensionsStore.getMainTimelineYAxisAttrs(d) }>{ d.toLocaleString() }</text> )}
         </g>
 
         {/* year bars */}

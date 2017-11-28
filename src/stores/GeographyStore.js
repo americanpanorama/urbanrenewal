@@ -39,7 +39,6 @@ const GeographyStore = {
   },
 
   setViewFromBounds(city_id) {
-    console.log(city_id, CitiesStore.getCityData(city_id).center);
     this.data.lat = (CitiesStore.getCityData(city_id).center) ? CitiesStore.getCityData(city_id).center[0] : CitiesStore.getCityData(city_id).lat;
     this.data.lng = (CitiesStore.getCityData(city_id).center) ? CitiesStore.getCityData(city_id).center[1] : CitiesStore.getCityData(city_id).lng;
     this.data.zoom = (CitiesStore.getCityData(city_id).boundingBox) ? Math.min(this.data.theMap.getBoundsZoom(CitiesStore.getCityData(city_id).boundingBox), 16) : 14;
@@ -359,7 +358,6 @@ GeographyStore.dispatchToken = AppDispatcher.register((action) => {
   case AppActionTypes.projectSelected:
     // if the project city isn't loaded, load it
     const city_id = CitiesStore.getCityId(action.value);
-    console.log(CitiesStore.getSelectedCity(), city_id);
     if (city_id && CitiesStore.getSelectedCity() !== city_id) {
       const waitingId = setInterval(() => {
         if (GeographyStore.getTheMap()) {
