@@ -30,12 +30,15 @@
     "flux": "^3.1.2",
     "intro.js": "^1.1.1",
     "leaflet": "^1.0.0",
+    "number-to-words": "^1.2.3",
     "queue-async": "^1.0.7",
-    "react": "^15.4.1",
+    "react": "^15.6.1",
     "react-addons-transition-group": "^15.4.1",
     "react-dom": "^15.4.1",
     "react-leaflet": "^1.0.1",
     "react-modal": "^1.6.4",
+    "react-svg-pan-zoom": "^2.10.0",
+    "react-typeahead": "^2.0.0-alpha.6",
     "topojson": "^2.2.0"
   },
   "devDependencies": {

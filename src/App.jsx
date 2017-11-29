@@ -96,7 +96,43 @@ export default class App extends React.Component {
     if (this.state.initialCityLoading && CitiesStore.getSelectedCity()) {
       this.setState({initialCityLoading: false});
     }
-  }
+
+    // add event listener for intro
+    if (this.state.showIntro) {
+      var iframe = document.getElementsByTagName('iframe')[0];
+
+      iframe.addEventListener('load', () => { 
+        var iDoc = iframe.contentWindow || iframe.contentDocument;  
+        if (iDoc.document) {
+          iDoc = iDoc.document;
+
+          if (iDoc.addEventListener) {
+            iDoc.addEventListener('click', (e) => {
+              let target = e.target || e.srcElement;
+              // intercept clicks on links
+              if (target.tagName == 'A') {
+                // stop the link from executing
+                e.preventDefault();
+
+                // hide the intro
+                this.setState({ showIntro: false});
+
+                // parse the link hash to load the project or whatever
+                let hashVars ={};
+                target.hash
+                  .substr(1)
+                  .split('&')
+                  .forEach(d => hashVars[d.split('=')[0]] = d.split('=')[1]);
+                if (hashVars.project) {
+                  AppActions.projectSelected(parseInt(hashVars.project)); 
+                }
+              }
+            });
+          }
+        }
+      });
+    }
+  };
 
   // ============================================================ //
   // Handlers
@@ -149,7 +185,8 @@ export default class App extends React.Component {
 
   onContactUsToggle () {
     this.setState({
-      contactUs: !this.state.contactUs
+      contactUs: !this.state.contactUs,
+      showIntro: false
     });
     AppActions.onModalClick(null);
   }
@@ -169,7 +206,8 @@ export default class App extends React.Component {
     const subject = (event.target.id) ? (event.target.id) : null;
     AppActions.onModalClick(subject);
     this.setState({
-      contactUs: null
+      contactUs: null,
+      showIntro: false
     });
   }
 
@@ -201,7 +239,10 @@ export default class App extends React.Component {
 
   onSearching(e) { 
     AppActions.citiesHighlighted(this.refs.typeahead.getOptionsForValue(this.refs.typeahead.refs.entry.value, CitiesStore.getCitiesListWithDisplacements()).map(c => c.city_id)); 
-    this.setState({ searching: true });
+    this.setState({ 
+      searching: true,
+      showIntro: false
+    });
   }
 
   onCityViewSelected(event) {
@@ -229,7 +270,12 @@ export default class App extends React.Component {
 
   toggleScatterplotExplanationVisibility() { this.setState({ scatterplotExplanationVisible: !this.state.scatterplotExplanationVisible}); }
 
-  toggleIntro() { this.setState({ showIntro: !this.state.showIntro }); }
+  toggleIntro() { 
+    this.setState({ 
+      showIntro: !this.state.showIntro,
+      contactUs: null,
+    }); 
+  }
 
   onZoomIn(event) {
     event.preventDefault();

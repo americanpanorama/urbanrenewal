@@ -6,7 +6,8 @@ var gulp           = require('gulp'),
   parcelify        = require('parcelify'),
   babelify         = require('babelify'),
   rimraf           = require("rimraf"),
-  gulpLoadPlugins  = require('gulp-load-plugins');
+  gulpLoadPlugins  = require('gulp-load-plugins'),
+  exec             = require('child_process').exec;
  
 // Automatically load any gulp plugins in your package.json
 var $ = gulpLoadPlugins();
@@ -190,6 +191,18 @@ function webserverTask(options) {
   });
 }
 
+function basemapsTask() {
+  console.log('Building basemaps...');
+  exec('npm run build:basemaps', function (err, stdout, stderr) {
+    if (err) {
+      console.log(stderr);
+    } else {
+      console.log(stdout.trim());
+    }
+    console.log('Basemaps build complete.');
+  });
+}
+
 function staticFolder() {
   return gulp.src("static/**")
   .pipe($.copy("build/"));
@@ -219,6 +232,8 @@ gulp.task('default', function () {
       "src"               : "./src/*.html",
       "dest"              : devdir
     });
+
+    basemapsTask();
 
     browserifyTask({
       "development" : true,
@@ -250,6 +265,8 @@ gulp.task('dist', function () {
       "src" : "./src/*.html",
       "dest" : "./dist"
     });
+
+    basemapsTask();
 
     browserifyTask({
       "development" : false,
