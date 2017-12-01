@@ -585,6 +585,8 @@ const CitiesStore = {
         };        
       }).sort((a,b) => b.value - a.value); 
     });
+
+    this.emit(AppActionTypes.storeChanged);
   },
 
   // SETTERS

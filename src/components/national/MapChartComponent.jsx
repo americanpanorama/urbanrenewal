@@ -50,6 +50,7 @@ export default class MapChartField extends React.Component {
           <MapField
             selectedView={ this.props.selectedView }
             z={ GeographyStore.getXYZ().z }
+            mapScale={ DimensionsStore.getMapScale() }
           />
 
           { (this.props.selectedView == 'map') ? 
@@ -81,6 +82,7 @@ export default class MapChartField extends React.Component {
                 onCityHover={ this.props.onCityHover }
                 onCityOut={ this.props.onCityOut }
                 pocSpan={ CitiesStore.getPOC() }
+                mapScale={ DimensionsStore.getMapScale() }
               />
             );  
           })}
@@ -93,13 +95,14 @@ export default class MapChartField extends React.Component {
                   { ...cityData }
                   { ...GeographyStore.getXYZ() }
                   r={ DimensionsStore.getDorlingRadius(cityData.value) }
-                  selectedView={ CitiesStore.getSelectedView() }
+                  view={ CitiesStore.getSelectedView() }
                   roughNumber={ CitiesStore.getSelectedYear() }
                   key={'cityCircle' + cityData.city_id }
                   strokeWidth={ 0.5/GeographyStore.getZ()}
                   onCityClicked={ this.props.onCityClicked }
                   onCityHover={ this.props.onCityHover }
                   onCityOut={ this.props.onCityOut }
+                  mapScale={ DimensionsStore.getMapScale() }
                 />
               );
             }  

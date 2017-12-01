@@ -15,7 +15,7 @@ export default class MapField extends React.Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    return this.props.selectedView !== nextProps.selectedView || this.props.z !== nextProps.z;
+    return this.props.selectedView !== nextProps.selectedView || this.props.z !== nextProps.z || this.props.mapScale !== nextProps.mapScale;
   }
 
   componentWillReceiveProps(nextProps) {

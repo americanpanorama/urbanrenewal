@@ -12,11 +12,13 @@ export default class Dorlings extends React.Component {
       r: (this.props.view == 'cartogram') ? this.props.r : this.props.r / this.props.z,
       color: this.props.color,
       cx: this.props.coords[this.props.view].cx,
-      cy: this.props.coords[this.props.view].cy
+      cy: this.props.coords[this.props.view].cy,
+      windowDimensions: DimensionsStore.getMapDimensions()
     };
   }
 
   componentWillReceiveProps(nextProps) {
+    // resize the bubble on map or chart but not cartogram
     if (this.props.z !== nextProps.z && this.props.view !== 'cartogram') {
       d3.select(ReactDOM.findDOMNode(this))
         .transition()
@@ -36,7 +38,7 @@ export default class Dorlings extends React.Component {
       d3.select(ReactDOM.findDOMNode(this))
         .transition()
         .delay((nextProps.view == 'scatterplot' && this.props.view !== 'scatterplot') ? (1- nextProps.coords[nextProps.view].cy/scatterplotMaxY) * 5000 : 0)
-        .duration(750)
+        .duration((this.state.windowDimensions.width == DimensionsStore.getMapDimensions().width && this.state.windowDimensions.height == DimensionsStore.getMapDimensions().height) ? 750 : 0) // immediately replace on window resize
         .attr('r', (nextProps.view !== 'cartogram') ? nextProps.r / nextProps.z : nextProps.r)
         .attr('cx', nextProps.coords[nextProps.view].cx)
         .attr('cy', nextProps.coords[nextProps.view].cy)
@@ -46,14 +48,14 @@ export default class Dorlings extends React.Component {
             cx: nextProps.coords[nextProps.view].cx,
             cy: nextProps.coords[nextProps.view].cy,
             r: (nextProps.view !== 'cartogram') ? nextProps.r / nextProps.z : nextProps.r,
-            color: nextProps.color
+            color: nextProps.color,
+            windowDimensions: DimensionsStore.getMapDimensions()
           });
         });
     }
   }
 
   render () {
-    const labelSize = (8 * this.state.r  / 15 < 14) ? 14 : (8 * this.state.r  / 15 > 18) ? 18 : 8 * this.state.r  / 15;
     return (
       <circle className='dorling'
         cx={ this.state.cx }

@@ -14,11 +14,29 @@ export default class Handle extends React.Component {
       isDragging: false,
       max: (this.props.max) ? this.props.max : 1,
       min: (this.props.min) ? this.props.min : 0,
-      handleColor: 'yellow'
+      handleColor: 'yellow',
+      xToTest: DimensionsStore.getLegendGradientPercentX(0.5),
     };
 
     const handlers = ['hover','selectElement','deSelectElement','drag'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
+  }
+
+  componentWillUpdate(nextProps) {
+    if (this.state.xToTest !== DimensionsStore.getLegendGradientPercentX(0.5)) {
+      let xForPercent = DimensionsStore.getLegendGradientPercentX(this.props.percent);
+      this.setState({
+        x: (nextProps.max) ? xForPercent : xForPercent - 4, // the visible handle position
+        deX: (nextProps.max) ? xForPercent - 2 : xForPercent - 6, // the draggable element x
+        deWidth: 8,
+        percent: nextProps.percent,
+        isDragging: false,
+        max: (nextProps.max) ? nextProps.max : 1,
+        min: (nextProps.min) ? nextProps.min : 0,
+        handleColor: 'yellow',
+        xToTest: DimensionsStore.getLegendGradientPercentX(0.5),
+      });
+    }
   }
 
   hover(e) {
