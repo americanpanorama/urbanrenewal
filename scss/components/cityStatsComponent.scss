@@ -164,7 +164,8 @@
       &.count {
         font-size: 12px;
 
-        &.poc {
+        &.poc,
+        &.territory {
           text-anchor: end;
         }
       }

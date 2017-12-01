@@ -15,6 +15,7 @@ export default class Timeline extends React.Component {
   constructor (props) { super(props); }
 
   render() {
+    console.log(this.props);
     return (
       <svg 
         { ...DimensionsStore.getCityTimelineStyle() }

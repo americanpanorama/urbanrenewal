@@ -30,6 +30,7 @@ export default class ProjectDisplacementGraph extends React.Component {
   }
 
   render() {
+    console.log(this.props);
     return (
       <g 
         onMouseEnter={ (this.props.the_geojson) ? this.props.onProjectInspected : null }
@@ -134,15 +135,15 @@ export default class ProjectDisplacementGraph extends React.Component {
 
           <g>
             <rect
-              x={DimensionsStore.getCityTimelineStyle().width * 0.5  }
+              x={ this.props.x  }
               y={0}
-              width={ (this.props.totalFamilies / this.props.theMax) * DimensionsStore.getCityTimelineStyle().width / 3 }
+              width={ this.props.width }
               height={14}
               className={'territory ' + +((this.props.inspectedProject && this.props.inspectedProject != this.props.project_id) ? ' notInspected' : '')}
               id={ this.props.project_id  }
             />
             <text
-              x={ DimensionsStore.getCityTimelineStyle().width * 0.5 + (this.props.totalFamilies / this.props.theMax) * DimensionsStore.getCityTimelineStyle().width / 3 + 3}
+              x={ this.props.x - 3 }
               y={ 0 + 13 }
               className={'count territory '  + ((this.props.inspectedProject && this.props.inspectedProject != this.props.project_id) ? ' notInspected' : '')}
               id={ this.props.project_id  }

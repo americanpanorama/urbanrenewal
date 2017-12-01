@@ -667,7 +667,7 @@ export default class App extends React.Component {
           <div
             className='storymap'
           >
-            <iframe width="100%" height="100%" src="http://dsl.richmond.edu/panorama/renewal/intro/index.html?appid=8627fd65192a4734a7173f421e240e8c&ui=min&embed" frameBorder="0" scrolling="yes"></iframe>
+            <iframe width="100%" height="100%" src="//dsl.richmond.edu/panorama/renewal/intro/index.html?appid=8627fd65192a4734a7173f421e240e8c&ui=min&embed" frameBorder="0" scrolling="yes"></iframe>
 
             <div className='closeIntro' onClick={ this.toggleIntro }>
               x
