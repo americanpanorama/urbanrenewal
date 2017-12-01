@@ -334,8 +334,8 @@ const DimensionsStore = {
 
   getTimelineAttrs: function() {
     return {
-      width: this.data.sidebarWidth,
-      height: this.data.timelineHeight - this.data.containerPadding * 2
+      width: this.data.sidebarWidth + this.data.containerPadding,
+      height: this.data.timelineHeight - this.data.containerPadding
     };
   },
 
@@ -432,14 +432,16 @@ const DimensionsStore = {
   // },
 
   // 90% of the height
-  getMainTimelineBarBottom: function() { return this.getTimelineAttrs().height - this.data.containerPadding ; },
+  getMainTimelineBarBottom: function() { return this.getTimelineAttrs().height - Math.max(this.getMainTimelineBarWidth(), this.getMainTimelineFontSize()) * 1.2; },
 
   // 90% of the width
   getMainTimelineBarFieldWidth: function() { return this.getTimelineAttrs().width * 0.9; },
 
   getMainTimelineBarHeight: function(year, race) { return this.getMainTimelineMaxBarHeight() * CitiesStore.getYearTotals(year)[race]/ CitiesStore.getYearsTotalsMaxRace() || 1; },
 
-  getMainTimelineMaxBarHeight: function() { return this.getTimelineAttrs().height - this.data.containerPadding * 2; },
+  getMainTimelineMaxBarHeight: function() { 
+    return this.getTimelineAttrs().height - this.getMainTimelineLegendLabelPOCAttrs().fontSize * 1.2 - this.getMainTimelineYearLabelAttrs().fontSize * 1.2; 
+  },
 
   getMainTimelineYearWidth: function() { return this.getMainTimelineBarFieldWidth() / (1966-1949); },
   
@@ -447,7 +449,7 @@ const DimensionsStore = {
 
   getMainTimelineBarXOffset: function(year) {  return (year == 1955) ? 0 : this.getMainTimlineXOffset(year) + this.getMainTimelineBarWidth() / 6; },
 
-  getMainTimelineBarY: function(year, race) { return this.data.containerPadding + this.getMainTimelineMaxBarHeight() - this.getMainTimelineBarHeight(year, race) || 0; },
+  getMainTimelineBarY: function(year, race) { return this.getMainTimelineYearLabelAttrs().fontSize * 1.2 + this.getMainTimelineMaxBarHeight() - this.getMainTimelineBarHeight(year, race) || 0; },
 
   getMainTimlineXOffset: function(year) { return (year - 1950 + 0.5) * this.getMainTimelineYearWidth(); },
 
@@ -492,7 +494,7 @@ const DimensionsStore = {
 
 
   // the font size is calculated to take up just less than 10% of the full timeline area's height
-  getMainTimelineFontSize: function() { return Math.min(Math.floor(this.getTimelineAttrs().height * 0.085), 16); },
+  getMainTimelineFontSize: function() { return Math.max(Math.min(Math.floor(this.getTimelineAttrs().height * 0.085), 16), 10); },
 
   getMainTimelineXAxisAttrs: function(year) {
     return {
@@ -530,8 +532,8 @@ const DimensionsStore = {
   getMainTimelineYearLabelAttrs: function() {
     return {
       dx: this.getMainTimlineXOffset(1950),
-      dy: 18,
-      fontSize: 18,
+      dy: this.getMainTimelineFontSize() * 1.25,
+      fontSize: this.getMainTimelineFontSize() * 1.25,
       className: 'timelineLabel',
     };
   },
@@ -539,9 +541,9 @@ const DimensionsStore = {
   getMainTimelineLegendBoxPOCAttrs() {
     return {
       x: this.getMainTimlineXOffset(1950) * 1.5,
-      y: 27,
-      width: Math.max(this.getMainTimelineBarWidth(), 16),
-      height: Math.max(this.getMainTimelineBarWidth(), 16),
+      y: this.getMainTimelineYearLabelAttrs().fontSize * 1.5,
+      width: Math.max(this.getMainTimelineBarWidth(), this.getMainTimelineFontSize()),
+      height: Math.max(this.getMainTimelineBarWidth(), this.getMainTimelineFontSize()),
       fill: '#a387be',
       stroke: '#444',
       strokeWidth: 0
@@ -550,18 +552,18 @@ const DimensionsStore = {
 
   getMainTimelineLegendLabelPOCAttrs() {
     return {
-      dx: this.getMainTimlineXOffset(1950) * 1.5 + Math.max(this.getMainTimelineBarWidth(), 16) * 1.5 ,
-      dy: 27 + Math.max(this.getMainTimelineBarWidth(), 16) ,
-      fontSize: Math.max(this.getMainTimelineBarWidth(), 16),
+      dx: this.getMainTimlineXOffset(1950) * 1.5 + Math.max(this.getMainTimelineBarWidth(), this.getMainTimelineFontSize()) * 1.5 ,
+      dy: this.getMainTimelineYearLabelAttrs().fontSize * 1.5 + Math.max(this.getMainTimelineBarWidth(), this.getMainTimelineFontSize()) ,
+      fontSize: Math.max(this.getMainTimelineBarWidth(), this.getMainTimelineFontSize()),
     };
   },
 
   getMainTimelineLegendBoxWhiteAttrs() {
     return {
       x: this.getMainTimlineXOffset(1950) * 1.5,
-      y: 27 + Math.max(this.getMainTimelineBarWidth(), 16) * 1.5 ,
-      width: Math.max(this.getMainTimelineBarWidth(), 16),
-      height: Math.max(this.getMainTimelineBarWidth(), 16),
+      y: this.getMainTimelineYearLabelAttrs().fontSize * 1.5 + Math.max(this.getMainTimelineBarWidth(), this.getMainTimelineFontSize()) * 1.5 ,
+      width: Math.max(this.getMainTimelineBarWidth(), this.getMainTimelineFontSize()),
+      height: Math.max(this.getMainTimelineBarWidth(), this.getMainTimelineFontSize()),
       fill: '#2ca02c',
       stroke: '#444',
       strokeWidth: 0
@@ -570,18 +572,18 @@ const DimensionsStore = {
 
   getMainTimelineLegendLabelWhiteAttrs() {
     return {
-      dx: this.getMainTimlineXOffset(1950) * 1.5 + Math.max(this.getMainTimelineBarWidth(), 16) * 1.5 ,
-      dy: 27 + Math.max(this.getMainTimelineBarWidth(), 16) * 2.5,
-      fontSize: Math.max(this.getMainTimelineBarWidth(), 16),
+      dx: this.getMainTimlineXOffset(1950) * 1.5 + Math.max(this.getMainTimelineBarWidth(), this.getMainTimelineFontSize()) * 1.5 ,
+      dy: this.getMainTimelineYearLabelAttrs().fontSize * 1.5 + Math.max(this.getMainTimelineBarWidth(), this.getMainTimelineFontSize()) * 2.5,
+      fontSize: Math.max(this.getMainTimelineBarWidth(), this.getMainTimelineFontSize()),
     };
   },
 
   getMainTimelineLegendBoxPRVIAttrs() {
     return {
       x: this.getMainTimlineXOffset(1950) * 1.5,
-      y: 27 + Math.max(this.getMainTimelineBarWidth(), 16) * 3 ,
-      width: Math.max(this.getMainTimelineBarWidth(), 16),
-      height: Math.max(this.getMainTimelineBarWidth(), 16),
+      y: this.getMainTimelineYearLabelAttrs().fontSize * 1.5 + Math.max(this.getMainTimelineBarWidth(), this.getMainTimelineFontSize()) * 3 ,
+      width: Math.max(this.getMainTimelineBarWidth(), this.getMainTimelineFontSize()),
+      height: Math.max(this.getMainTimelineBarWidth(), this.getMainTimelineFontSize()),
       fill: '#909EAC',
       stroke: '#444',
       strokeWidth: 0
@@ -590,9 +592,9 @@ const DimensionsStore = {
 
   getMainTimelineLegendLabelPRVIAttrs() {
     return {
-      dx: this.getMainTimlineXOffset(1950) * 1.5 + Math.max(this.getMainTimelineBarWidth(), 16) * 1.5 ,
-      dy: 27 + Math.max(this.getMainTimelineBarWidth(), 16) * 4,
-      fontSize: Math.max(this.getMainTimelineBarWidth(), 16),
+      dx: this.getMainTimlineXOffset(1950) * 1.5 + Math.max(this.getMainTimelineBarWidth(), this.getMainTimelineFontSize()) * 1.5 ,
+      dy: this.getMainTimelineYearLabelAttrs().fontSize * 1.5 + Math.max(this.getMainTimelineBarWidth(), this.getMainTimelineFontSize()) * 4,
+      fontSize: Math.max(this.getMainTimelineBarWidth(), this.getMainTimelineFontSize()),
     };
   },
 

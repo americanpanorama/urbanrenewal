@@ -19,8 +19,6 @@ export default class Timeline extends React.Component {
   render() {
     const years = [1950,1951,1952,1953,1954,1955,1956,1957,1958,1959,1960,1961,1962,1963,1964,1965,1966];
 
-    //console.log(this.props);
-
     return (
       <svg 
         { ...DimensionsStore.getTimelineAttrs() }
@@ -92,8 +90,8 @@ export default class Timeline extends React.Component {
           x={0}
           y={ DimensionsStore.getMainTimelineBarBottom() }
           width={DimensionsStore.getMainTimelineBarFieldWidth()}
-          height={1}
-          fill='black'
+          height={0.5}
+          fill='#555'
         />
 
         {/* label for year */}
