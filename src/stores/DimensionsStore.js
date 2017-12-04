@@ -36,7 +36,7 @@ const DimensionsStore = {
     this.data.windowHeight = window.innerHeight;
     this.data.windowWidth = window.innerWidth;
     this.data.tilesHeight = this.data.windowHeight - this.data.headerHeight - 2*this.data.containerPadding;
-    this.data.sidebarWidth =(document.getElementsByClassName('dataViewer').length > 0) ? document.getElementsByClassName('dataViewer')[0].offsetWidth : this.data.windowWidth * 0.322 - 2*this.data.containerPadding;
+    this.data.sidebarWidth =(document.getElementsByClassName('dataViewer').length > 0) ? document.getElementsByClassName('dataViewer')[0].offsetWidth : this.data.windowWidth * 0.322 - this.data.containerPadding;
     this.data.mainPaneWidth = (document.getElementsByClassName('main-pane').length > 0) ? document.getElementsByClassName('main-pane')[0].offsetWidth : (this.data.windowWidth) * (2/3 - 0.015*8/12) - this.data.containerPadding ; // this is complicated--I deduced it from the calcuations in _skeleton.scss
     this.data.mainPaneHeight = this.data.windowHeight - this.data.headerHeight - 2*this.data.containerPadding;
 
@@ -334,7 +334,7 @@ const DimensionsStore = {
 
   getTimelineAttrs: function() {
     return {
-      width: this.data.sidebarWidth + this.data.containerPadding,
+      width: this.data.sidebarWidth,
       height: this.data.timelineHeight - this.data.containerPadding
     };
   },
@@ -604,8 +604,7 @@ const DimensionsStore = {
 
   getCityTimelineStyle: function() {
     return {
-      width: this.data.sidebarWidth - this.data.containerPadding,
-      transform: 'translate(' + this.data.containerPadding/3 + ')'
+      width: this.data.sidebarWidth
     };
   },
 

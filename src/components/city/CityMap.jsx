@@ -180,7 +180,7 @@ export default class CityMap extends React.Component {
           />
 
           {/* city outlines */}
-          { this.props.cities_geoms.map((city_geom, i) =>
+          {/* this.props.cities_geoms.map((city_geom, i) =>
             <GeoJSON
               data={ city_geom }
               key={ 'city_geom' + i}
@@ -192,7 +192,7 @@ export default class CityMap extends React.Component {
               } }
               className='city_boundary'
             />
-          )}
+          )*/}
 
           {/* race and income data in census tracts */}
           { (this.props.selectedCityView == 'pr' && this.props.tracts) ? 

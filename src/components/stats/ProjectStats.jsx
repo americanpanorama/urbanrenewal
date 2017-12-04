@@ -620,6 +620,7 @@ export default class ProjectStats extends React.Component {
             <h3>{(Object.keys(theProject.citations).length == 1) ? 'Source' : 'Sources'} for Project Footprint</h3>
             <ul>
             { Object.keys(theProject.citations).map(citation_id => {
+              console.log(theProject.citations[citation_id]);
               if (theProject.citations[citation_id].links.length == 0) {
                 return (
                   <li key={'citation_' + citation_id}>{theProject.citations[citation_id].citation}</li>
