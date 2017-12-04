@@ -379,7 +379,7 @@ const CitiesStore = {
         format: 'JSON'
       },
       {
-        query: "select projects.project_id, urdr_citations.citation_id, citation, urdr_citations.link, box, report, urdr_citation_amazon.link as internal_link from urdr_id_key projects join urdr_citation_join on projects.project_id = urdr_citation_join.project_id join urdr_citations on urdr_citations.citation_id = urdr_citation_join.citation_id left join urdr_citation_amazon on urdr_citation_amazon.citation_id = urdr_citations.citation_id where city_id = " + city_id,
+        query: "select projects.project_id, urdr_citations.citation, urdr_citations.link, box, report, urdr_citation_join.amazon_link as internal_link from urdr_id_key projects join urdr_citation_join on projects.project_id = urdr_citation_join.project_id join urdr_citations on urdr_citations.citation_id = urdr_citation_join.citation where projects.city_id =" + city_id,
         format: 'JSON'
       }
     ]).then(responses => {

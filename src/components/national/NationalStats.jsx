@@ -81,12 +81,14 @@ export default class NationalStats extends React.Component {
             <div>
               <p>Slum clearance projects were already underway in a few cities prior to the federal Housing Act of 1949. Illinois's Blighted Areas Redevelopment Act of 1947 anticipated and arguably served as a model for federal urban redevelopment legislation. It authorized cities in the state to create commissions empowered with the authority to clear slums by seizing property through eminent domain.</p>
               <p>Chicago's <span onClick={ this.props.onProjectClick } id={2468}>Lake Meadows</span> project was initiated before passage of the Housing Act of 1949, but the city quickly applied for and was awarded nearly $10 million in federal funding. The clearance of the area displaced more that 3,400 African American families and nearly 1,000 individual adults. Many of those displaced moved south into the Hyde Park neighborhood, helping prompt <span onClick={ this.props.onProjectClick } id={2466}>another urban renewal project</span> several years later that would displace a larger number of families than any other project in the city and the fifth most of any in the country.</p>
+              <p className='sources'>Sources: Arnold R. Hirsch, <cite>Making the Second Ghetto: Race and Housing in Chicago, 1940-1960</cite> (New York: Cambridge University Press, 1983).</p>
             </div> : 
             (this.props.selectedYear == 1952) ? 
             <div>
               <p>Norfolk's aptly named <span onClick={ this.props.onProjectClick } id={1616}>"Project No. 1"</span> was the first large-scale urban redevelopment project executed with federal funding. Big it was. Located on 70 acres just north of downtown, the project displaced nearly 3,000 families, about twice the number of the next largest individual projects that would be executed in a comparably sized city.</p>
               <p>If exceptional in the number displaced, who they were was typical: all but a tiny number of were African American. Many families would be relocated to four new public housing projects. The 800 single individuals who were displaced did not have that option as public housing was limited to families, and most of them didn't have enough income to afford private housing.</p>
               <div><img src='static/195112PROJECTONE00066.jpg' style={{ width: DimensionsStore.getSidebarStyle().width * 0.9 - 40, paddingLeft: DimensionsStore.getSidebarStyle().width * 0.05 }} /></div>
+              <p className='sources'>Sources: "Federal Slum Clearance Gets Its First Full Scale Tryout in Norfolk, Va.," <cite>Architectural Forum</cite> (May 1950): 130-137); <a href='https://nrha.photoshelter.com/gallery-image/Historical/G0000sjxf1Fx4fek/I000089JnCn44Fdc' target='_blank'>"1951 December..Redevelopment..Project#1 (UR1-1)..Demolition Ceremony," Norfolk Redevelopment and Housing Authority</a>.</p>
             </div> : 
             (this.props.selectedYear == 1953) ? 
             <div>
@@ -104,9 +106,10 @@ export default class NationalStats extends React.Component {
               </div> : 
             (this.props.selectedYear == 1957) ? 
               <div>
-                <p>Initially, some African Americans welcomed urban renewal as an opportunity to improve housing in black communities and perhaps even begin to desegregate some cities. But for many those hopes quickly faded as they found themselves displaced from their homes with no other options than to move to other segregated neighborhoods that were no or little better. At a 1957 Senate hearing, the executive secretary of the Pittsburgh branch of the NAACP condemned the execution of the city's <span onClick={ this.props.onProjectClick } id={1417}>Lower Hill project</span>. "As a result of slum clearance in the Lower Hill," she reported, "other areas, such as the Upper Hill and the Homewood-Brushton area are now experiencing overcrowding, exploitation by real estate dealers, and transference of some of the same conditions responsible for deterioration of the Lower Hill District" (<cite>Pittsburgh Courier</cite>, December 28, 1957).</p>
+                <p>Initially, some African Americans welcomed urban renewal as an opportunity to improve housing in black communities and perhaps even begin to desegregate some cities. But for many those hopes quickly faded as they found themselves displaced from their homes with no other options than to move to other segregated neighborhoods that were no or little better. At a 1957 Senate hearing, the executive secretary of the Pittsburgh branch of the NAACP condemned the execution of the city's <span onClick={ this.props.onProjectClick } id={1417}>Lower Hill project</span>. "As a result of slum clearance in the Lower Hill," she reported, "other areas, such as the Upper Hill and the Homewood-Brushton area are now experiencing overcrowding, exploitation by real estate dealers, and transference of some of the same conditions responsible for deterioration of the Lower Hill District."</p>
                 <p>Ultimately, nearly 1,900 families, two-thirds of them of color, were displaced by the Lower Hill project. <span onClick={ this.props.onProjectClick } id={1416}>Homewood</span> became an urban renewal site ten years later, one that did not involve displacements. The community of the Upper Hill successfully resisted urban renewal from extending beyond Lower Hill.</p>
                 <div><img src='static/lowerhillpittsburgh.jpg' style={{ width: DimensionsStore.getSidebarStyle().width * 0.9 - 40, paddingLeft: DimensionsStore.getSidebarStyle().width * 0.05 }} /></div>
+                <p className='sources'>Sources: <cite>Pittsburgh Courier</cite>, December 28, 1957; <a href='http://www.pittsburghmagazine.com/Pittsburgh-Magazine/December-2013/The-Way-We-Were/' target='_blank'>The Way We Were: 150 Years of Pittsburg History</a>.</p>
               </div> : 
             (this.props.selectedYear == 1958) ? 
               <div>
@@ -117,17 +120,20 @@ export default class NationalStats extends React.Component {
                 <p>Scholars have tended the emphasize the momentous 1954 amendments to the 1949 Housing Act, but the 1959 amendments set in motion significant new patterns in renewal as well. In 1959, Congress made universities eligible to receive renewal funds without having to include plans for housing. Two years later, the same opportunity was extended to hospitals. By 1964, 154 projects were underway involving college and university or hospital campus developments. These included medical facilities in cities of all sizes including Detroit's <span onClick={ this.props.onProjectClick } id={2744}>Medical Center</span>, Oklahoma City's <span onClick={ this.props.onProjectClick } id={3573}>University Medical Center</span>, Tuscaloosa's <span onClick={ this.props.onProjectClick } id={1807}>Druid City Hospital</span>, and Evansville's <span onClick={ this.props.onProjectClick } id={2582}>Welborn Medical Center</span>. </p>
                 <p>The <span onClick={ this.props.onProjectClick } id={1881}>Medical College of Georgia</span> twice expanded through two urban renewal projects. Grady Abrams was one of the people displaced through that expansion. Reflecting decades later, he readily acknowledged that "my surroundings improved tremendously" as he relocated from his childhood home as a 21-year-old young man. But displacement took a profound emotional toll: "It is one thing to leave your home, your neighborhood on your own, to be forced out is a different manner. It takes on a different meaning. It was, to me, the closest thing to death I can think of. In fact, my neighbors and I lost relationships forever. There is nothing of the past now in Five Points that I can show my grandchildren and great grandchildren that was part of my past. Nothing at all."</p>
                 {/* JSX Comment <p>In Chicago, in fact, the University of Chicago used urban renewal as part of an effort to exclude African Americans from the neighborhood of <span onClick={ this.props.onProjectClick } id={2466}>Hyde Park</span> and to construct a barrier around the campus. As they contemplated the need to protect the campus from African American incursions, the University of Chicago's board of trustees took a bus tour through nearby black neighborhoods. Robert Maynard Hutchins, Chicago's Chancellor and President, hand wrote a short verse explaining the rationale behind seizing and razing local properties: "Our neighborhood, once blossomed like the lily. / Just seven coons with seven kids could knock our program silly."In part thanks to its access to federal urban renewal funds, the University of Chicago expanded from just 7 acres to more than 100, carving out a massive campus within the predominantly black neighborhoods on the south side of Chicago.</p> */}
+                <p className='sources'>Sources: Guian A. McKee, "The Hospital in an Ethnic Enclave: Tufts-New England Medical Center, Boston's Chinatown, and the Urban Political Economy of Health Care," <cite>Journal of Urban History</cite> 42 (March 2016): 259-283; Grady Abrams, "Mixed Emotions about Urban Renewal" in <cite>The Evolution of a Negro Into an Integrated Society: Opinion Editorials, Columns, Letters to the Editor, Business and Personal Letters, Poems</cite> (Xlibris: 2011), 283-285.</p>
               </div> : 
             (this.props.selectedYear == 1960) ? 
               <div>
                 <p>While the map shows how urban renewal effected dozens of small localities that we typically don't think of as urban, it's harder to see the inverse: the few large cities that didn't seek federal urban renewal funds.</p>
-                <p>Neither of the largest two cities in Texas, Houston and Dallas—respectively, the seventh and thirteenth largest cities in the US in 1960—applied for urban renewal funds. Before cities could apply for urban renewal funding, state legislatures needed to pass enabling legislation granting them the authority to seize property through eminent domain. The Texas legislature didn't pass such legislation until 1957, and that legislation required the passage of a citywide referendum before any locality could apply for urban renewal funding. In Dallas, the city council opted not to put a referendum on the ballot after a contentious public debate where opponents characterized the use of eminent domain and federal funding as "creeping socialism." In Houston, the city refused to enact zoning and code regulations that were required for eligiblity. Rather than redevelop their cities from the center out, Dallas and Houston linked outward sprawl with the conservative political values of limited government.(See Robert B. Fairbanks's "The Texas Exception: San Antonio and Urban Renewal, 1949-1965," <cite>Journal of Planning History</cite> 1 (May 2002): 181-196 for more detail about Texas and urban renewal.)</p>
+                <p>Neither of the largest two cities in Texas, Houston and Dallas—respectively, the seventh and thirteenth largest cities in the US in 1960—applied for urban renewal funds. Before cities could apply for urban renewal funding, state legislatures needed to pass enabling legislation granting them the authority to seize property through eminent domain. The Texas legislature didn't pass such legislation until 1957, and that legislation required the passage of a citywide referendum before any locality could apply for urban renewal funding. In Dallas, the city council opted not to put a referendum on the ballot after a contentious public debate where opponents characterized the use of eminent domain and federal funding as "creeping socialism." In Houston, the city refused to enact zoning and code regulations that were required for eligiblity. Rather than redevelop their cities from the center out, Dallas and Houston linked outward sprawl with the conservative political values of limited government.</p>
                 <p>The largest urban renewal project in Texas was located in the far west of the state in the comparatively small city of Lubbock. There the city's <span onClick={ this.props.onProjectClick } id={3660}>Coronado project</span> displaced nearly 1300 African American families.</p>
+                <p className='sources'>Sources: Robert B. Fairbanks "The Texas Exception: San Antonio and Urban Renewal, 1949-1965," <cite>Journal of Planning History</cite> 1 (May 2002): 181-196.</p>
               </div> :
             (this.props.selectedYear == 1961) ? 
               <div>
                 <p>Published in 1961, Jane Jacobs's <cite>The Death and Life of Great American Cities</cite> offered a damning critique of urban renewal in large American cities. While much of her criticism stemmed from what she considered the banal sterility of planned modernist urban spaces, she also condemned the human toil urban renewal took upon the communities it targeted. "People who get marked with the planners' hex signs are pushed about, expropriated, and uprooted much as if they were the subjects of a conquering power .... Whole communities are torn apart and sown to the winds, with a reaping of cynicism, resentment and despair."</p>
-                <p>While the power and eloquence of Jacobs's indictment had a long impact on urbanism and planning, more immediately significant was the grassroots resistance to urban renewal mounted in cities throughout the United States. "You have depressed the values of our property by calling it blighted," charged a Los Angeles activist resisting the <span onClick={ this.props.onProjectClick } id={3826}>Temple</span> and <span onClick={ this.props.onProjectClick } id={3821}>Bunker Hill</span> projects. "They call us 'land-grabbers' without really knowing why," retorted a local planning official. "Perhaps they have a point, but under the concept of urban renewal, so do we" (<cite>Los Angeles Times</cite>, September 3, 1962). Nearly 3000 families were displaced by those two projects.</p>
+                <p>While the power and eloquence of Jacobs's indictment had a long impact on urbanism and planning, more immediately significant was the grassroots resistance to urban renewal mounted in cities throughout the United States. "You have depressed the values of our property by calling it blighted," charged a Los Angeles activist resisting the <span onClick={ this.props.onProjectClick } id={3826}>Temple</span> and <span onClick={ this.props.onProjectClick } id={3821}>Bunker Hill</span> projects. "They call us 'land-grabbers' without really knowing why," retorted a local planning official. "Perhaps they have a point, but under the concept of urban renewal, so do we" . Nearly 3000 families were displaced by those two projects.</p>
+                <p className='sources'>Sources: Jane Jacobs, <cite>The Death and Life of Great American Cities</cite> (1961; New York: Modern Library, 1993), 7; <cite>Los Angeles Times</cite>, September 3, 1962.</p>
               </div> :
             (this.props.selectedYear == 1962) ? 
               <div>
@@ -141,13 +147,15 @@ export default class NationalStats extends React.Component {
               </div> : 
             (this.props.selectedYear == 1964) ? 
               <div>
-                <p>In 1964 the <cite>Journal of Higher Education</cite> featured a short article aimed at university administrators advocating that they partner with local city governments to win urban renewal contracts that to expand their campuses by clearing "adjoining slum areas" so that they could "purchase cleared land wthin the project from the local urban renewal agency for considerably less than it could buy the same land with buildings on it." Urban renewal thus subsidized the expansion of universities and colleges at the expense of low-income families who lived near their campuses.</p>
+                <p>In 1964 the <cite>Journal of Higher Education</cite> featured a short article aimed at university administrators advocating that they partner with local city governments to win urban renewal contracts that to expand their campuses by clearing "adjoining slum areas" so that they could "purchase cleared land within the project from the local urban renewal agency for considerably less than it could buy the same land with buildings on it." Urban renewal thus subsidized the expansion of universities and colleges at the expense of low-income families who lived near their campuses.</p>
                 <p>One of every twenty federal projects in 1964 was awarded under a section of the Housing Act of 1959 that made universities and colleges eligible to apply for urban renewal projects. The 1959 amendment had been made at the urging of the president of the University of Chicago, which had long been involved in a series of urban renewal projects between the university and the African American neighborhoods on Chicago's South Side. A number of colleges took advantage of this program. A few examples: the <span onClick={ this.props.onProjectClick } id={3040}>Ohio State University North</span> project displaced 73 families to expand the university. About 150 families were moved through a series of <span onClick={ this.props.onProjectClick } id={802}>University of Maryland, Baltimore projects</span>.  Yale University received funding thorugh the <span onClick={ this.props.onProjectClick } id={76}>Dwight project</span>. Duquesne University in Pittsburgh expanded through the <span onClick={ this.props.onProjectClick } id={1411}>Bluff Street project</span>. The former displaced 50 families, the latter more than 400.</p> 
+                <p className='sources'>Sources: Kenneth H. Ashworth, "Urban Renewal and the University: A Tool for Campus Expansion and Neighborhood Improvement," <cite>Journal of Higher Education</cite> 35 (December 1964): 495-496.</p>
               </div> : 
             (this.props.selectedYear == 1965) ? 
               <div>
                 <p>"The overriding issue is whether we are aiming to feather the nests of entrepreneurs or to build homes for the forgotten familes," urbanist Charles Abrams wrote in a 1965 study of urban renewal. What had begun in 1949 as a program specifically aimed at moving people from "substandard," "blighted" housing into better accommodations had evolved through the 1954 amendments into a program that often used federal funds to destroy neighborhoods and communities for commercial ventures aimed at revitalizing downtowns. "As the situation stood in 1965," Abrams lamented, "nest-feathering was in the ascendant, while the social purpose was being moved ot the background."</p>
                 <p>The dozens of projects all named "Central Business District" is one indication of how much urban renewal was used for ends other than improving the housing condition of the poor. A few examples of "Central Business District" projects can be found in <span onClick={ this.props.onProjectClick } id={2729}>Detroit</span>, <span onClick={ this.props.onProjectClick } id={3570}>Oklahoma City</span>, <span onClick={ this.props.onProjectClick } id={3004}>Cincinnati</span>, <span onClick={ this.props.onProjectClick } id={631}>Rochester</span> and <span onClick={ this.props.onProjectClick } id={831}>Salisbury, Maryland</span>.</p> 
+                <p className='sources'>Sources: Charles Abrams, <cite>The City Is the Frontier</cite> (New York: Harper & Row, 1965), 238.</p>
               </div> :
             (this.props.selectedYear == 1966) ? 
               <div>
@@ -165,7 +173,7 @@ export default class NationalStats extends React.Component {
 
 
 
-        { (this.props.total_projects > 0) ?
+        { (false && this.props.total_projects > 0) ?
           <svg
             { ...DimensionsStore.getProjectStatsOverallDimensions() }
             className='projectStat'
@@ -252,7 +260,7 @@ export default class NationalStats extends React.Component {
           </svg> : ''
         }
 
-        { (this.props.totalFamilies > 0) ?
+        { (false && this.props.totalFamilies > 0) ?
           <svg
             { ...DimensionsStore.getProjectStatsOverallDimensions() }
             className='projectStat'
@@ -308,7 +316,7 @@ export default class NationalStats extends React.Component {
           </svg> : ''
         }
 
-        { (houses > 0) ?
+        { (false && houses > 0) ?
           <svg
             { ...DimensionsStore.getProjectStatsOverallDimensions() }
             className='projectStat'
@@ -353,7 +361,7 @@ export default class NationalStats extends React.Component {
           </svg> : ''
         }
          
-        { (acres > 0) ? 
+        { (false && acres > 0) ? 
           <svg
             { ...DimensionsStore.getProjectStatsOverallDimensions() }
             className='projectStat'
@@ -417,7 +425,7 @@ export default class NationalStats extends React.Component {
           </svg> : ''
         }
 
-        { (this.props.funding_dispursed) ?
+        { (false && this.props.funding_dispursed) ?
           <svg
             { ...DimensionsStore.getProjectStatsOverallDimensions() }
             className='projectStat'
