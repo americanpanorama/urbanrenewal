@@ -381,7 +381,11 @@ const CitiesStore = {
       {
         query: "select projects.project_id, urdr_citations.citation, urdr_citations.link, box, report, urdr_citation_join.amazon_link as internal_link from urdr_id_key projects join urdr_citation_join on projects.project_id = urdr_citation_join.project_id join urdr_citations on urdr_citations.citation_id = urdr_citation_join.citation where projects.city_id =" + city_id,
         format: 'JSON'
-      }
+      },
+      // {
+      //   query: "select projects.project_id, projects.project, projects.city_id, urdr_citations.citation, urdr_citations.link, box, report, urdr_citation_join.amazon_link as internal_link from urdr_id_key projects join urdr_citation_join on projects.project_id = urdr_citation_join.project_id join urdr_citations on urdr_citations.citation_id = urdr_citation_join.citation",
+      //   format: 'JSON'
+      // }
     ]).then(responses => {
       responses[0].forEach(response => {
         this.data.cities[city_id].tracts[response.gisjoin] = {
@@ -421,16 +425,20 @@ const CitiesStore = {
       });
 
       responses[4].forEach(response => {
-        if (response.box) {
-          // const boxData = nara.find(report => report.containerId == response.box);
-          // if (boxData && boxData.items) {
-          //   const recordData = boxData.items.find(item => item.reportNum == response.report);
-          //   console.log(boxData.items, recordData);
-          // }
+        if (response.box && response.box.trim() !== '' && response.box !== '0') {
+          const boxData = nara.find(report => report.containerId == response.box);
+          let title ='';
+          if (boxData && boxData.items) {
+            const recordData = boxData.items.find(item => item.reportNum == response.report) || {};
+            if (recordData.title) {
+              title = recordData.title.replace("[Report #]", '').replace(response.report + ' -', '').trim() || '';
+            }
+          }
           
-          response.citation = " Box " + response.box + ", Report " + response.report + "; Final Grant Reports, 1951 - 1981; General Records of the Department of Housing and Urban Development, 1931 - 2003, Record Group 207; Records National Archives at College Park, MD.";
+          response.citation = ((title !== '') ? "\"" + title + ",\" " : '') + "Final Grant Reports 1951-1981, General Records of the Department of Housing and Urban Development 1931-2003, Record Group 207, Box " + response.box + ", Report " + response.report + ", National Archives, College Park, MD.";
           response.link = response.internal_link;
         } 
+
         if (response.citation && !this.data.cities[city_id].projects[response.project_id].citations[response.citation_id]) {
           this.data.cities[city_id].projects[response.project_id].citations[response.citation_id] = {
             citation: response.citation,
@@ -440,6 +448,36 @@ const CitiesStore = {
           this.data.cities[city_id].projects[response.project_id].citations[response.citation_id].links.push(response.link);
         }
       });
+
+      // this is to troubleshoot citations
+      // let citationData = {};
+      // responses[5].forEach(response => {
+      //   if (response.box && response.box.trim() !== '' && response.box !== '0') {
+      //     const boxData = nara.find(report => report.containerId == response.box);
+      //     let title ='';
+      //     if (boxData && boxData.items) {
+      //       const recordData = boxData.items.find(item => item.reportNum == response.report) || {};
+      //       if (recordData.title) {
+      //         title = recordData.title.replace("[Report #]", '').replace(response.report + ' -', '').trim() || '';
+      //       }
+      //     }
+          
+      //     response.citation = ((title !== '') ? "\"" + title + ",\" " : '') + "Final Grant Reports 1951-1981, General Records of the Department of Housing and Urban Development 1931-2003, Record Group 207, Box " + response.box + ", Report " + response.report + ", National Archives, College Park, MD.";
+      //     response.link = response.internal_link;
+      //   } 
+
+      //   citationData[response.city_id] = citationData[response.city_id] || {city: this.getCityData(response.city_id).city, projects: {}};
+      //   citationData[response.city_id].projects[response.project_id] = citationData[response.city_id].projects[response.project_id] || {project: response.project, citations: {}};
+      //   if (response.citation && !citationData[response.city_id].projects[response.project_id].citations[response.citation_id]) {
+      //     citationData[response.city_id].projects[response.project_id].citations[response.citation_id] = {
+      //       citation: response.citation,
+      //       links: (response.link !== "") ? [response.link] : []
+      //     };
+      //   } else if (response.citation && response.link !== "" && !citationData[response.city_id].projects[response.project_id].citations[response.citation_id].links.includes(response.link)) {
+      //     citationData[response.city_id].projects[response.project_id].citations[response.citation_id].links.push(response.link);
+      //   }
+      // });
+      // console.log(citationData);
 
       // use the project totals to calculate city totals
       this.data.cities[city_id].yearsData = {};

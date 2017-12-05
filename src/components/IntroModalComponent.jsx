@@ -80,7 +80,7 @@ export default class IntroModal extends React.Component {
               <h3>Urban Renewal, Family Displacements, and Race 1955-1966</h3>
             </div>
             <img src={ './static/aurora_vargas_being_removed.jpg' } className={ this.state.coverImgLoaded ? '' : 'loading' } />
-            <p>For a quarter century the federal government provided funding for cities large and small to clear "blighted" slums to clear land for public housing, highways, industry. and commerce. Through this program they displaced hundreds of thousands of families from their homes and neighborhoods. <cite>Renewing Inequality</cite> visualizes those displacements and urban renewal more generally.</p>
+            <p>For a quarter century the federal government provided funding for cities large and small to raze "blighted" slums to clear land for public housing, highways, industry. and commerce. Through this program they displaced hundreds of thousands of families from their homes and neighborhoods. <cite>Renewing Inequality</cite> visualizes those displacements and urban renewal more generally.</p>
             <div className='intro-modal-button' onClick={ () => this.setPage(1) }>Next</div>
           </div>
         </div>
@@ -100,7 +100,7 @@ export default class IntroModal extends React.Component {
                 <li>
                   <div className='ordinal'>1</div>
                   <div className='item'>
-                    <p className='no-margin'>Circles represent cities where families were displaced by urban renewal. Size indicates the number of families displaced, color the proportion that were of color or white.</p>
+                    <p className='no-margin'>Circles represent cities where families were displaced by urban renewal. Size indicates the number of families displaced. Color respresents the proportion that were white or of color.</p>
                     <object data='./static/intro-national.svg' type="image/svg+xml" />
                   </div>
                 </li>

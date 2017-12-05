@@ -30,7 +30,6 @@ export default class ProjectDisplacementGraph extends React.Component {
   }
 
   render() {
-    console.log(this.props);
     return (
       <g 
         onMouseEnter={ (this.props.the_geojson) ? this.props.onProjectInspected : null }
