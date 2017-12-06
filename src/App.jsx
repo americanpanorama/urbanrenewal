@@ -409,6 +409,7 @@ export default class App extends React.Component {
                 <h2><a href='./'>Family Displacements through Urban Renewal, 1950-1966</a></h2>
                 <h4 onClick={ this.toggleIntro } id={ 'intro' }>Introduction</h4>
                 <h4 onClick={ this.onModalClick } id={ 'sources' }>Sources & Method</h4>
+                <h4 onClick={ this.onModalClick } id={ 'defining' }>Legislative History</h4>
                 <h4 onClick={ this.onModalClick } id={ 'citing' }>Citing</h4>
                 <h4 onClick={ this.onModalClick } id={ 'about' }>About</h4>
                 <h4 onClick={ this.onContactUsToggle }>Contact Us</h4>

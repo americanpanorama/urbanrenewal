@@ -53,6 +53,73 @@ const TextsStore = {
       <div><a rel='license' href='http://creativecommons.org/licenses/by-nc-sa/4.0/''><img alt='Creative Commons License' src='https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png' class='cc' /></a><br />This work and its data are licensed under a <a rel='license' href='http://creativecommons.org/licenses/by-nc-sa/4.0/'>Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</div>
     `,
     defining: `
+      <h2>Overview of the Legislative<br />History of Urban Renewal</h2>
+      <h3>Housing Act of 1949</h3>
+      <ul>
+        <li>Title I: established federal financing for slum clearance</li>
+        <li>Title II: expanded FHA mortgage insurance program</li>
+        <li>Title III: set aside federal funds to construct 800,000 units of public housing over a six year period (this title expanded upon the goals and funding created in the Housing Acts of 1937 and 1934). By 1954, only a quarter of the units had been constructed</li>
+      </ul>
+      <p>The Housing Act set aside $1 billion in federal aid to assist localities with clearing and redeveloping slum areas. The Housing portion of Title I was to be carried out largely by private developers, while Title III funds for public housing could be used with or without application for Title I.  The emphasis of the 1949 Act was still very much on housing. As the legislation read, the Act established the goal of “a decent home and suitable living environment for every American family.” While the Act did not mandate that public housing be associated with a renewal project, it stipulated that renewal sites must be “predominantly residential” either before or following redevelopment.</p>
+
+      <h3>Housing Act of 1954</h3>
+      <ul>
+        <li>Established the 701 Planning Grant Program that offered financial support for establishing planning agencies for cities with a population of less than 25,000. The 701 program</li>
+        <li>Deemphasized public housing goals, calling for just 35,000 new units and only for those who were to be displaced by slum-clearance programs</li>
+        <li>Authorized a new mortgage insurance program to subsidize rehabilitation of dwellings and the construction of new housing in urban renewal areas</li>
+      </ul>
+      <p>As amended, the Housing Act of 1954 deemphasized housing and inserted language and provisions designed to support urban redevelopment plans. In particular, the Act mandated that municipalities submit a “workable program” for redevelopment. This requirement for comprehensive planning prior to securing federal aid was the first of its kind.</p>
+ 
+      <h3>1955 Amendments to Housing Act</h3>
+      <p>Enabled state and local governments to finance construction of public facilities under Title I.</p>
+
+      <h3>1959 Amendments to Housing Act</h3>
+        <p>Universities were authorized to receive renewal funds without having to include plans for housing</p>
+
+      <h3>1961 Omnibus Housing Act</h3>
+      <ul>
+        <li>Authorized a further $2 billion for urban renewal funds</li>
+        <li>Authorized $75 million to expand the 701 planning grant program (and raised the threshold from cities of 25,000 or fewer to 50,000 or fewer)</li>
+        <li>Increased the federal share of renewal grants from 2/3 to 3/4 for projects in communities of 50,000 or fewer or in economically depressed cities of up to 150,000</li>
+        <li>Authorized hospitals to receive renewal funds</li>
+        <li>Enabled local renewal authorities to sell land and property at sub-market rates to cooperatives, non-profits, and public agencies who plan to build moderate-income rental units</li>
+      </ul>
+      <h3>1964</h3>
+      <ul>
+        <li>A new regulation stipulates that within three years all municipalities receiving urban renewal funds had to set a minimum housing code standard (or risk losing federal renewal funds) and demonstrate that the code was being enforced</li>
+        <li>Permitted renewal funds be used to enforce housing codes in renewal areas</li>
+        <li>Required that no demolition project be undertaken until the HHFA determined that the same goals could not be realized through rehabilitation</li>
+        <li>Authorized urban planning aid (701 program) for (1) an community experiencing employment loss thanks to the withdrawal of a federal facility; (2) any depressed area regardless of population that had qualified for assistance under the Area Redevelopment Administration (which was terminated that year); (3) Indian reservations; and (4) any county with populations over 50,000</li>
+      </ul>
+      <h3>1965</h3>
+      <p>>The Housing Act of 1965 was a landmark in terms of delivering rent supplements for low-income families.</p>
+      <p>In terms of redevelopment, the Act extended urban renewal for four years, through October 1, 1969, and provided a further $2.9 billion for grants. It also:</p>
+      <ul>
+        <li>Expanded urban renewal code enforcement programs</li>
+        <li>Provided grants to low-income homeowners in renewal areas to rehabilitate their homes</li>
+        <li>Established uniform land-acquisition procedure for property seized through eminent domain under the renewal program</li>
+        <li>Authorized grants for up to two-thirds of the cost of building neighborhood facilities such as health, recreation, and community centers</li>
+        <li>Authorized grants for urban beautification programs and increased renewal grants for providing parks and playgrounds</li>
+        <li>Created the “General Neighborhood Renewal Plans” intended to include non-renewal areas in the comprehensive planning for community development</li>
+        <li>Made ARA-designated depressed areas with populations above 150,000 eligible for urban renewal capital grants with a federal matching ratio of three-quarters</li>
+      </ul>
+
+      <h3>1966 Demonstration Cities and Metropolitan Development Act of 1966</h3>
+      <ul>
+        <li>Required that the residential development within urban renewal areas provide a “substantial” supply of standard housing of low and moderate cost and ensure “marked progress in serving the poor and disadvantaged people living in slum and blighted areas.”</li>
+        <li>Clarified the 1965 Act by underscoring the fact that the URA was to grant ¾ rather than 2/3 contribution to renewal projects in areas suffering from persistent unemployment</li>
+      </ul>
+      <p>The broader act was intended to encourage cities to better coordinate the many federal programs at work in their communities.</p>
+
+      <h3>1974 Housing and Community Development Act of 1974</h3>
+      <ul>
+        <li>The Act consolidated 10 categorical grant programs including Urban Renewal and a number of programs of Lyndon Johnson’s War on Poverty into a block grant.</li>
+        <li>The new Community Development Block Grant program authorized block grant funding for communities of 50,000 or more residents and based its allocation rates on population, the extent of housing overcrowding, and poverty</li>
+        <li>Cities could apply for funding by identifying community development needs, offering a program to meet those needs, offer a housing assistance plan, indicate compliance with various civil rights acts, and certify that citizens had an opportunity to weigh in on the application process</li>
+        <li>Funds could then be used to acquire land, clear slums,  construct public facilities as well parks and recreation centers, improve infrastructure, historic preservation, or deliver funds to local health, social welfare, education or other community services to meet urgent needs</li>
+        <li>In 1975, the CDBG program was authorized with $2.95 billion</li>
+      </ul>
+ 
 
     `
   },
