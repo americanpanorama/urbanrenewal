@@ -543,6 +543,12 @@ export default class App extends React.Component {
                         >
                           { (this.state.legendVisible) ? '⇲ hide legend' : '⇱ show legend' }
                         </div>
+
+                        { (CitiesStore.getCityLoading()) ?
+                          <div className='cityLoading'>
+                            <img src='static/loading3.svg' style={{ marginTop: DimensionsStore.getLoaderOffset() }} />
+                          </div> : ''
+                        }
                       </div> : ''
                   }
 

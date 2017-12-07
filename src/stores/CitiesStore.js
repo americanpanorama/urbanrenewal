@@ -28,6 +28,7 @@ const CitiesStore = {
     poc: [0, 1],
     visibleCitiesIds: [],
     highlightedCities: [],
+    cityLoading: false,
 
     // the city data propers
     cities: {},
@@ -629,6 +630,11 @@ const CitiesStore = {
 
   // SETTERS
 
+  setCityLoading: function(bool) { 
+    this.data.cityLoading = bool;
+    this.emit(AppActionTypes.storeChanged);
+  },
+
   setHighlightedCities: function(ids) {
     this.data.inspectedCity = null;
     this.data.highlightedCities = ids;
@@ -886,6 +892,8 @@ const CitiesStore = {
   getCityId: function(project_id) { return (project_id) ? parseInt(Object.keys(this.data.cities).filter(city_id => this.data.cities[city_id].projects.hasOwnProperty(project_id))[0]) : null; },
 
   getCityIdFromSlug: function(slug) { return (this.data.cities) ? Object.keys(this.data.cities).filter(cityId => (this.data.cities[cityId].slug == slug))[0] : null; },
+
+  getCityLoading: function() { return this.data.cityLoading; },
 
   getDorlingXY: function(city_id) { return (this.data.loaded && this.data.dorlingXYs[this.data.selectedYear][city_id]) ? this.data.dorlingXYs[this.data.selectedYear][city_id] : [0,0]; },
 
@@ -1296,12 +1304,14 @@ CitiesStore.dispatchToken = AppDispatcher.register((action) => {
     } else if (CitiesStore.cityLoaded(action.value)) {
       CitiesStore.setSelectedCity(action.value);
     } else {
+      CitiesStore.setCityLoading(true);
       CitiesStore.loadCityData(action.value);
       let waitingId = setInterval(() => {
         if (CitiesStore.cityLoaded(action.value)) {
           clearInterval(waitingId);
           CitiesStore.setSelectedCity(action.value);
         }
+        CitiesStore.setCityLoading(false);
       }, 100);
     }
     CitiesStore.setInspectedCity(null);

@@ -667,7 +667,7 @@ const DimensionsStore = {
 
   getProjectStatProportionWidth: function(prop) { return (this.getProjectStatsOverallDimensions().width - 220) * prop; },
             
-
+  getLoaderOffset: function() { return this.data.mainPaneHeight / 2 - 32; },
  
       // xOffsetForYearMiddle = (year) => xOffsetForYear(year) + yearMiddleOffset,
       // xOffsetForYearBar = (year) => xOffsetForYear(year) + barOffset;
