@@ -10,6 +10,8 @@ import HighwaysStore from './stores/HighwaysStore';
 import TextsStore from './stores/TextsStore';
 import HashManager from './stores/HashManager';
 
+import panoramaNavData from '../data/pannav.json';
+
 
 
 // components
@@ -38,6 +40,7 @@ import TimelineYearComponent from './components/TimelineYearComponent.jsx';
 
 import IntroModal from './components/IntroModalComponent.jsx';
 import ContactUs from './components/ContactUs.jsx';
+import PanNavComponent from './components/PanNavComponent.jsx';
 
 
 // utils
@@ -58,12 +61,13 @@ export default class App extends React.Component {
       contactUs: false,
       showIntroModal: window.localStorage.getItem('hasViewedIntroModal-renewal') !== 'true',
       showIntro: false,
+      showPanoramaMenu: false,
     };
 
     this.coords = {};
 
     // bind handlers
-    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle', 'onProjectInspected', 'onProjectOut', 'onSearching', 'onProjectMapHover', 'onProjectSelected', 'onProjectMapUnhover','onSearchBlur','onCloseSearch','toggleScatterplotExplanationVisibility','onDismissIntroModal','onModalClick','onContactUsToggle','onCityViewSelected','toggleIntro'];
+    const handlers = ['storeChanged','onCategoryClicked','onCityClicked','onDragUpdate','onYearClicked','onWindowResize','onZoomIn','handleMouseUp','handleMouseDown','handleMouseMove','zoomOut','resetView','toggleLegendVisibility','zoomToState', 'onViewSelected','onCityInspected','onCityOut','onCityMapMove', 'onHOLCToggle', 'onProjectInspected', 'onProjectOut', 'onSearching', 'onProjectMapHover', 'onProjectSelected', 'onProjectMapUnhover','onSearchBlur','onCloseSearch','toggleScatterplotExplanationVisibility','onDismissIntroModal','onModalClick','onContactUsToggle','onCityViewSelected','toggleIntro','introIntercept','onPanoramaMenuClick'];
     handlers.map(handler => { this[handler] = this[handler].bind(this); });
 
     console.time('update');
@@ -99,7 +103,9 @@ export default class App extends React.Component {
 
     // add event listener for intro
     if (this.state.showIntro) {
-      var iframe = document.getElementsByTagName('iframe')[0];
+      var iframe = document.getElementById('storymap');
+
+      console.log(iframe);
 
       iframe.addEventListener('load', () => { 
         var iDoc = iframe.contentWindow || iframe.contentDocument;  
@@ -107,40 +113,56 @@ export default class App extends React.Component {
           iDoc = iDoc.document;
 
           if (iDoc.addEventListener) {
-            iDoc.addEventListener('click', (e) => {
-              let target = e.target || e.srcElement;
-              // intercept clicks on links
-              if (target.tagName == 'A') {
-                // stop the link from executing
-                e.preventDefault();
-
-                // hide the intro
-                this.setState({ showIntro: false});
-
-                // parse the link hash to load the project or whatever
-                let hashVars ={};
-                target.hash
-                  .substr(1)
-                  .split('&')
-                  .forEach(d => hashVars[d.split('=')[0]] = d.split('=')[1]);
-                if (hashVars.project) {
-                  AppActions.projectSelected(parseInt(hashVars.project)); 
-                }
-              }
-            });
+            iDoc.addEventListener('click', this.introIntercept, true);
           }
         }
       });
     }
-  };
+  }
 
   // ============================================================ //
   // Handlers
   // ============================================================ //
 
+  introIntercept(e) {
+    let target = e.target || e.srcElement;
+    // intercept clicks on links
+    if (target.tagName == 'A') {
+      // stop the link from executing
+      e.stopPropagation();
+      e.preventDefault();
+
+      // hide the intro
+      this.setState({ showIntro: false});
+      //iframe.removeEventListener('load', this.introIntercept);
+
+      // parse the link hash to load the project or whatever
+      let hashVars ={};
+      target.hash
+        .substr(1)
+        .split('&')
+        .forEach(d => hashVars[d.split('=')[0]] = d.split('=')[1]);
+      console.log(hashVars, hashVars.year);
+      if (hashVars.project) {
+        AppActions.projectSelected(parseInt(hashVars.project)); 
+      } else if (hashVars.city) {
+        AppActions.citySelected(CitiesStore.getCityIdFromSlug(hashVars.city));
+        if (hashVars.cityview) {
+          AppActions.cityViewSelected(hashVars.cityview);
+        }
+      } else if (hashVars.year) {
+        console.log(hashVars);
+        //AppActions.citySelected(null);
+        //AppActions.projectSelected(null);
+        AppActions.dateSelected(hashVars.year);
+      }
+
+    }
+  }
+
   hashChanged (event, suppressRender) { }
 
-  storeChanged () { this.setState({});}
+  storeChanged () { this.setState({}); }
 
   onDragUpdate(value, leftOrRight) { AppActions.POCSelected(value, leftOrRight); }
 
@@ -252,6 +274,8 @@ export default class App extends React.Component {
       AppActions.cityViewSelected(event.target.id); 
     }
   }
+
+  onPanoramaMenuClick() { this.setState({ showPanoramaMenu: !this.state.showPanoramaMenu }); }
 
   onViewSelected(event) { 
     if (event.target.id !== CitiesStore.getSelectedView()) {
@@ -398,6 +422,11 @@ export default class App extends React.Component {
     // console.log(tempStats);
     // console.log(cityCount);
     // console.log(projects.sort((a,b) => b.totalFamilies - a.totalFamilies ));
+
+    // let citiesToHighlight = Object.keys(CitiesStore.getCities()).filter(id => CitiesStore.getCityData(id).percentFamiliesOfColor == 1).map(id => parseInt(id));
+    // let citiesToHighlight = Object.keys(CitiesStore.getCities()).filter(id => CitiesStore.getCityData(id).pop_1960 <= 50000).map(id => parseInt(id));
+    // setTimeout(() => { AppActions.citiesHighlighted(citiesToHighlight); }, 3000);
+    // console.log(citiesToHighlight);
 
     return (
         <div className='container full-height'>
@@ -670,11 +699,29 @@ export default class App extends React.Component {
 
         </div>
 
+        <PanNavComponent
+          show_menu={ this.state.showPanoramaMenu } 
+          on_hamburger_click={ this.onPanoramaMenuClick } 
+          nav_data={ panoramaNavData.filter((item, i) => item.url.indexOf('renewing-inequality') === -1) } 
+          links={ [
+            { name: 'Digital Scholarship Lab', url: '//dsl.richmond.edu' },
+            { name: 'University of Richmond', url: '//www.richmond.edu' }
+          ] }
+          link_separator=', '
+        />
+
         { (this.state.showIntro) ?
           <div
             className='storymap'
           >
-            <iframe width="100%" height="100%" src="//dsl.richmond.edu/panorama/renewal/intro/index.html?appid=8627fd65192a4734a7173f421e240e8c&ui=min&embed" frameBorder="0" scrolling="yes"></iframe>
+            <iframe 
+              width="100%" 
+              height="100%" 
+              src="//dsl.richmond.edu/panorama/renewal/intro/index.html?appid=8627fd65192a4734a7173f421e240e8c&ui=min&embed" 
+              frameBorder="0" 
+              scrolling="yes"
+              id='storymap'>
+            </iframe>
 
             <div className='closeIntro' onClick={ this.toggleIntro }>
               x

@@ -240,6 +240,7 @@ export default class ChartField extends React.Component {
           width={  DimensionsStore.getNationalMapWidth() }
           height={ this.state.maskHeight }
           fill="url(#maskgradient)"
+          //fill='transparent'
           ref='scatterplotMask'
         />
       </g>

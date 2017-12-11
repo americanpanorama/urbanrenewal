@@ -1,0 +1,85 @@
+// 
+// nav header
+//
+
+
+.ReactModal__Overlay {
+  z-index: 1000010;
+}
+
+#hamburger, #navburger {
+  left: 20px;
+  top: 7px;
+}
+
+#hamburger {
+  z-index: 79999; 
+}
+
+#navburger {
+  position: absolute;
+}
+
+#nav_header {
+
+  @import url(https://fonts.googleapis.com/css?family=Abel|Oswald);
+
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  background-color: white;
+  overflow: visible;
+  /* bottom padding matches offset of #maps set with top below */
+  padding-bottom: 75px;
+
+  a {
+    text-decoration: none;
+    color: #888;
+    font-weight: normal;
+    text-transform: none;
+  }
+
+  h1 {
+    position: absolute;
+    left: 80px;
+    top: 10px;
+    margin: 0;
+    font-family: 'Oswald';
+    color: #28668a;
+    font-size: 30px;
+    
+
+    a {
+      color: #28668a;
+    }
+  }
+
+  h2 {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    font-family: 'Oswald';
+    width: auto;
+    border: none;
+    font-size: 20px;
+    margin: 0;
+  }
+
+  #maps {
+    position: relative;
+    top: 75px;
+  }
+
+  .pan_nav_item {
+    float: left;
+    margin-right: 20px;
+    margin-left: 20px;
+
+    h4 {
+      text-align: center;
+      font-family: 'Abel', sans-serif;
+      font-size: 18px;
+    }
+  }
+}

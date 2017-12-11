@@ -113,6 +113,14 @@ const DimensionsStore = {
     };
   },
 
+  getHamburgerStyle() {
+    return {
+      position: 'fixed',
+      top: 20,
+      left: 30
+    };
+  },
+
   getNationalMapStyle: function() {
     return {
       width: this.data.mainPaneWidth,
