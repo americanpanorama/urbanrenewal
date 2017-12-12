@@ -438,7 +438,10 @@ const CitiesStore = {
           
           response.citation = ((title !== '') ? "\"" + title + ",\" " : '') + "Final Grant Reports 1951-1981, General Records of the Department of Housing and Urban Development 1931-2003, Record Group 207, Box " + response.box + ", Report " + response.report + ", National Archives, College Park, MD.";
           response.link = response.internal_link;
-        } 
+        }  else if (response.box && response.box == '0') {
+          response.citation = "Final Grant Reports 1951-1981, General Records of the Department of Housing and Urban Development 1931-2003, Record Group 207, National Archives, College Park, MD.";
+          response.link = response.internal_link;
+        }
 
         if (response.citation && !this.data.cities[city_id].projects[response.project_id].citations[response.citation_id]) {
           this.data.cities[city_id].projects[response.project_id].citations[response.citation_id] = {

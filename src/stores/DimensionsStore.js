@@ -40,7 +40,7 @@ const DimensionsStore = {
     this.data.mainPaneWidth = (document.getElementsByClassName('main-pane').length > 0) ? document.getElementsByClassName('main-pane')[0].offsetWidth : (this.data.windowWidth) * (2/3 - 0.015*8/12) - this.data.containerPadding ; // this is complicated--I deduced it from the calcuations in _skeleton.scss
     this.data.mainPaneHeight = this.data.windowHeight - this.data.headerHeight - 2*this.data.containerPadding;
 
-    this.data.sidebarHeight = (this.data.windowHeight - this.data.headerHeight - 2 * this.data.containerPadding) * 2/3 ;
+    this.data.sidebarHeight = (this.data.windowHeight - this.data.headerHeight - this.data.containerPadding) * 2/3 ;
     this.data.sidebarTitleHeight = (document.getElementsByClassName('sidebarTitle').length > 0) ? document.getElementsByClassName('sidebarTitle')[0].offsetHeight: 30;
     this.data.nationalMapHeight = this.data.mainPaneHeight - this.data.containerPadding * 2;
     this.data.nationalMapWidth = this.data.mainPaneWidth - this.data.containerPadding * 2;
@@ -137,7 +137,7 @@ const DimensionsStore = {
 
   getLegendWidth: function() { return this.data.legendWidth; },
 
-  getLegendFontSize: function() { return Math.max(this.data.dorlingsMaxRadius / 3, 14); },
+  getLegendFontSize: function() { return Math.max(Math.min(this.data.dorlingsMaxRadius / 3, 10), 12); },
 
   getLegendDimensions: function() { 
     return {
@@ -321,9 +321,10 @@ const DimensionsStore = {
 
   getSearchResultsStyle: function() {
     return {
-      width: this.getSidebarStyle().width + this.data.containerPadding,
-      height: this.getSidebarStyle().height + this.data.containerPadding,
-      marginTop: this.data.headerHeight * (2/3) - 20 
+      width: this.getSidebarStyle().width,
+      height: this.getSidebarStyle().height - this.data.containerPadding,
+      marginTop: this.data.headerHeight * (2/3) - 18,
+      marginLeft: this.data.containerPadding
     };
   },
 
@@ -443,7 +444,7 @@ const DimensionsStore = {
   getMainTimelineBarBottom: function() { return this.getTimelineAttrs().height - Math.max(this.getMainTimelineBarWidth(), this.getMainTimelineFontSize()) * 1.2; },
 
   // 90% of the width
-  getMainTimelineBarFieldWidth: function() { return this.getTimelineAttrs().width * 0.9; },
+  getMainTimelineBarFieldWidth: function() { return this.getTimelineAttrs().width * 0.85; },
 
   getMainTimelineBarHeight: function(year, race) { return this.getMainTimelineMaxBarHeight() * CitiesStore.getYearTotals(year)[race]/ CitiesStore.getYearsTotalsMaxRace() || 1; },
 

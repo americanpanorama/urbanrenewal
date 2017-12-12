@@ -692,12 +692,14 @@ export default class App extends React.Component {
             >X</div> : ''
           }
 
-          { this.state.showIntroModal ? <IntroModal onDismiss={ this.onDismissIntroModal } /> : '' }
+          
 
 
 
 
         </div>
+
+        { this.state.showIntroModal ? <IntroModal onDismiss={ this.onDismissIntroModal } /> : '' }
 
         <PanNavComponent
           show_menu={ this.state.showPanoramaMenu } 

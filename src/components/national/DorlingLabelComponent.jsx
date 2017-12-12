@@ -58,7 +58,7 @@ export default class DorlingLabel extends React.Component {
           y={ -1 }
           fontSize={ labelSize / this.props.z }
           key={'cityLabel' + this.props.city_id}
-          className={ (this.props.color == 'transparent') ? 'hidden' : ''}
+          className={ (this.props.color == 'transparent' || this.props.percentFamiliesOfColor < this.props.pocSpan[0] || this.props.percentFamiliesOfColor > this.props.pocSpan[1]) ? 'hidden' : ''}
         >
           {this.props.name.replace(/\w\S*/g, txt =>  txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())}
         </text> 
@@ -68,7 +68,7 @@ export default class DorlingLabel extends React.Component {
           y={ 1 + labelSize / this.props.z * 0.8  }
           fontSize={ labelSize / this.props.z * 0.8 }
           key={'cityNumsLabel' + this.props.city_id}
-          className={ (this.props.color == 'transparent') ? 'hidden' : 'displacements'}
+          className={ (this.props.color == 'transparent' || this.props.percentFamiliesOfColor < this.props.pocSpan[0] || this.props.percentFamiliesOfColor > this.props.pocSpan[1]) ? 'hidden' : 'displacements'}
         >
           { (this.props.roughNumber) ? '~' + formatNumber(roughNumber(this.props.value)) : formatNumber(this.props.value) }
         </text> 
