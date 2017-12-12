@@ -103,12 +103,8 @@ export default class App extends React.Component {
 
     // add event listener for intro
     if (this.state.showIntro) {
-      var iframe = document.getElementById('storymap');
-
-      console.log(iframe);
-
-      iframe.addEventListener('load', () => { 
-        var iDoc = iframe.contentWindow || iframe.contentDocument;  
+      this.refs.storymap.addEventListener('load', () => { 
+        var iDoc = this.refs.storymap.contentWindow || this.refs.storymap.contentDocument;  
         if (iDoc.document) {
           iDoc = iDoc.document;
 
@@ -132,31 +128,34 @@ export default class App extends React.Component {
       e.stopPropagation();
       e.preventDefault();
 
-      // hide the intro
-      this.setState({ showIntro: false});
-      //iframe.removeEventListener('load', this.introIntercept);
-
       // parse the link hash to load the project or whatever
       let hashVars ={};
       target.hash
         .substr(1)
         .split('&')
         .forEach(d => hashVars[d.split('=')[0]] = d.split('=')[1]);
-      console.log(hashVars, hashVars.year);
-      if (hashVars.project) {
-        AppActions.projectSelected(parseInt(hashVars.project)); 
-      } else if (hashVars.city) {
-        AppActions.citySelected(CitiesStore.getCityIdFromSlug(hashVars.city));
-        if (hashVars.cityview) {
-          AppActions.cityViewSelected(hashVars.cityview);
-        }
-      } else if (hashVars.year) {
-        console.log(hashVars);
-        //AppActions.citySelected(null);
-        //AppActions.projectSelected(null);
-        AppActions.dateSelected(hashVars.year);
-      }
 
+      // hide the intro
+      this.setState({ showIntro: false }, () => {
+        if (hashVars.project) {
+          AppActions.projectSelected(parseInt(hashVars.project)); 
+        } else if (hashVars.city) {
+          AppActions.citySelected(CitiesStore.getCityIdFromSlug(hashVars.city));
+          if (hashVars.cityview) {
+            AppActions.cityViewSelected(hashVars.cityview);
+          }
+        } else if (hashVars.year) {
+          // after much trial and error, it appears the storymap needs to be gone and out of the dom before you can make the updates.
+          // uncomfortably hacky, but it seems to work
+          var waitingId1 = setInterval(() => {
+            if (!this.refs.storymap) {
+              clearInterval(waitingId1);
+              this.resetView();
+              AppActions.dateSelected(hashVars.year);
+            }
+          }, 50);
+        }
+      });
     }
   }
 
@@ -525,6 +524,7 @@ export default class App extends React.Component {
                           handleMouseDown={ this.handleMouseDown }
                           handleMouseMove={ this.handleMouseMove }
                           handleMouseUp={ this.handleMouseUp }
+                          ref='nationalmap'
                         />
 
                         { (CitiesStore.getSelectedView() == 'scatterplot') ?
@@ -720,8 +720,8 @@ export default class App extends React.Component {
               src="//dsl.richmond.edu/panorama/renewal/intro/index.html?appid=8627fd65192a4734a7173f421e240e8c&ui=min&embed" 
               frameBorder="0" 
               scrolling="yes"
-              id='storymap'>
-            </iframe>
+              id='storymap'
+              ref='storymap' />
 
             <div className='closeIntro' onClick={ this.toggleIntro }>
               x

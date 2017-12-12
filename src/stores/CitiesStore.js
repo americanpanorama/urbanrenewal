@@ -683,7 +683,7 @@ const CitiesStore = {
   setSelectedCity: function(city_id) {
     this.data.selectedCity = parseInt(city_id);
     // you know it's visible, so set the data for initial rendering
-    if (!this.data.visibleCitiesIds.includes(parseInt(city_id))) {
+    if (city_id && !this.data.visibleCitiesIds.includes(parseInt(city_id))) {
       this.data.visibleCitiesIds = [parseInt(city_id)];
     }
     this.emit(AppActionTypes.storeChanged);

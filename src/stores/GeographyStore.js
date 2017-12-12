@@ -332,7 +332,7 @@ GeographyStore.dispatchToken = AppDispatcher.register((action) => {
     
   case AppActionTypes.citySelected:
     if (action.value == null) {
-      GeographyStore.setView(null,null,null);
+      //GeographyStore.setView(null,null,null);
     } else {
       // you have to wait for the map to set the bounds
       const waitingId = setInterval(() => {
