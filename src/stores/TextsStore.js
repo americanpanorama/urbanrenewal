@@ -38,6 +38,29 @@ const TextsStore = {
       <p>The maps and visualizations in <cite>Renewing Inequality</cite> convey the impact of urban renewal projects on certainly more than a million Americans displaced from their homes and often separated from their communities. Still, it cannot be emphasized enough that what's represented here shows only a fraction of the displacements. First, data on race and displacements is only available from 1955 to 1966. Federal funding for urban renewal continued for eight more years. Second, the figures reported to the federal government were often estimates of displacements, and other reports about urban renewal projects often show considerably higher numbers. Third, the numbers reported in the characteristics reports were only displacements of families; those reports do not contain statistics about single adult individuals displaced through urban renewal.</p>
       <p>A number reported in the quarterly characteristics reports reflected the total estimated family displacements by individual project, an estimate that often did go up and down from quarter to quarter as the scope of projects changed and the estimates were refined. As such, we use the last available number for the maps. As we don't have evidence about exactly when these displacements happened, the year-by-year statistics represented in the bubbles on the maps and in the charts were calculated by distributing the total displacements over the first third of the active years of each project. If, say, a project displaced 500 families and was executed between 1961 and 1966, we estimate 250 displacement for 1961 and 250 for 1962. While imperfect, we reason that most projects were divided into three phases: acquisition of properties and relocation of people, clearance of buildings, and reuse of the cleared land.</p>
       <p>Sources for project boundaries come from many and varied sources. Citations and, when available, links to images can be found by selecting individual projects. It should be emphasized that the boundaries for many projects evolved. For some projects what's represented here is not a definitive representation of the project boundaries but a moment in the project's planning or execution for which we were able to locate a map. To date we have been able to locate maps for a significant fraction, but still only a fraction, of projects. We will be adding new project boundaries as we locate additional maps.</p>
+      <h2>Further Reading</h2>
+      <h3>Books and Articles</h3>
+      <ul>
+        <li>Francesca Russello Ammon, <cite>Bulldozer: Demolition and Clearance of the Postwar Landscape</cite> (New Haven: Yale University Press, 2016).</li>
+        <li>Douglas R. Appler, "Changing the Scale of Analysis for Urban Renewal Research," <cite>Journal of Planning History</cite> 16 (August 2017): 200-221.</li>
+        <li>Arnold R. Hirsch, <cite>Making the Second Ghetto: Race and Housing in Chicago, 1940-1960</cite> (New York: Cambridge University Press, 1983).</li>
+        <li>Thomas J. Sugrue, <cite>The Origins of the Urban Crisis: Race and Inequality in Postwar Detroit (Princeton: Princeton Univeristy Press, 1996).</li>
+        <li>Jon C. Teaford, <cite>The Rough Road to Renaissance: Urban Revitalization in America, 1940-1985</cite> (Baltimore: The Johns Hopkins University Press, 1990).</li>
+        <li>Samuel Zipp, <cite>Manhattan Projects: The Rise and Fall of Urban Renewal in Cold War New York</cite> (New York: Oxford University Press, 2012).</li>
+      </ul>
+      <h3>Digital Projects</h3>
+      <ul>
+        <li><a href='//98acresinalbany.wordpress.com/' target='_blank'>Ann Pfau, David Hochfelder, Stacy Sewell, Christopher Rees, Mike Wren, and Andrew Lang, "98 Acres in Albany."</a></li>
+        <li><a href='//www.urbanreviewer.org/' target='_blank'>Eric Brelsford et al., "Urban Reviewer."</a></li>
+      </ul>
+      <h3>Primary Sources</h3>
+      <ul>
+        <li><a href='http://hdl.handle.net/2027/uc1.a0011971173' target='_blank'>James W. Follin, <cite>Slums and Blight--A Disease of Urban Life</cite> ([Washington, D.C.] : Urban Renewal Administration, Housing and Home Finance Agency: [1956])</a></li>
+        <li><a href='http://hdl.handle.net/2027/uiug.30112052505010' target='_blank'><cite>Report on Urban Renewal; Statement of William L. Slayton, Commissioner, Urban Renewal Administration, Housing and Home Finance Agency, before the Subcommittee on Housing, Committee on Banking and Currency, United States House of Representatives, November 21, 1963.</cite> ([Washington, D.C. 1964]).</a></li>
+        <li><a href='http://hdl.handle.net/2027/osu.32435064058597' target='_blank'><cite>Urban renewal notes</cite> (Washington, D.C.: Housing and Home Finance Agency, Urban Renewal Administration, [1960-1966].</a></li>
+        <li><a href='http://hdl.handle.net/2027/uc1.d0005855184' target='_blank'><cite>Urban Renewal Service, Family surveys in conservation areas</cite> (Washington, D.C. : Urban Renewal Administration, 1960).</a></li>
+
+      </ul>
     `,
     citing: `
       <h2>Linking to and Citing</h2>
@@ -57,7 +80,7 @@ const TextsStore = {
       <h3>Housing Act of 1949</h3>
       <ul>
         <li>Title I: established federal financing for slum clearance</li>
-        <li>Title II: expanded FHA mortgage insurance program</li>
+        <li>Title II: expanded Federal Housing Administration (FHA) mortgage insurance program</li>
         <li>Title III: set aside federal funds to construct 800,000 units of public housing over a six year period (this title expanded upon the goals and funding created in the Housing Acts of 1937 and 1934). By 1954, only a quarter of the units had been constructed</li>
       </ul>
       <p>The Housing Act set aside $1 billion in federal aid to assist localities with clearing and redeveloping slum areas. The Housing portion of Title I was to be carried out largely by private developers, while Title III funds for public housing could be used with or without application for Title I.  The emphasis of the 1949 Act was still very much on housing. As the legislation read, the Act established the goal of “a decent home and suitable living environment for every American family.” While the Act did not mandate that public housing be associated with a renewal project, it stipulated that renewal sites must be “predominantly residential” either before or following redevelopment.</p>
@@ -83,16 +106,17 @@ const TextsStore = {
         <li>Increased the federal share of renewal grants from 2/3 to 3/4 for projects in communities of 50,000 or fewer or in economically depressed cities of up to 150,000</li>
         <li>Authorized hospitals to receive renewal funds</li>
         <li>Enabled local renewal authorities to sell land and property at sub-market rates to cooperatives, non-profits, and public agencies who plan to build moderate-income rental units</li>
+        <li>Included a title that authorized the FHA to insure mortgages for condos, which jumpstarted a boom in condominium construction</li>
       </ul>
       <h3>1964</h3>
       <ul>
         <li>A new regulation stipulates that within three years all municipalities receiving urban renewal funds had to set a minimum housing code standard (or risk losing federal renewal funds) and demonstrate that the code was being enforced</li>
         <li>Permitted renewal funds be used to enforce housing codes in renewal areas</li>
-        <li>Required that no demolition project be undertaken until the HHFA determined that the same goals could not be realized through rehabilitation</li>
+        <li>Required that no demolition project be undertaken until the Housing and Home Finance Agency determined that the same goals could not be realized through rehabilitation</li>
         <li>Authorized urban planning aid (701 program) for (1) an community experiencing employment loss thanks to the withdrawal of a federal facility; (2) any depressed area regardless of population that had qualified for assistance under the Area Redevelopment Administration (which was terminated that year); (3) Indian reservations; and (4) any county with populations over 50,000</li>
       </ul>
       <h3>1965</h3>
-      <p>>The Housing Act of 1965 was a landmark in terms of delivering rent supplements for low-income families.</p>
+      <p>The Housing Act of 1965 was a landmark in terms of delivering rent supplements for low-income families.</p>
       <p>In terms of redevelopment, the Act extended urban renewal for four years, through October 1, 1969, and provided a further $2.9 billion for grants. It also:</p>
       <ul>
         <li>Expanded urban renewal code enforcement programs</li>
@@ -104,7 +128,7 @@ const TextsStore = {
         <li>Made ARA-designated depressed areas with populations above 150,000 eligible for urban renewal capital grants with a federal matching ratio of three-quarters</li>
       </ul>
 
-      <h3>1966 Demonstration Cities and Metropolitan Development Act of 1966</h3>
+      <h3>Demonstration Cities and Metropolitan Development Act of 1966</h3>
       <ul>
         <li>Required that the residential development within urban renewal areas provide a “substantial” supply of standard housing of low and moderate cost and ensure “marked progress in serving the poor and disadvantaged people living in slum and blighted areas.”</li>
         <li>Clarified the 1965 Act by underscoring the fact that the URA was to grant ¾ rather than 2/3 contribution to renewal projects in areas suffering from persistent unemployment</li>
@@ -113,11 +137,11 @@ const TextsStore = {
 
       <h3>1974 Housing and Community Development Act of 1974</h3>
       <ul>
-        <li>The Act consolidated 10 categorical grant programs including Urban Renewal and a number of programs of Lyndon Johnson’s War on Poverty into a block grant.</li>
-        <li>The new Community Development Block Grant program authorized block grant funding for communities of 50,000 or more residents and based its allocation rates on population, the extent of housing overcrowding, and poverty</li>
-        <li>Cities could apply for funding by identifying community development needs, offering a program to meet those needs, offer a housing assistance plan, indicate compliance with various civil rights acts, and certify that citizens had an opportunity to weigh in on the application process</li>
-        <li>Funds could then be used to acquire land, clear slums,  construct public facilities as well parks and recreation centers, improve infrastructure, historic preservation, or deliver funds to local health, social welfare, education or other community services to meet urgent needs</li>
-        <li>In 1975, the CDBG program was authorized with $2.95 billion</li>
+        <li>The Act consolidated 10 categorical grant programs into a new program, Community Development Block Grants. The programs with funding that were bundled together and terminated included Urban Renewal and a number of programs of Lyndon Johnson’s War on Poverty, including Community Action.</li>
+        <li>The new Community Development Block Grant program authorized block grant funding for communities of 50,000 or more residents and based its allocation rates on population, the extent of housing overcrowding, and poverty.</li>
+        <li>Cities could apply for funding by identifying community development needs, offering a program to meet those needs, offer a housing assistance plan, indicate compliance with various civil rights acts, and certify that citizens had an opportunity to weigh in on the application process.</li>
+        <li>Funds could then be used to acquire land, clear slums,  construct public facilities as well parks and recreation centers, improve infrastructure, historic preservation, or deliver funds to local health, social welfare, education or other community services to meet urgent needs.</li>
+        <li>In 1975, the CDBG program was authorized with $2.95 billion.</li>
       </ul>
  
 

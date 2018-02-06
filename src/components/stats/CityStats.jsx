@@ -47,7 +47,7 @@ export default class CityStats extends React.Component {
 
         { (someWithNoDisplacements) ? 
           <div>
-            <p className='footprintExplanation'>The following projects either did not involve displacements or happened after 1966 when the federal government stopped collecting displacement data.</p>
+            <p className='footprintExplanation'>The following projects either did not involve  or report displacements or happened after 1966 when the federal government stopped collecting displacement data.</p>
             <NoDisplacements {...this.props} />
           </div> : ''
         }

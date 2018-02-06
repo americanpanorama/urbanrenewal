@@ -232,7 +232,7 @@ export default class App extends React.Component {
     });
   }
 
-  onProjectInspected(event) { console.log(event.target.id); AppActions.projectInspected(event.target.id); }
+  onProjectInspected(event) { AppActions.projectInspected(event.target.id); }
 
   onProjectMapHover(event) { AppActions.projectInspectedStats(parseInt(event.target.options.id)); }
 
@@ -427,6 +427,8 @@ export default class App extends React.Component {
     // setTimeout(() => { AppActions.citiesHighlighted(citiesToHighlight); }, 3000);
     // console.log(citiesToHighlight);
 
+    //console.log(Object.keys(Object.keys(CitiesStore.getCities()).filter(id => CitiesStore.getCityData(id).state == 'pr').reduce((acc, id) => { console.log(acc, CitiesStore.getCityData(id).totalFamilies); return acc + CitiesStore.getCityData(id).totalFamilies; }, 0)));
+
     return (
         <div className='container full-height'>
 
@@ -435,7 +437,7 @@ export default class App extends React.Component {
               <header style={ DimensionsStore.getHeaderStyle() }>
                 <h1><a href='./'>Renewing <span className='dark'>Inequality</span></a></h1>
                 <h2><a href='./'>Family Displacements through Urban Renewal, 1950-1966</a></h2>
-                <h4 onClick={ this.toggleIntro } id={ 'intro' }>Introduction</h4>
+                <h4 onClick={ this.toggleIntro } id={ 'intro' }>The People & the Program</h4>
                 <h4 onClick={ this.onModalClick } id={ 'sources' }>Sources & Method</h4>
                 <h4 onClick={ this.onModalClick } id={ 'defining' }>Legislative History</h4>
                 <h4 onClick={ this.onModalClick } id={ 'citing' }>Citing</h4>
@@ -648,6 +650,7 @@ export default class App extends React.Component {
               selectedYear={ CitiesStore.getSelectedYear() }
               onCityClicked={ this.onCityClicked }
               onProjectClick={ this.onProjectSelected }
+              toggleIntro={ this.toggleIntro }
             /> : ''
           }
         </aside>
