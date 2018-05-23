@@ -187,13 +187,14 @@ export default class App extends React.Component {
   }
 
   onCityMapMove(event) { 
+    AppActions.cityMapMoved();
     // wait until move has stopped before executing
-    let waitingId = setInterval(() => {
-      if (!this.refs.cityMap.isMoving()) {
-        clearInterval(waitingId);
-        AppActions.cityMapMoved();
-      }
-    }, 100);
+    // let waitingId = setInterval(() => {
+    //   if (!this.refs.cityMap.isMoving()) {
+    //     clearInterval(waitingId);
+    //     AppActions.cityMapMoved();
+    //   }
+    // }, 100);
   }
 
   onCityOut() { AppActions.cityInspected(null); }

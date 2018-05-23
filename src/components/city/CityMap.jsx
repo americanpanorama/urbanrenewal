@@ -133,8 +133,13 @@ export default class CityMap extends React.Component {
   onMove() { this.setState({ moving: true }); }
 
   onMoveEnd() {
-    this.setState({ moving: false }); 
-    this.props.onMoveend(); 
+    // this is called repeatedly--I think on rerender, so only call if map if it's being dragged
+    if (this.state.moving) {
+      this.setState(
+        { moving: false },
+        () => this.props.onMoveend()
+      ); 
+    }
   }
 
   isMoving() { return this.state.moving; }
